@@ -3,12 +3,8 @@
 *{box-sizing:border-box}html{scroll-behavior:smooth}
 body{margin:0;font:17px/1.65 "Golos Text","PT Sans",system-ui,sans-serif;color:var(--ink);background:var(--paper);
 background-image:linear-gradient(var(--grid) 1px,transparent 1px),linear-gradient(90deg,var(--grid) 1px,transparent 1px);background-size:28px 28px}
-body::before{content:"";position:fixed;left:max(14px,calc(50% - 560px));top:0;bottom:0;width:2px;background:var(--red);opacity:.35;pointer-events:none}
 .wrap{max-width:1000px;margin:0 auto;padding:0 28px}
-header.nav{position:sticky;top:0;z-index:5;background:color-mix(in srgb,var(--paper) 90%,transparent);backdrop-filter:blur(6px);border-bottom:1px solid var(--line)}
-.nav .wrap{display:flex;justify-content:space-between;align-items:center;height:58px}
 .logo{font-family:"Marck Script",cursive;font-size:24px;color:var(--ink);text-decoration:none}
-.nav nav a{margin-left:20px;color:var(--mute);text-decoration:none;font-size:15px}.nav nav a:hover{color:var(--blue)}
 h1,h2,h3{font-family:"Marck Script","Golos Text",cursive;font-weight:400;line-height:1.2;margin:0 0 .5em}
 h1{font-size:clamp(40px,7vw,68px)}h2{font-size:38px;margin-top:0}h3{font-size:25px}
 .hero{padding:72px 0 56px}.hero p.lead{font-size:20px;max-width:620px;color:var(--mute)}
@@ -23,7 +19,7 @@ section{padding:44px 0}
 a.card:hover{transform:translateY(-3px) rotate(-.4deg)}.card.soon{opacity:.6;border-style:dashed;box-shadow:none}
 .tag{display:inline-block;font-size:13px;padding:2px 11px;border-radius:99px;background:var(--yellow);margin:0 6px 10px 0;color:var(--ink)}
 .card h3{font-size:24px}.card p{margin:.3em 0;color:var(--mute);font-size:15px}
-.two{display:grid;grid-template-columns:1fr 1fr;gap:28px}@media(max-width:700px){.two{grid-template-columns:1fr}.nav nav a{margin-left:12px}}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:28px}@media(max-width:700px){.two{grid-template-columns:1fr}}
 .note{background:var(--card);border-left:5px solid var(--green);padding:14px 20px;border-radius:0 12px 12px 0;margin:20px 0}
 .steps{counter-reset:s;list-style:none;padding:0}.steps li{counter-increment:s;position:relative;padding:14px 18px 14px 64px;background:var(--card);border:1px solid var(--line);border-radius:12px;margin-bottom:12px}
 .steps li::before{content:counter(s);position:absolute;left:16px;top:10px;width:36px;height:36px;border-radius:50%;background:var(--blue);color:#fff;font:22px "Marck Script",cursive;display:grid;place-items:center}
@@ -36,3 +32,32 @@ details{background:var(--card);border:1px dashed var(--mute);border-radius:12px;
 .crumb{padding-top:28px;font-size:15px}.crumb a{color:var(--blue)}
 svg text{font-family:"PT Sans",sans-serif;fill:var(--ink)}
 footer{border-top:1px solid var(--line);padding:30px 0;color:var(--mute);font-size:14px;background:var(--paper);margin-top:30px}
+
+/* ===== Боковое меню ===== */
+.layout{display:grid;grid-template-columns:270px minmax(0,1fr);min-height:100vh}
+.col{position:relative;min-width:0}
+.col::before{content:"";position:absolute;left:14px;top:0;bottom:0;width:2px;background:var(--red);opacity:.35;pointer-events:none}
+.side{position:sticky;top:0;align-self:start;height:100vh;overflow-y:auto;padding:28px 20px;border-right:1px solid var(--line);background:color-mix(in srgb,var(--paper) 92%,transparent);backdrop-filter:blur(6px);z-index:5}
+.side .logo{display:block;font-size:30px;line-height:1.15;margin-bottom:28px}
+.menu ul{list-style:none;margin:0;padding:0}
+.menu>ul>li{margin-bottom:14px}
+.menu a{display:block;color:var(--ink);text-decoration:none;padding:7px 12px;border-radius:8px}
+.menu>ul>li>a{font-weight:600;font-size:18px}
+.menu ul ul{margin:2px 0 0 14px;padding-left:10px;border-left:2px dashed var(--line)}
+.menu ul ul a{font-size:15px;color:var(--mute)}
+.menu a:hover{color:var(--blue);background:var(--card)}
+.menu a[aria-current="page"]{background:var(--yellow);color:var(--ink)}
+.menu a:focus-visible,.burger:focus-visible,#menu-toggle:focus-visible+.burger{outline:3px solid var(--blue);outline-offset:2px}
+#menu-toggle{position:absolute;opacity:0;pointer-events:none}
+.burger{display:none;padding:8px 16px;border:2px solid var(--blue);border-radius:10px;color:var(--blue);font-weight:600;cursor:pointer;background:var(--card)}
+@media(max-width:860px){
+  .layout{display:block}
+  .side{height:auto;display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;padding:10px 20px;border-right:0;border-bottom:1px solid var(--line)}
+  .side .logo{margin:0;font-size:26px}
+  .burger{display:block}
+  .menu{display:none;flex-basis:100%;max-height:70vh;overflow-y:auto;padding-top:12px}
+  #menu-toggle:checked~.menu{display:block}
+  section{scroll-margin-top:72px}
+}
+
+.about{max-width:760px}.about h3{margin-top:1.4em}.about p{margin:.6em 0}
