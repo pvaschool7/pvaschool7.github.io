@@ -7,3 +7,4 @@
 Новый материал: положить файл в data/, скопировать materials/uslovnaya-veroyatnost.html, добавить карточку на index.html и в нужный раздел (matematika.html / informatika.html).
 Страница «Обо мне»: obo-mne.html (ссылка с блока «Об учителе» на главной; в боковое меню не добавлена).
 Иконка сайта: icon-pva.svg (основная), favicon.ico и apple-touch-icon.png (запасные). Подключены тегами <link rel="icon"> в <head> каждой страницы.
+Иконка в левом верхнем углу: <img class="logo-ico"> внутри <a class="logo"> в блоке бокового меню каждой страницы.
