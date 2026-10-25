@@ -66,3 +66,15 @@ footer{border-top:1px solid var(--line);padding:30px 0;color:var(--mute);font-si
 @media(max-width:860px){.side .logo{font-size:24px;gap:10px}.logo-ico{width:36px;height:36px;border-radius:10px}}
 
 .side .logo span{white-space:nowrap}
+
+/* ===== Футер ===== */
+footer.foot{position:relative;background:var(--card);padding:36px 0 20px;margin-top:40px;font-size:15px;color:var(--mute)}
+.foot-grid{display:grid;grid-template-columns:1.4fr 1fr 1.3fr;gap:32px;padding-bottom:26px}
+.foot p{margin:.35em 0}
+.foot ul{list-style:none;margin:8px 0 0;padding:0}.foot li{margin:.35em 0}
+.foot a{color:var(--blue)}
+.foot-h{display:block;color:var(--ink);font-size:14px;letter-spacing:.08em;text-transform:uppercase;margin-bottom:6px}
+.foot-brand{display:flex;align-items:center;gap:12px;font:24px/1.15 "Marck Script",cursive;color:var(--ink)!important;text-decoration:none;margin-bottom:8px}
+.foot-brand span{white-space:nowrap}
+.foot-bottom{border-top:1px dashed var(--line);padding-top:16px;display:flex;flex-wrap:wrap;gap:8px 24px;justify-content:space-between;font-size:14px}
+@media(max-width:760px){.foot-grid{grid-template-columns:1fr;gap:22px}}
