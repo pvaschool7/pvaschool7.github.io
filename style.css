@@ -90,3 +90,24 @@ footer.foot{position:relative;background:var(--card);padding:36px 0 20px;margin-
   .about-grid .portrait{order:-1;max-width:300px}
   .about-row .portrait{max-width:220px}
 }
+
+/* ===== Разделы по классам (7–11): раскрывающиеся секции ===== */
+.grade-nav{display:flex;flex-wrap:wrap;gap:10px;padding-top:4px}
+.grade-nav a{display:inline-block;font-size:15px;font-weight:600;color:var(--blue);text-decoration:none;background:var(--card);border:2px solid var(--blue);border-radius:99px;padding:3px 16px;box-shadow:2px 3px 0 var(--line);transition:.15s}
+.grade-nav a:hover{transform:translate(1px,2px);box-shadow:0 1px 0 var(--line)}
+.grade{margin:18px 0 8px;padding:0;border:1px solid var(--line);border-radius:14px;background:var(--card);box-shadow:4px 5px 0 var(--line);scroll-margin-top:20px}
+.grade>summary{list-style:none;display:flex;align-items:center;gap:14px;padding:12px 22px;cursor:pointer}
+.grade>summary::-webkit-details-marker{display:none}
+.grade>summary h2{margin:0;font-size:32px;flex:1}
+.grade>summary:hover h2{color:var(--blue)}
+details[open]>summary .chev{transform:rotate(45deg)}
+.chev{flex:none;width:12px;height:12px;border-right:3px solid var(--blue);border-bottom:3px solid var(--blue);transform:rotate(-45deg);transition:transform .18s}
+.grade[open]>summary{border-bottom:1px dashed var(--line)}
+.grade-body{padding:4px 22px 18px}
+.subsec{margin:14px 0 0;padding:0;border:1.5px dashed var(--line);border-radius:12px;background:transparent}
+.subsec>summary{list-style:none;display:flex;align-items:center;gap:12px;padding:11px 16px;cursor:pointer;font-weight:600;font-size:18px}
+.subsec>summary::-webkit-details-marker{display:none}
+.subsec>summary:hover{color:var(--blue)}
+.subsec[open]>summary{border-bottom:1px dashed var(--line)}
+.subsec-body{padding:16px}
+@media(max-width:860px){.grade>summary{padding:10px 14px}.grade>summary h2{font-size:25px}.grade-body{padding:2px 14px 14px}.subsec>summary{font-size:16px;padding:10px 12px}.subsec-body{padding:12px}}
