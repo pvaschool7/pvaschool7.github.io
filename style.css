@@ -91,23 +91,32 @@ footer.foot{position:relative;background:var(--card);padding:36px 0 20px;margin-
   .about-row .portrait{max-width:220px}
 }
 
-/* ===== Разделы по классам (7–11): раскрывающиеся секции ===== */
-.grade-nav{display:flex;flex-wrap:wrap;gap:10px;padding-top:4px}
-.grade-nav a{display:inline-block;font-size:15px;font-weight:600;color:var(--blue);text-decoration:none;background:var(--card);border:2px solid var(--blue);border-radius:99px;padding:3px 16px;box-shadow:2px 3px 0 var(--line);transition:.15s}
-.grade-nav a:hover{transform:translate(1px,2px);box-shadow:0 1px 0 var(--line)}
-.grade{margin:18px 0 8px;padding:0;border:1px solid var(--line);border-radius:14px;background:var(--card);box-shadow:4px 5px 0 var(--line);scroll-margin-top:20px}
-.grade>summary{list-style:none;display:flex;align-items:center;gap:14px;padding:12px 22px;cursor:pointer}
-.grade>summary::-webkit-details-marker{display:none}
-.grade>summary h2{margin:0;font-size:32px;flex:1}
-.grade>summary:hover h2{color:var(--blue)}
-details[open]>summary .chev{transform:rotate(45deg)}
+/* ===== Меню классов (7–11): верхняя панель с табами ===== */
+.grade-bar{position:sticky;top:0;z-index:40;margin:16px 0 22px;padding:9px;border:1px solid var(--line);border-radius:16px;background:color-mix(in srgb,var(--card) 90%,transparent);backdrop-filter:blur(8px);box-shadow:4px 5px 0 var(--line)}
+.grade-nav{display:flex;flex-wrap:wrap;gap:8px;justify-content:center}
+.grade-tab{display:inline-flex;align-items:center;gap:9px;font-size:16px;font-weight:600;color:var(--ink);text-decoration:none;background:var(--paper);border:2px solid var(--line);border-radius:99px;padding:5px 18px 5px 6px;transition:.15s}
+.grade-tab .n{display:grid;place-items:center;width:29px;height:29px;border-radius:50%;background:var(--yellow);font-family:"Marck Script",cursive;font-size:19px;line-height:1;color:var(--ink)}
+.grade-tab:hover{border-color:var(--blue);color:var(--blue);transform:translateY(-2px)}
+.grade-tab.is-active{background:var(--blue);border-color:var(--blue);color:#fff;box-shadow:2px 3px 0 rgba(0,0,0,.16)}
+.grade-tab.is-active .n{background:#fff;color:var(--blue)}
+.grade-panel{margin:0 0 20px;border:1px solid var(--line);border-radius:14px;background:var(--card);box-shadow:4px 5px 0 var(--line);scroll-margin-top:96px;animation:panel-in .25s ease}
+@keyframes panel-in{from{opacity:0;transform:translateY(7px)}to{opacity:1;transform:none}}
+.grade-panel[hidden]{display:none}
+.grade-panel-head{display:flex;align-items:center;gap:12px;padding:12px 22px;border-bottom:1px dashed var(--line)}
+.grade-panel-head h2{margin:0;font-size:32px}
+.grade-panel-body{padding:4px 22px 18px}
 .chev{flex:none;width:12px;height:12px;border-right:3px solid var(--blue);border-bottom:3px solid var(--blue);transform:rotate(-45deg);transition:transform .18s}
-.grade[open]>summary{border-bottom:1px dashed var(--line)}
-.grade-body{padding:4px 22px 18px}
+details[open]>summary .chev{transform:rotate(45deg)}
 .subsec{margin:14px 0 0;padding:0;border:1.5px dashed var(--line);border-radius:12px;background:transparent}
 .subsec>summary{list-style:none;display:flex;align-items:center;gap:12px;padding:11px 16px;cursor:pointer;font-weight:600;font-size:18px}
 .subsec>summary::-webkit-details-marker{display:none}
 .subsec>summary:hover{color:var(--blue)}
 .subsec[open]>summary{border-bottom:1px dashed var(--line)}
 .subsec-body{padding:16px}
-@media(max-width:860px){.grade>summary{padding:10px 14px}.grade>summary h2{font-size:25px}.grade-body{padding:2px 14px 14px}.subsec>summary{font-size:16px;padding:10px 12px}.subsec-body{padding:12px}}
+@media(max-width:860px){.grade-bar{top:58px;padding:7px;border-radius:12px}.grade-nav{gap:6px}.grade-tab{font-size:14px;padding:3px 13px 3px 4px;gap:6px}.grade-tab .n{width:25px;height:25px;font-size:16px}.grade-panel{scroll-margin-top:132px}.grade-panel-head{padding:10px 14px}.grade-panel-head h2{font-size:25px}.grade-panel-body{padding:2px 14px 14px}.subsec>summary{font-size:16px;padding:10px 12px}.subsec-body{padding:12px}}
+
+/* ===== Кнопки «Пройти урок в классе» в карточках ===== */
+.card-actions{display:flex;flex-wrap:wrap;align-items:center;gap:14px;margin-top:14px}
+.btn.sm{padding:9px 18px;font-size:15px;border-radius:10px}
+.card-link{font-weight:600;color:var(--blue);text-decoration:none;font-size:15px}
+.card-link:hover{text-decoration:underline}

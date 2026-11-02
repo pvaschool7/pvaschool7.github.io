@@ -1,0 +1,606 @@
+<!doctype html><html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Измерение информации: бортовой центр — интерактивный урок · Плотников В. А.</title>
+<meta name="description" content="Интерактивный урок информатики для 7 класса «Измерение информации: бортовой центр»: работа в парах, баллы за ответы, проверка донесений бортового ИИ, итоговый балл и предварительная отметка.">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Golos+Text:wght@400;600&family=Marck+Script&family=PT+Serif:ital@1&display=swap" rel="stylesheet"><link rel="stylesheet" href="../style.css"><link rel="icon" href="../favicon.ico" sizes="48x48"><link rel="icon" href="../icon-pva.svg" type="image/svg+xml">
+<style>
+/* ===== Каркас интерактивного урока ===== */
+.lwrap{max-width:1180px;margin:0 auto;padding:0 24px}
+.lhero{position:relative;color:#fff;padding:30px 0 36px;margin-bottom:26px;overflow:hidden;background-image:radial-gradient(1.5px 1.5px at 12% 25%,rgba(255,255,255,.7) 50%,transparent 51%),radial-gradient(2px 2px at 78% 18%,rgba(255,255,255,.5) 50%,transparent 51%),radial-gradient(1.5px 1.5px at 55% 65%,rgba(255,255,255,.45) 50%,transparent 51%),radial-gradient(2.5px 2.5px at 88% 70%,rgba(255,215,110,.55) 50%,transparent 51%),radial-gradient(1.5px 1.5px at 35% 80%,rgba(255,255,255,.4) 50%,transparent 51%),linear-gradient(160deg,#0c1830,#16264a 55%,#20365f)}
+.lhero .tag{background:var(--yellow);color:#1f2a37;border:none}
+.back{display:inline-block;color:#ffd76e;text-decoration:none;font-weight:600;font-size:15px}
+.back:hover{text-decoration:underline}
+.lhero h1{color:#fff;font-size:clamp(34px,5vw,54px);margin:.4em 0 .25em}
+.lhero .lead{color:#c9d6ef;max-width:780px;font-size:18px;margin:.4em 0 0}
+.lgrid{display:grid;grid-template-columns:minmax(0,1fr) 330px;gap:26px;align-items:start;padding-bottom:10px}
+.lfoot{border-top:1px solid var(--line);margin-top:34px;padding:22px 0 30px;color:var(--mute);font-size:14px;background:var(--card)}
+.lfoot a{color:var(--blue)}
+@media(max-width:1020px){.lgrid{display:block}.board{position:sticky;top:60px;z-index:35;margin:0 0 20px}.b-rules{display:none}}
+/* ===== Шаги урока ===== */
+.step{background:var(--card);border:1px solid var(--line);border-radius:14px;box-shadow:4px 5px 0 var(--line);padding:22px 24px;margin:0 0 22px}
+.step-n{width:42px;height:42px;border-radius:50%;background:var(--blue);color:#fff;font:22px/42px "Marck Script",cursive;text-align:center;margin-bottom:8px}
+.step-title{font-size:30px;margin:0 0 .35em}
+.step p{margin:.45em 0}
+.mute{color:var(--mute)}
+.tgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:12px;margin:14px 0}
+.tcard{border:1.5px solid var(--line);border-radius:12px;padding:12px 14px;background:var(--paper)}
+.tcard b{display:block;margin-bottom:2px;color:var(--blue)}
+.tcard p{margin:0;font-size:14.5px;color:var(--mute)}
+.chain{display:flex;align-items:center;flex-wrap:wrap;gap:8px;margin:14px 0}
+.chain b{background:var(--yellow);border-radius:10px;padding:6px 13px;font-size:15px;white-space:nowrap}
+.chain .x{color:var(--mute);font-weight:600;font-size:14px}
+.lad{display:flex;flex-direction:column;gap:4px;margin:14px 0;max-width:520px}
+.lad-r{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.lad-u{min-width:96px;text-align:center;border:2px solid var(--green);border-radius:10px;padding:5px 12px;font-weight:600;background:var(--card)}
+.lad-x{color:var(--mute);font-size:13.5px}
+.sch{display:flex;flex-wrap:wrap;gap:7px;align-items:center;margin:14px 0}
+.sch .node{border:2px solid var(--blue);border-radius:10px;padding:6px 11px;font-weight:600;background:var(--card);font-size:15px}
+.sch .arr{color:var(--blue);font-weight:700}
+.sch .warn{border-color:var(--red);color:var(--red)}
+.frm{display:inline-block;font:italic 20px "PT Serif",Georgia,serif;border:2px dashed var(--blue);color:var(--blue);padding:6px 18px;border-radius:12px;background:var(--paper);margin:6px 0}
+/* ===== Табло пары ===== */
+.board{background:var(--card);border:2px solid var(--blue);border-radius:14px;box-shadow:4px 5px 0 rgba(47,111,208,.22);padding:16px 18px;position:sticky;top:12px}
+.b-head{font-weight:700;letter-spacing:.07em;font-size:13px;text-transform:uppercase;color:var(--mute);margin-bottom:10px}
+.b-names label{display:block;font-size:13px;color:var(--mute);margin-bottom:7px}
+.b-names input{width:100%;margin-top:2px;padding:6px 10px;border:1.5px solid var(--line);border-radius:8px;background:var(--paper);color:var(--ink);font:15px "Golos Text",sans-serif}
+.b-switch{margin:12px 0 10px;font-size:13px;color:var(--mute)}
+.sw-wrap{display:flex;gap:8px;margin-top:6px}
+.sw{flex:1;padding:10px 6px;border:2px solid var(--line);border-radius:12px;background:var(--paper);font-weight:700;color:var(--ink);cursor:pointer;transition:.12s;font-size:14.5px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.sw.on{background:var(--blue);border-color:var(--blue);color:#fff;box-shadow:2px 3px 0 rgba(0,0,0,.15)}
+.b-row{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:8px 12px;border-radius:10px;border:1px dashed var(--line);margin:6px 0;background:var(--paper);position:relative}
+.b-row .b-who{font-weight:600;font-size:14.5px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.b-row .b-val{flex:none;color:var(--mute);font-size:13.5px}
+.b-row .b-val b{font-size:20px;color:var(--ink);margin-right:2px}
+.b-row.pair{border:2px solid var(--blue);background:color-mix(in srgb,var(--blue) 7%,var(--card))}
+.b-sub{font-size:12.5px;color:var(--mute);margin:2px 2px 6px}
+.b-bar{height:10px;border-radius:99px;background:var(--paper);border:1px solid var(--line);overflow:hidden;margin:8px 0 4px}
+.b-barfill{height:100%;background:linear-gradient(90deg,var(--green),var(--blue));width:0;transition:.4s}
+.b-rules{font-size:13px;color:var(--mute);border-top:1px dashed var(--line);margin-top:12px;padding-top:10px;line-height:1.6}
+.b-rules b{color:var(--ink)}
+.b-reset{margin-top:12px;width:100%;padding:8px;border:2px dashed var(--red);background:none;color:var(--red);border-radius:10px;font-weight:600;cursor:pointer;font-size:14px}
+.b-reset:hover{background:var(--red);color:#fff}
+.flt{position:absolute;right:10px;top:-4px;font-weight:800;color:var(--green);animation:flt 1s ease forwards;pointer-events:none}
+@keyframes flt{from{opacity:1;transform:translateY(0)}to{opacity:0;transform:translateY(-20px)}}
+/* ===== Задания ===== */
+.task-intro{font-size:15.5px}
+.titem{display:flex;align-items:center;gap:10px;padding:8px 12px;border:1.5px dashed var(--line);border-radius:10px;margin:8px 0;background:var(--paper);flex-wrap:wrap}
+.titem .who{flex:none;width:26px;height:26px;border-radius:50%;background:var(--yellow);display:grid;place-items:center;font-weight:700;font-size:14px}
+.titem .tlabel{flex:none;font-weight:600;font-size:15px}
+.tin{flex:1;min-width:80px;max-width:210px;padding:8px 12px;border:2px solid var(--line);border-radius:10px;font:600 16px "Golos Text",sans-serif;background:var(--card);color:var(--ink)}
+.tin.wide{max-width:300px}
+.tin:focus{outline:none;border-color:var(--blue)}
+.tin:disabled{opacity:.8}
+select.tin{max-width:250px;font-weight:600}
+.tunit{color:var(--mute);font-size:14.5px}
+.tstat{flex:none;font-weight:700;font-size:14px;min-width:24px}
+.titem.ok{border:2px solid var(--green)}
+.titem.ok .tstat{color:var(--green)}
+.titem.late{border:2px solid var(--green);opacity:.85}
+.titem.late .tstat{color:var(--green)}
+.titem.reveal{border:2px solid var(--blue);opacity:.92}
+.titem.reveal .tstat{color:var(--blue)}
+.titem.wrong{border:2px solid var(--red)}
+.titem.wrong .tstat{color:var(--red)}
+.task-foot{margin-top:12px;display:flex;flex-wrap:wrap;align-items:center;gap:12px}
+.hint{width:100%;font-size:14px;color:var(--mute);background:var(--paper);border-left:4px solid var(--yellow);border-radius:0 10px 10px 0;padding:8px 12px}
+/* ===== Донесения ИИ и вердикты ===== */
+.seans{border:1.5px solid var(--line);border-radius:12px;padding:14px 16px;margin:14px 0;background:var(--paper)}
+.seans-n{display:inline-block;background:var(--yellow);border-radius:99px;padding:2px 13px;font-weight:700;font-size:13px;margin-bottom:8px}
+.ai{background:linear-gradient(150deg,#0d1a33,#1e335c);color:#e8eefc;border-radius:12px;padding:13px 16px;margin:8px 0}
+.ai-chip{display:inline-block;background:#ffd76e;color:#1f2a37;font-size:11.5px;font-weight:700;border-radius:99px;padding:2px 10px;letter-spacing:.05em;text-transform:uppercase}
+.ai-say{margin:8px 0 0;font-size:16.5px;line-height:1.5}
+.vrow{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-top:10px}
+.vbtn{border:2px solid var(--line);border-radius:12px;padding:9px 15px;font-weight:700;cursor:pointer;background:var(--card);transition:.12s;font-size:14.5px;font-family:inherit}
+.vbtn.yes{border-color:var(--green);color:var(--green)}
+.vbtn.no{border-color:var(--red);color:var(--red)}
+.vbtn.maybe{border-color:#c9a227;color:#8a6d00}
+.vbtn.yes:hover{background:var(--green);color:#fff}
+.vbtn.no:hover{background:var(--red);color:#fff}
+.vbtn.maybe:hover{background:#e6c34a;color:#1f2a37}
+.vbtn:disabled{opacity:.45;cursor:default}
+.vbtn.picked{opacity:1}
+.vbtn.picked.yes{background:var(--green);color:#fff}
+.vbtn.picked.no{background:var(--red);color:#fff}
+.vbtn.picked.maybe{background:#e6c34a;color:#1f2a37}
+.owner-now{font-size:13px;color:var(--mute);margin-left:auto}
+.vfeed{border-radius:12px;padding:11px 15px;margin-top:12px;font-size:15px;line-height:1.55}
+.vfeed.good{background:color-mix(in srgb,var(--green) 13%,var(--card));border:1.5px solid var(--green)}
+.vfeed.bad{background:color-mix(in srgb,var(--red) 11%,var(--card));border:1.5px solid var(--red)}
+.vfeed.meh{background:color-mix(in srgb,#e6c34a 22%,var(--card));border:1.5px solid #c9a227}
+.expl{display:none}
+.proof{margin-top:12px;border-top:1px dashed var(--line);padding-top:10px}
+.p-lab{font-weight:600;font-size:14px;display:block;margin-bottom:6px}
+.ta{width:100%;padding:10px 12px;border:2px solid var(--line);border-radius:10px;background:var(--card);color:var(--ink);font:15px/1.5 "Golos Text",sans-serif;margin:4px 0 10px;resize:vertical}
+.ta:focus{outline:none;border-color:var(--blue)}
+.ta:disabled{opacity:.7}
+.p-foot{display:flex;align-items:center;flex-wrap:wrap;gap:10px;margin-top:4px}
+.pmsg{font-size:14px;font-weight:600}
+.pmsg.good{color:var(--green)}
+.pmsg.bad{color:var(--red)}
+/* ===== Лаборатория / практика / финал ===== */
+.lab-type{max-width:420px}
+.cbx label{display:flex;gap:9px;align-items:flex-start;padding:7px 10px;border:1.5px dashed var(--line);border-radius:10px;margin:7px 0;background:var(--paper);font-size:14.5px;cursor:pointer}
+.cbx input{margin-top:3px}
+.q-was,.q-now{border-radius:12px;padding:11px 15px;margin:8px 0;font-size:15px}
+.q-was{border:1.5px dashed var(--red)}
+.q-now{border:1.5px dashed var(--green)}
+.q-was b{color:var(--red)}
+.q-now b{color:var(--green)}
+/* ===== Итоги ===== */
+.rcard{background:var(--paper);border:2px solid var(--blue);border-radius:14px;padding:18px 20px;margin:12px 0}
+.rc-t{margin:0 0 10px;font-size:22px}
+.rt{width:100%;border-collapse:collapse;background:var(--card)}
+.rt th,.rt td{padding:9px 12px;border-bottom:1px solid var(--line);text-align:left;font-size:15px}
+.rt th{background:var(--yellow);font-size:14.5px}
+.rt .mk{font-size:19px}
+.rline{font-size:14.5px;margin:10px 0 4px}
+.rnote{font-size:13.5px;color:var(--mute);margin:4px 0}
+.rdate{font-size:13px;color:var(--mute);margin:2px 0 0}
+.res-actions{display:flex;flex-wrap:wrap;gap:12px;margin:14px 0}
+.refl label,.finw label,.lab label,.prax label{font-weight:600;font-size:14.5px;display:block;margin-top:8px}
+.rscroll{overflow-x:auto}
+/* ===== Модальное окно ===== */
+.modal{position:fixed;inset:0;background:rgba(10,18,35,.62);display:grid;place-items:center;z-index:100;padding:20px}
+.modal[hidden]{display:none}
+.modal-box{background:var(--card);border-radius:16px;max-width:660px;width:100%;max-height:90vh;overflow:auto;box-shadow:0 22px 60px rgba(0,0,0,.4)}
+.modal-bar{display:flex;justify-content:space-between;align-items:center;padding:12px 18px;border-bottom:1px solid var(--line);position:sticky;top:0;background:var(--card)}
+.modal-bar .btn{padding:6px 14px;font-size:14px}
+@media print{body *{visibility:hidden}#modal,#modal *{visibility:visible}#modal{position:absolute;inset:0;background:#fff;display:block;padding:10px}.modal-box{box-shadow:none;max-height:none;max-width:none}.modal-bar{display:none}}
+</style></head><body>
+<div class="lhero"><div class="lwrap">
+<a class="back" href="../informatika.html">← На сайт учителя</a><br>
+<span class="tag">Информатика · 7 класс · урок-экспедиция</span>
+<h1>Измерение информации: бортовой центр</h1>
+<p class="lead">Пары-связисты измеряют донесения станции «Самара‑1» и проверяют бортового ИИ. Работайте вдвоём за одним устройством: переключайте Ученика А и Ученика Б на табло, зарабатывайте баллы — а в конце покажите учителю итоговый балл и предварительную отметку.</p>
+</div></div>
+<div class="lwrap lgrid">
+<main>
+<!-- 1. Легенда -->
+<section class="step"><div class="step-n">1</div><h2 class="step-title">Легенда: бортовой центр</h2>
+<p>Станция «Самара‑1» шлёт на Землю донесения. Канал связи узкий и дорогой, каждый бит на счету. Чтобы не терять данные, связист должен уметь измерять информацию: знать, сколько она «весит».</p>
+<div class="tgrid">
+<div class="tcard"><b>Бортовой ИИ Навигатор</b><p>Докладывает быстро и уверенно, но путает единицы и ошибается в расчётах. Верить можно не всегда.</p></div>
+<div class="tcard"><b>Вы — связисты</b><p>Работаем парами: докладчик и писарь, роли меняются. В заданиях А решает 1–3, Б решает 4–5, затем взаимная проверка.</p></div>
+<div class="tcard"><b>Радиомолчание</b><p>Телефоны создают помехи и сданы в «Шлюз». Проверяем теорией и счётом, работаем шёпотом.</p></div>
+<div class="tcard"><b>Главный вопрос урока</b><p>Сколько «весит» информация? В конце урока — итоговый балл пары и предварительная отметка каждому.</p></div>
+</div>
+<p class="mute">Впишите позывные (имена) на табло справа — они попадут в результат для учителя. Вердикты о донесениях ИИ поднимает тот, кто выбран на табло: переключайте Ученика А и Ученика Б.</p>
+</section>
+<!-- 2. Входная ловушка -->
+<section class="step"><div class="step-n">2</div><h2 class="step-title">Входная ловушка: датчик люка</h2>
+<p><b>Датчик люка станции</b> показывает <b>ОТКРЫТ</b> или <b>ЗАКРЫТ</b> — два возможных состояния.</p>
+<div class="seans js-verdict" data-block="vhod" data-ok="no" data-nopoints>
+<span class="seans-n">Разминка · без баллов</span>
+<div class="ai"><span class="ai-chip">Бортовой ИИ Навигатор</span><p class="ai-say">«Сообщение датчика “люк открыт / люк закрыт” несёт 2 бита информации».</p></div>
+<div class="vrow" role="group" aria-label="Вердикт">
+<button class="vbtn yes" data-v="yes" type="button">ВЕРЮ ИИ</button>
+<button class="vbtn no" data-v="no" type="button">НЕ ВЕРЮ</button>
+<button class="vbtn maybe" data-v="maybe" type="button">СОМНЕВАЮСЬ</button>
+<span class="owner-now" data-own></span></div>
+<div class="vfeed" hidden></div>
+<div class="expl">У датчика всего два состояния — это один выбор из двух вариантов, то есть <b>1 бит</b>. Навигатор завысил вес вдвое. Баллов за разминку нет: мы просто проверили, с чем пришли на урок.</div>
+</div>
+</section>
+<!-- 3. Теория 1 -->
+<section class="step"><div class="step-n">3</div><h2 class="step-title">Теория 1: бит и алфавит</h2>
+<div class="tgrid">
+<div class="tcard"><b>Бит</b><p>Наименьшая единица информации: выбор из двух вариантов, «да / нет», 0 или 1.</p></div>
+<div class="tcard"><b>Алфавит</b><p>Набор знаков сообщения. N — мощность алфавита, число знаков в нём.</p></div>
+<div class="tcard"><b>Вес знака</b><p>i — сколько бит несёт один знак. Связь: N = 2<sup>i</sup>.</p></div>
+<div class="tcard"><b>Удвоение</b><p>Каждый новый бит удваивает число знаков, которые можно различить.</p></div>
+</div>
+<div class="chain"><b>1 бит → 2 знака</b><span class="x">×2</span><b>2 бита → 4 знака</b><span class="x">×2</span><b>3 бита → 8 знаков</b><span class="x">×2</span><b>4 бита → 16 знаков</b><span class="x">×2</span><b>5 бит → 32 знака</b></div>
+<div class="note"><b>Запись в тетрадь</b><br>1. Бит — выбор из двух вариантов (0 или 1). «Да / нет» несёт 1 бит.<br>2. N = 2<sup>i</sup> — N число знаков алфавита, i число бит на один знак.<br>3. Больше знаков в алфавите — больше бит на знак: 8 знаков — 3 бита, 256 знаков — 8 бит.</div>
+</section>
+<!-- 4. Задание 1 -->
+<section class="step"><div class="step-n">4</div><h2 class="step-title">Задание 1: сколько бит на знак?</h2>
+<p class="task-intro">Сколько бит несёт один знак, если в алфавите: 1) 64 знака; 2) 128 знаков; 3) 256 знаков; 4) 512 знаков; 5) 1024 знака. Запишите 2<sup>i</sup> = N и найдите i. <b>Роли:</b> А решает 1–3, Б решает 4–5, затем взаимная проверка.</p>
+<div class="js-task" data-block="task1">
+<div class="titem js-item" data-owner="A" data-ok="6" data-sol="6"><span class="who">А</span><span class="tlabel">1) 64 знака — i =</span><input class="tin" type="text" inputmode="numeric" autocomplete="off" aria-label="Ответ 1"><span class="tunit">бит</span><span class="tstat" aria-live="polite"></span></div>
+<div class="titem js-item" data-owner="A" data-ok="7" data-sol="7"><span class="who">А</span><span class="tlabel">2) 128 знаков — i =</span><input class="tin" type="text" inputmode="numeric" autocomplete="off" aria-label="Ответ 2"><span class="tunit">бит</span><span class="tstat" aria-live="polite"></span></div>
+<div class="titem js-item" data-owner="A" data-ok="8" data-sol="8"><span class="who">А</span><span class="tlabel">3) 256 знаков — i =</span><input class="tin" type="text" inputmode="numeric" autocomplete="off" aria-label="Ответ 3"><span class="tunit">бит</span><span class="tstat" aria-live="polite"></span></div>
+<div class="titem js-item" data-owner="B" data-ok="9" data-sol="9"><span class="who">Б</span><span class="tlabel">4) 512 знаков — i =</span><input class="tin" type="text" inputmode="numeric" autocomplete="off" aria-label="Ответ 4"><span class="tunit">бит</span><span class="tstat" aria-live="polite"></span></div>
+<div class="titem js-item" data-owner="B" data-ok="10" data-sol="10"><span class="who">Б</span><span class="tlabel">5) 1024 знака — i =</span><input class="tin" type="text" inputmode="numeric" autocomplete="off" aria-label="Ответ 5"><span class="tunit">бит</span><span class="tstat" aria-live="polite"></span></div>
+<div class="task-foot"><button class="btn sm js-check" type="button">Проверить задание</button><div class="hint js-hint" hidden>Подбирай степень двойки: 2, 4, 8, 16, 32, 64, 128, 256, 512, 1024… Балл начисляется только с первой попытки.</div></div>
+</div>
+</section>
+<!-- 5. Теория 2 -->
+<section class="step"><div class="step-n">5</div><h2 class="step-title">Теория 2: единицы измерения</h2>
+<div class="lad">
+<div class="lad-r"><span class="lad-u">бит</span><span class="lad-x">×8 →</span><span class="lad-u">байт</span><span class="lad-x">×1024 →</span><span class="lad-u">Кбайт</span><span class="lad-x">×1024 →</span><span class="lad-u">Мбайт</span><span class="lad-x">×1024 →</span><span class="lad-u">Гбайт</span></div>
+</div>
+<div class="tgrid">
+<div class="tcard"><b>Вниз — умножаем</b><p>Из крупной единицы в мелкую: 2 байта × 8 = 16 бит; 3 Кбайт × 1024 = 3072 байта.</p></div>
+<div class="tcard"><b>Вверх — делим</b><p>Из мелкой единицы в крупную: 24 бита : 8 = 3 байта; 4096 байт : 1024 = 4 Кбайт.</p></div>
+</div>
+<div class="note"><b>Главное</b><br>1 байт = 8 бит. Один знак алфавита из 256 знаков весит ровно 1 байт.<br>1 Кбайт — это 1024 байта, а не 1000: компьютер считает степенями двойки (1024 = 2<sup>10</sup>).</div>
+</section>
+<!-- 6. Задание 2 -->
+<section class="step"><div class="step-n">6</div><h2 class="step-title">Задание 2: переводим единицы</h2>
+<p class="task-intro">Переведите: 1) 3 байта в биты; 2) 24 бита в байты; 3) 2 Кбайт в байты; 4) 4096 байт в Кбайт; 5) 2 Мбайт в Кбайт. <b>Роли:</b> А решает 1–3, Б решает 4–5, затем взаимная проверка.</p>
+<div class="js-task" data-block="task2">
+<div class="titem js-item" data-owner="A" data-ok="24" data-sol="24"><span class="who">А</span><span class="tlabel">1) 3 байта =</span><input class="tin" type="text" inputmode="numeric" autocomplete="off" aria-label="Ответ 1"><span class="tunit">бит</span><span class="tstat" aria-live="polite"></span></div>
+<div class="titem js-item" data-owner="A" data-ok="3" data-sol="3"><span class="who">А</span><span class="tlabel">2) 24 бита =</span><input class="tin" type="text" inputmode="numeric" autocomplete="off" aria-label="Ответ 2"><span class="tunit">байта</span><span class="tstat" aria-live="polite"></span></div>
+<div class="titem js-item" data-owner="A" data-ok="2048" data-sol="2048"><span class="who">А</span><span class="tlabel">3) 2 Кбайт =</span><input class="tin" type="text" inputmode="numeric" autocomplete="off" aria-label="Ответ 3"><span class="tunit">байта</span><span class="tstat" aria-live="polite"></span></div>
+<div class="titem js-item" data-owner="B" data-ok="4" data-sol="4"><span class="who">Б</span><span class="tlabel">4) 4096 байт =</span><input class="tin" type="text" inputmode="numeric" autocomplete="off" aria-label="Ответ 4"><span class="tunit">Кбайт</span><span class="tstat" aria-live="polite"></span></div>
+<div class="titem js-item" data-owner="B" data-ok="2048" data-sol="2048"><span class="who">Б</span><span class="tlabel">5) 2 Мбайт =</span><input class="tin" type="text" inputmode="numeric" autocomplete="off" aria-label="Ответ 5"><span class="tunit">Кбайт</span><span class="tstat" aria-live="polite"></span></div>
+<div class="task-foot"><button class="btn sm js-check" type="button">Проверить задание</button><div class="hint js-hint" hidden>Вниз по лестнице — умножаем (×8, ×1024), вверх — делим (:8, :1024). Не забудь: 1 Кбайт = 1024 байта.</div></div>
+</div>
+</section>
+<!-- 7. Теория 3 -->
+<section class="step"><div class="step-n">7</div><h2 class="step-title">Теория 3: объём сообщения</h2>
+<p><span class="frm">I = K · i</span></p>
+<p>I — объём сообщения, K — число знаков, i — вес одного знака. Пример «СВЯЗЬ ЕСТЬ»: 10 знаков (пробел тоже знак), алфавит 256 знаков. i = 8 бит, I = 10 · 8 = 80 бит, 80 : 8 = 10 байт.</p>
+<div class="tgrid">
+<div class="tcard"><b>Порядок действий</b><p>По N найти i: 2<sup>i</sup> = N. Найти объём: I = K · i. Перевести в нужную единицу.</p></div>
+<div class="tcard"><b>Считаем всё</b><p>Пробелы и знаки препинания — тоже знаки.</p></div>
+<div class="tcard"><b>Связь с Землёй</b><p>Канал узкий: чем меньше вес донесения, тем быстрее оно дойдёт.</p></div>
+</div>
+</section>
+<!-- 8. Задание 3 -->
+<section class="step"><div class="step-n">8</div><h2 class="step-title">Задание 3: считаем донесение</h2>
+<p class="task-intro">Донесение: 40 знаков. Алфавит станции: 32 знака. <b>Роли:</b> А находит i и I в битах, Б переводит объём в байты, затем взаимная проверка.</p>
+<div class="js-task" data-block="task3">
+<div class="titem js-item" data-owner="A" data-ok="5" data-sol="5"><span class="who">А</span><span class="tlabel">1) Вес знака i =</span><input class="tin" type="text" inputmode="numeric" autocomplete="off" aria-label="Ответ 1"><span class="tunit">бит</span><span class="tstat" aria-live="polite"></span></div>
+<div class="titem js-item" data-owner="A" data-ok="200" data-sol="200"><span class="who">А</span><span class="tlabel">2) Объём I =</span><input class="tin" type="text" inputmode="numeric" autocomplete="off" aria-label="Ответ 2"><span class="tunit">бит</span><span class="tstat" aria-live="polite"></span></div>
+<div class="titem js-item" data-owner="B" data-ok="25" data-sol="25"><span class="who">Б</span><span class="tlabel">3) Объём I =</span><input class="tin" type="text" inputmode="numeric" autocomplete="off" aria-label="Ответ 3"><span class="tunit">байт</span><span class="tstat" aria-live="polite"></span></div>
+<div class="task-foot"><button class="btn sm js-check" type="button">Проверить задание</button><div class="hint js-hint" hidden>Сначала i из равенства 2<sup>i</sup> = 32, потом I = K · i, потом биты в байты: делим на 8. Проверь ответ обратным действием.</div></div>
+</div>
+</section>
+<!-- 9. Инструменты связиста -->
+<section class="step"><div class="step-n">9</div><h2 class="step-title">Инструменты связиста</h2>
+<div class="tgrid">
+<div class="tcard"><b>Факты</b><p>Верны ли формулы и числа: N = 2<sup>i</sup>, 1 байт = 8 бит, 1 Кбайт = 1024 байта? Совпадает ли с теорией?</p></div>
+<div class="tcard"><b>Логика</b><p>Следует ли вывод? Не перепутаны ли N и i, биты и байты? Вверх делим, вниз умножаем?</p></div>
+<div class="tcard"><b>Источники</b><p>Назван ли источник? Можно ли его найти?</p></div>
+<div class="tcard"><b>Противоречия</b><p>Не спорит ли ответ сам с собой или с теорией урока? Сходится ли пересчёт?</p></div>
+</div>
+<p><b>Не просто «не верю» — докажи:</b> 1) где ошибка? 2) почему Навигатор ошибся: перепутал единицы, ошибся в счёте, противоречие? 3) как избежать: как улучшить запрос к ИИ?</p>
+</section>
+<!-- 10. Сеансы 1–6 -->
+<section class="step"><div class="step-n">10</div><h2 class="step-title">Сеансы 1–6: ловим ошибки</h2>
+<p class="mute">Навигатор передаёт донесения. Вердикт поднимает тот, кто выбран на табло: за верный вердикт <b>+1</b>. Затем запишите доказательство — за него <b>+2</b>, но баллы «на проверке» утвердит учитель.</p>
+<div class="seans js-verdict" data-block="s1" data-ok="no">
+<span class="seans-n">Сеанс 1</span>
+<div class="ai"><span class="ai-chip">Навигатор сообщает</span><p class="ai-say">«Чтобы закодировать 8 разных сигналов, нужно 8 бит на каждый сигнал».</p></div>
+<div class="vrow" role="group" aria-label="Вердикт"><button class="vbtn yes" data-v="yes" type="button">ВЕРЮ ИИ</button><button class="vbtn no" data-v="no" type="button">НЕ ВЕРЮ</button><button class="vbtn maybe" data-v="maybe" type="button">СОМНЕВАЮСЬ</button><span class="owner-now" data-own></span></div>
+<div class="vfeed" hidden></div>
+<div class="expl">8 разных сигналов различаются тремя битами: 2<sup>3</sup> = 8. Навигатор перепутал число сигналов (N) с числом бит (i).</div>
+<div class="proof" hidden><label class="p-lab" for="pf1">Доказательство письменно (+2 — проверит учитель): где ошибка, почему Навигатор ошибся, как избежать?</label><textarea id="pf1" class="ta js-proof" rows="3" placeholder="Например: 8 сигналов различаются тремя битами, потому что 2 в кубе равно 8…"></textarea><div class="p-foot"><button class="btn sm ghost js-saveproof" type="button">Записать доказательство (+2)</button><span class="pmsg"></span></div></div>
+</div>
+<div class="seans js-verdict" data-block="s2" data-ok="no">
+<span class="seans-n">Сеанс 2</span>
+<div class="ai"><span class="ai-chip">Навигатор сообщает</span><p class="ai-say">«В 1 Кбайте 1000 байт, поэтому 2 Кбайт — это 2000 байт».</p></div>
+<div class="vrow" role="group" aria-label="Вердикт"><button class="vbtn yes" data-v="yes" type="button">ВЕРЮ ИИ</button><button class="vbtn no" data-v="no" type="button">НЕ ВЕРЮ</button><button class="vbtn maybe" data-v="maybe" type="button">СОМНЕВАЮСЬ</button><span class="owner-now" data-own></span></div>
+<div class="vfeed" hidden></div>
+<div class="expl">1 Кбайт = 1024 байта = 2<sup>10</sup>. Компьютер считает степенями двойки, поэтому 2 Кбайт = 2048 байта.</div>
+<div class="proof" hidden><label class="p-lab" for="pf2">Доказательство письменно (+2 — проверит учитель):</label><textarea id="pf2" class="ta js-proof" rows="3" placeholder="Запиши: сколько байт в 1 Кбайте и почему…"></textarea><div class="p-foot"><button class="btn sm ghost js-saveproof" type="button">Записать доказательство (+2)</button><span class="pmsg"></span></div></div>
+</div>
+<div class="seans js-verdict" data-block="s3" data-ok="no">
+<span class="seans-n">Сеанс 3</span>
+<div class="ai"><span class="ai-chip">Навигатор сообщает</span><p class="ai-say">«Чтобы перевести байты в биты, число делят на 8: 5 байт — это меньше одного бита».</p></div>
+<div class="vrow" role="group" aria-label="Вердикт"><button class="vbtn yes" data-v="yes" type="button">ВЕРЮ ИИ</button><button class="vbtn no" data-v="no" type="button">НЕ ВЕРЮ</button><button class="vbtn maybe" data-v="maybe" type="button">СОМНЕВАЮСЬ</button><span class="owner-now" data-own></span></div>
+<div class="vfeed" hidden></div>
+<div class="expl">Байт крупнее бита. Байты → биты — это вниз по лестнице, значит умножаем: 5 × 8 = 40 бит.</div>
+<div class="proof" hidden><label class="p-lab" for="pf3">Доказательство письменно (+2 — проверит учитель):</label><textarea id="pf3" class="ta js-proof" rows="3" placeholder="Когда умножаем, а когда делим: вниз или вверх по лестнице единиц…"></textarea><div class="p-foot"><button class="btn sm ghost js-saveproof" type="button">Записать доказательство (+2)</button><span class="pmsg"></span></div></div>
+</div>
+<div class="seans js-verdict" data-block="s4" data-ok="no">
+<span class="seans-n">Сеанс 4</span>
+<div class="ai"><span class="ai-chip">Навигатор сообщает</span><p class="ai-say">«Донесение из 20 знаков, алфавит из 16 знаков. Объём: 20 · 4 = 80 бит, то есть 8 байт».</p></div>
+<div class="vrow" role="group" aria-label="Вердикт"><button class="vbtn yes" data-v="yes" type="button">ВЕРЮ ИИ</button><button class="vbtn no" data-v="no" type="button">НЕ ВЕРЮ</button><button class="vbtn maybe" data-v="maybe" type="button">СОМНЕВАЮСЬ</button><span class="owner-now" data-own></span></div>
+<div class="vfeed" hidden></div>
+<div class="expl">Считаем вместе: 16 = 2<sup>4</sup>, значит i = 4 бита; I = 20 · 4 = 80 бит — здесь верно. Но 80 : 8 = 10 байт, а не 8. Ошибка в переводе единиц.</div>
+<div class="proof" hidden><label class="p-lab" for="pf4">Доказательство письменно (+2 — проверит учитель):</label><textarea id="pf4" class="ta js-proof" rows="3" placeholder="Посчитай на листе: 20 · 4, затем переведи в байты…"></textarea><div class="p-foot"><button class="btn sm ghost js-saveproof" type="button">Записать доказательство (+2)</button><span class="pmsg"></span></div></div>
+</div>
+<div class="seans js-verdict" data-block="s5" data-ok="yes">
+<span class="seans-n">Сеанс 5</span>
+<div class="ai"><span class="ai-chip">Навигатор сообщает</span><p class="ai-say">«Если в алфавите 256 знаков, то один знак весит 8 бит, то есть 1 байт».</p></div>
+<div class="vrow" role="group" aria-label="Вердикт"><button class="vbtn yes" data-v="yes" type="button">ВЕРЮ ИИ</button><button class="vbtn no" data-v="no" type="button">НЕ ВЕРЮ</button><button class="vbtn maybe" data-v="maybe" type="button">СОМНЕВАЮСЬ</button><span class="owner-now" data-own></span></div>
+<div class="vfeed" hidden></div>
+<div class="expl">Верно: 256 = 2<sup>8</sup>, значит i = 8 бит = 1 байт. Это единственное верное донесение — ловушка не сработала.</div>
+<div class="proof" hidden><label class="p-lab" for="pf5">Обоснуй письменно (+2 — проверит учитель): почему это верно?</label><textarea id="pf5" class="ta js-proof" rows="3" placeholder="2 в восьмой степени равно 256, поэтому…"></textarea><div class="p-foot"><button class="btn sm ghost js-saveproof" type="button">Записать обоснование (+2)</button><span class="pmsg"></span></div></div>
+</div>
+<div class="seans js-verdict" data-block="s6" data-ok="no">
+<span class="seans-n">Сеанс 6</span>
+<div class="ai"><span class="ai-chip">Навигатор сообщает</span><p class="ai-say">«Согласно “Справочнику связиста Ларина” (1985), в одном байте 10 бит, поэтому станции считают по десяткам».</p></div>
+<div class="vrow" role="group" aria-label="Вердикт"><button class="vbtn yes" data-v="yes" type="button">ВЕРЮ ИИ</button><button class="vbtn no" data-v="no" type="button">НЕ ВЕРЮ</button><button class="vbtn maybe" data-v="maybe" type="button">СОМНЕВАЮСЬ</button><span class="owner-now" data-own></span></div>
+<div class="vfeed" hidden></div>
+<div class="expl">Фальшивый источник: такого справочника нет, а в байте всегда 8 бит. Проверяй источники по «Инструментам связиста».</div>
+<div class="proof" hidden><label class="p-lab" for="pf6">Доказательство письменно (+2 — проверит учитель):</label><textarea id="pf6" class="ta js-proof" rows="3" placeholder="Назови, почему источник фальшивый и что говорит теория о байте…"></textarea><div class="p-foot"><button class="btn sm ghost js-saveproof" type="button">Записать доказательство (+2)</button><span class="pmsg"></span></div></div>
+</div>
+</section>
+<!-- 11. Лаборатория ловушек -->
+<section class="step"><div class="step-n">11</div><h2 class="step-title">Лаборатория ловушек: сочиняем сами</h2>
+<p class="task-intro">1. Выберите блок теории. 2. Придумайте заявление Навигатора с одной ошибкой (если расчёт — дайте исходные числа и неверный ответ). 3. На обороте листа напишите ключ: где ошибка и почему. 4. Обменяйтесь с соседней парой и найдите ошибку по «Инструментам связиста».</p>
+<div class="lab" data-block="lab" data-kind="lab">
+<label for="labT">Тип ошибки</label>
+<select id="labT" class="tin lab-type field"><option value="">— выбери тип —</option><option>путаница N и i (знаки и биты)</option><option>путаница бит и байт</option><option>1000 вместо 1024</option><option>перевод в не ту сторону</option><option>ошибка в расчёте I = K · i</option><option>фальшивый источник</option></select>
+<label for="labS">Заявление Навигатора</label>
+<textarea id="labS" class="ta field" rows="2" placeholder="Придумай уверенное заявление с одной ошибкой…"></textarea>
+<label for="labK">Ключ: где ошибка и почему</label>
+<textarea id="labK" class="ta field" rows="2" placeholder="Твой ключ для проверяющей пары…"></textarea>
+<p class="mute" style="font-size:13.5px">Нельзя придумывать обидное про людей: ловушки — только про информацию и ИИ. Время: 2 минуты сочиняем, 1 минута обмен, 1 минута проверка. Лучшую ловушку зачитаем всему классу.</p>
+<div class="p-foot"><button class="btn sm js-send" type="button">Сдать ловушку (+2)</button><span class="pmsg"></span></div>
+</div>
+</section>
+<!-- 12. Практика -->
+<section class="step"><div class="step-n">12</div><h2 class="step-title">Практика: исправь запрос к ИИ</h2>
+<div class="q-was"><b>Было: слабый запрос</b><br>«Сколько весит донесение?» — ответ ИИ: «Много, зависит от длины» — неполно. Данные для запроса: 40 знаков, алфавит 32 знака.</div>
+<div class="q-now"><b>Стало: сильный запрос</b><br>«Донесение: 40 знаков, алфавит 32 знака. Найди вес знака по формуле N = 2<sup>i</sup>, объём в битах и в байтах. Покажи каждое действие. Если данных не хватает, напиши “не знаю”».</div>
+<div class="prax" data-block="prax" data-kind="prax">
+<label for="praxQ">Напишите свой исправленный запрос к ИИ</label>
+<textarea id="praxQ" class="ta field" rows="3" placeholder="Данные, формулы, порядок действий, единицы, разрешение ответить «не знаю»…"></textarea>
+<div class="cbx">
+<label><input type="checkbox" class="cb"> Даны данные: число знаков и размер алфавита</label>
+<label><input type="checkbox" class="cb"> Названы формулы и порядок действий: сначала i, потом I</label>
+<label><input type="checkbox" class="cb"> Запрошены единицы в ответе: биты и байты</label>
+<label><input type="checkbox" class="cb"> Разрешено ответить «нет» или «не знаю»</label>
+</div>
+<div class="p-foot"><button class="btn sm js-send" type="button">Сдать запрос (до +4)</button><span class="pmsg"></span></div>
+</div>
+</section>
+<!-- 13. Финал -->
+<section class="step"><div class="step-n">13</div><h2 class="step-title">Финал: ловим сами</h2>
+<div class="seans js-verdict" data-block="finv" data-ok="no">
+<span class="seans-n">Финальное донесение</span>
+<div class="ai"><span class="ai-chip">Навигатор в финале</span><p class="ai-say">«Индикатор на пульте “связь есть / связи нет” несёт 1 байт информации».</p></div>
+<div class="vrow" role="group" aria-label="Вердикт"><button class="vbtn yes" data-v="yes" type="button">ВЕРЮ ИИ</button><button class="vbtn no" data-v="no" type="button">НЕ ВЕРЮ</button><button class="vbtn maybe" data-v="maybe" type="button">СОМНЕВАЮСЬ</button><span class="owner-now" data-own></span></div>
+<div class="vfeed" hidden></div>
+<div class="expl">У индикатора два состояния — выбор из двух вариантов несёт <b>1 бит</b>, а не 1 байт. Навигатор снова перепутал единицы.</div>
+</div>
+<div class="finw" data-block="finw" data-kind="finw">
+<h3 style="margin-bottom:4px">Письменный финал (каждый в паре)</h3>
+<p class="mute" style="font-size:14.5px">Переключайте Ученика А и Ученика Б на табло и отвечайте по очереди — учитель проверит тетради у обоих и оценит аргументацию по четырём критериям (до 8 баллов).</p>
+<label for="fw1">1) Верю, не верю или сомневаюсь? Почему?</label>
+<textarea id="fw1" class="ta field" rows="2"></textarea>
+<label for="fw2">2) Где ошибка и какое доказательство?</label>
+<textarea id="fw2" class="ta field" rows="2"></textarea>
+<label for="fw3">3) Как переписать запрос, чтобы ИИ не ошибся?</label>
+<textarea id="fw3" class="ta field" rows="2"></textarea>
+<div class="p-foot"><button class="btn sm js-send" type="button">Сдать письменный финал (до +8)</button><span class="pmsg"></span></div>
+</div>
+</section>
+<!-- 14. Итоги -->
+<section class="step"><div class="step-n">14</div><h2 class="step-title">Итоги: покажите учителю</h2>
+<div class="rcard" id="resultCard"></div>
+<div class="res-actions">
+<button class="btn" id="showBtn" type="button">Показать результат учителю</button>
+<button class="btn ghost" id="printBtn" type="button">Печать результата</button>
+<button class="btn ghost" id="againBtn" type="button">Пройти заново</button>
+</div>
+<div class="refl">
+<h3 style="margin-bottom:2px">Рефлексия</h3>
+<p class="mute" style="font-size:14.5px;margin:2px 0 4px">Закончи фразы — можно устно или письменно:</p>
+<label for="rf1">«Сегодня я понял, что…»</label><textarea id="rf1" class="ta" rows="2"></textarea>
+<label for="rf2">«Мне было сложно…»</label><textarea id="rf2" class="ta" rows="2"></textarea>
+<label for="rf3">«Теперь я смогу…»</label><textarea id="rf3" class="ta" rows="2"></textarea>
+</div>
+<div class="note"><b>Домашнее задание</b><br>Придумай ещё одно донесение станции с ошибкой по теме урока и напиши ключ. Лучшие войдут в следующий урок.</div>
+</section>
+</main>
+<aside class="board" aria-label="Табло пары">
+<div class="b-head">Бортовой журнал пары</div>
+<div class="b-names">
+<label>Ученик А<input id="nameA" type="text" placeholder="позывной (имя)" autocomplete="off"></label>
+<label>Ученик Б<input id="nameB" type="text" placeholder="позывной (имя)" autocomplete="off"></label>
+</div>
+<div class="b-switch">Сейчас отвечает:<div class="sw-wrap"><button class="sw on" id="swA" data-s="A" type="button">Ученик А</button><button class="sw" id="swB" data-s="B" type="button">Ученик Б</button></div></div>
+<div class="b-row" id="rowA"><span class="b-who" id="lblA">Ученик А</span><span class="b-val"><b id="sA">0</b> б.</span></div>
+<div class="b-row" id="rowB"><span class="b-who" id="lblB">Ученик Б</span><span class="b-val"><b id="sB">0</b> б.</span></div>
+<div class="b-row pair"><span class="b-who">Пара</span><span class="b-val"><b id="sPair">0</b> б.</span></div>
+<div class="b-sub" id="sPairSub">из них на проверке: 0</div>
+<div class="b-bar"><div class="b-barfill" id="barFill"></div></div>
+<div class="b-sub"><span id="barPct">0%</span> от максимума урока · блоков пройдено: <b id="sBlocks">0 из 14</b></div>
+<div class="b-rules"><b>Как копятся баллы</b><br>+1 — верный вердикт или ответ (с первой попытки)<br>+2 — доказательство к донесению (проверит учитель)<br>+2 — своя ловушка в лаборатории<br>до +4 — исправленный запрос к ИИ<br>до +8 — письменный финал<br><b>Баллы «на проверке» получает пара</b> — учитель утвердит их в конце урока.</div>
+<button class="b-reset" id="resetBtn" type="button">Сбросить урок</button>
+</aside>
+</div>
+<footer class="lfoot"><div class="lwrap">Интерактивный урок к презентации «Измерение информации: бортовой центр» · <a href="../informatika-uchenikam.html">Информатика · 7 класс</a> · Плотников В. А. · МБОУ «Школа №7» г.о. Самара · <a href="../index.html">pvaschool7.github.io</a></div></footer>
+<div class="modal" id="modal" hidden><div class="modal-box"><div class="modal-bar"><b>Результат пары — для учителя</b><button class="btn ghost" id="mClose" type="button">Закрыть</button></div><div class="rcard" id="mCard" style="border:none"></div></div></div>
+<script>
+(function(){
+"use strict";
+var LESSON_ID="izmerenie";
+var PAIR_MAX=46;
+var LESSON_TITLE="Интерактивный урок «Измерение информации: бортовой центр», информатика, 7 класс";
+var KEY="pva-lesson-"+LESSON_ID;
+var d=document;
+function $(s,c){return (c||d).querySelector(s)}
+function $$(s,c){return [].slice.call((c||d).querySelectorAll(s))}
+function norm(s){return (s||"").toLowerCase().replace(/ё/g,"е").replace(/[,;!?]+/g," ").replace(/\s+/g," ").trim()}
+function nums(s){var m=norm(s).match(/-?\d+(?:\.\d+)?/g);return m?m.map(Number):null}
+function isOk(val,spec){var v=norm(val),ok=false;spec.split("|").forEach(function(x){if(norm(x)===v)ok=true});if(ok)return true;var vn=nums(val),sn=nums(spec);return !!(vn&&sn&&vn.length&&vn.join(",")===sn.join(","))}
+function fmt(n){n=Math.round(n*10)/10;return n%1?n.toFixed(1).replace(".",","):String(n)}
+function esc(s){return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;")}
+var S={v:"A",names:{A:"",B:""},auto:{A:0,B:0},pend:0,blocks:0,items:{},done:{}};
+var TOTAL_BLOCKS=$$("[data-block]").length;
+try{var x=JSON.parse(localStorage.getItem(KEY)||"null");if(x&&x.items)S=x}catch(e){}
+function save(){try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}}
+function sname(k){return (S.names[k]||"").trim()||("Ученик "+(k==="A"?"А":"Б"))}
+function mark(p){return p>=90?"5":p>=75?"4":p>=55?"3":"2"}
+function renderResults(){
+ var box=$("#resultCard");if(!box)return;
+ var half=PAIR_MAX/2;
+ var tA=S.auto.A+S.pend/2,tB=S.auto.B+S.pend/2;
+ var pA=Math.min(100,Math.round(tA/half*100)),pB=Math.min(100,Math.round(tB/half*100));
+ var tot=S.auto.A+S.auto.B+S.pend;
+ box.innerHTML='<h3 class="rc-t">'+LESSON_TITLE+'</h3>'
+ +'<div class="rscroll"><table class="rt"><tr><th>Показатель</th><th>'+esc(sname("A"))+'</th><th>'+esc(sname("B"))+'</th></tr>'
+ +'<tr><td>Баллы за ответы</td><td>'+fmt(S.auto.A)+'</td><td>'+fmt(S.auto.B)+'</td></tr>'
+ +'<tr><td>Половина баллов пары «на проверке»</td><td>+'+fmt(S.pend/2)+'</td><td>+'+fmt(S.pend/2)+'</td></tr>'
+ +'<tr><td><b>Итоговый балл</b></td><td><b>'+fmt(tA)+'</b></td><td><b>'+fmt(tB)+'</b></td></tr>'
+ +'<tr><td><b>Предварительная отметка</b></td><td><b class="mk">«'+mark(pA)+'»</b></td><td><b class="mk">«'+mark(pB)+'»</b></td></tr>'
+ +'</table></div>'
+ +'<p class="rline">Балл пары: <b>'+fmt(tot)+'</b> из '+PAIR_MAX+' · из них на проверке: '+fmt(S.pend)+' · пройдено блоков: '+S.blocks+' из '+TOTAL_BLOCKS+'</p>'
+ +'<p class="rnote">Отметки предварительные: учитель проверит доказательства к донесениям, лабораторию ловушек, исправленный запрос и письменный финал — и утвердит результат.</p>'
+ +'<p class="rdate">'+new Date().toLocaleDateString("ru-RU",{day:"numeric",month:"long",year:"numeric"})+'</p>';
+}
+function renderBoard(){
+ $("#sA").textContent=fmt(S.auto.A);
+ $("#sB").textContent=fmt(S.auto.B);
+ $("#sPair").textContent=fmt(S.auto.A+S.auto.B+S.pend);
+ $("#sPairSub").textContent="из них на проверке: "+fmt(S.pend);
+ var p=Math.min(100,Math.round((S.auto.A+S.auto.B+S.pend)/PAIR_MAX*100));
+ $("#barFill").style.width=p+"%";$("#barPct").textContent=p+"%";
+ $("#sBlocks").textContent=S.blocks+" из "+TOTAL_BLOCKS;
+ $("#lblA").textContent=sname("A");$("#lblB").textContent=sname("B");
+ $("#swA").textContent=sname("A");$("#swB").textContent=sname("B");
+ $$(".sw").forEach(function(b){b.classList.toggle("on",b.getAttribute("data-s")===S.v)});
+ $$("[data-own]").forEach(function(el){el.textContent="Отвечает: "+sname(S.v)});
+ renderResults();
+}
+function bump(k,txt){
+ var row=$("#row"+k);if(!row)return;
+ var f=d.createElement("span");f.className="flt";f.textContent=txt;row.appendChild(f);
+ setTimeout(function(){if(f.parentNode)f.parentNode.removeChild(f)},1100);
+}
+/* ---- задачи с проверкой ---- */
+$$(".js-task").forEach(function(task){
+ var bid=task.getAttribute("data-block");
+ var items=$$(".js-item",task);
+ var btn=$(".js-check",task),hint=$(".js-hint",task);
+ function lock(it,val,cls,msg){
+  var inp=$(".tin",it);
+  if(inp){inp.value=val;inp.disabled=true}
+  it.classList.remove("wrong");it.classList.add(cls);
+  $(".tstat",it).textContent=msg;
+ }
+ items.forEach(function(it,idx){
+  var st=S.items[bid+"#"+idx];
+  if(!st)return;
+  var inp=$(".tin",it);
+  if(inp&&st.val!=null)inp.value=st.val;
+  if(st.stt==="ok")lock(it,st.val||"","ok","✓ +1");
+  else if(st.stt==="late")lock(it,st.val||"","late","✓ без балла");
+  else if(st.stt==="reveal")lock(it,it.getAttribute("data-sol"),"reveal","разобрали");
+  else if(st.stt==="wrong"){it.classList.add("wrong");$(".tstat",it).textContent="✗"}
+ });
+ task.addEventListener("keydown",function(e){
+  if(e.key==="Enter"&&e.target.classList&&e.target.classList.contains("tin")){e.preventDefault();if(btn&&!btn.disabled)btn.click()}
+ });
+ task.addEventListener("click",function(e){
+  if(!e.target.closest||!e.target.closest(".js-check"))return;
+  var anyOpen=false;
+  items.forEach(function(it,idx){
+   var key=bid+"#"+idx,st=S.items[key]||{};
+   var cl=it.classList;
+   if(cl.contains("ok")||cl.contains("late")||cl.contains("reveal"))return;
+   var inp=$(".tin",it),val=inp?inp.value:"";
+   if(!val.trim()){cl.add("wrong");$(".tstat",it).textContent="✗";S.items[key]={stt:"wrong",att:st.att||0,val:val};anyOpen=true;return}
+   if(isOk(val,it.getAttribute("data-ok"))){
+    if((st.att||0)===0){
+     S.items[key]={stt:"ok",att:0,val:val};
+     lock(it,val,"ok","✓ +1");
+     var own=it.getAttribute("data-owner")||S.v;S.auto[own]++;bump(own,"+1");
+    }else{
+     S.items[key]={stt:"late",att:st.att,val:val};
+     lock(it,val,"late","✓ без балла");
+    }
+   }else{
+    var att=(st.att||0)+1;
+    cl.add("wrong");$(".tstat",it).textContent="✗";
+    if(att>=2){
+     S.items[key]={stt:"reveal",att:att,val:val};
+     lock(it,it.getAttribute("data-sol"),"reveal","разобрали");
+    }else{
+     S.items[key]={stt:"wrong",att:att,val:val};anyOpen=true;
+    }
+   }
+  });
+  var solved=items.every(function(it){var c=it.classList;return c.contains("ok")||c.contains("late")||c.contains("reveal")});
+  if(hint)hint.hidden=solved;
+  if(solved&&!S.done[bid]){S.done[bid]=1;S.blocks++;btn.textContent="Задание проверено ✓";btn.disabled=true}
+  if(!solved)btn.textContent="Проверить ещё раз";
+  renderBoard();save();
+ });
+});
+/* ---- вердикты ---- */
+$$(".js-verdict").forEach(function(v){
+ var bid=v.getAttribute("data-block"),ok=v.getAttribute("data-ok");
+ var feed=$(".vfeed",v),expl=$(".expl",v),proof=$(".proof",v),ta=$(".js-proof",v),sp=$(".js-saveproof",v),msg=$(".pmsg",v);
+ function apply(st){
+  $$(".vbtn",v).forEach(function(b){b.disabled=true;if(b.getAttribute("data-v")===st.v)b.classList.add("picked")});
+  var good=st.v===ok,nop=v.hasAttribute("data-nopoints");
+  feed.hidden=false;
+  feed.className="vfeed "+(good?"good":(st.v==="maybe"?"meh":"bad"));
+  feed.innerHTML="<b>"+(good?(nop?"Ловушка распознана! ":"Верно! +1 балл. "):(st.v==="maybe"?"Сомнение — это честно, но балла нет. ":"Мимо ловушки! "))+"</b>"+(expl?expl.innerHTML:"");
+  if(proof)proof.hidden=false;
+  if(st.proof&&ta&&sp){ta.value=st.txt||"";ta.disabled=true;sp.disabled=true;if(msg){msg.textContent="✓ записано: +2 на проверке";msg.className="pmsg good"}}
+ }
+ if(S.items[bid])apply(S.items[bid]);
+ $$(".vbtn",v).forEach(function(b){b.addEventListener("click",function(){
+  if(S.items[bid])return;
+  var rec={v:b.getAttribute("data-v"),proof:0};
+  S.items[bid]=rec;
+  if(rec.v===ok&&!v.hasAttribute("data-nopoints")){S.auto[S.v]++;bump(S.v,"+1")}
+  apply(rec);
+  if(!S.done[bid]){S.done[bid]=1;S.blocks++}
+  renderBoard();save();
+ })});
+ if(sp)sp.addEventListener("click",function(){
+  var st=S.items[bid];
+  if(!st||st.proof)return;
+  if(norm(ta.value).length<20){msg.textContent="Запиши доказательство подробнее — от 20 знаков.";msg.className="pmsg bad";return}
+  st.proof=1;st.txt=ta.value;S.pend+=2;
+  ta.disabled=true;sp.disabled=true;
+  msg.textContent="✓ записано: +2 на проверке — проверит учитель";msg.className="pmsg good";
+  renderBoard();save();
+ });
+});
+/* ---- лаборатория / практика / письменный финал ---- */
+$$("[data-kind]").forEach(function(box){
+ var bid=box.getAttribute("data-block"),kind=box.getAttribute("data-kind");
+ var fields=$$(".field",box);
+ var cbs=$$(".cb",box);
+ var send=$(".js-send",box),msg=$(".pmsg",box);
+ function lock(){fields.forEach(function(x){x.disabled=true});cbs.forEach(function(c){c.disabled=true});send.disabled=true}
+ if(S.items[bid]&&S.items[bid].ok){
+  var st=S.items[bid];
+  fields.forEach(function(x,i){if(st.vals&&st.vals[i]!=null)x.value=st.vals[i]});
+  cbs.forEach(function(c,i){if(st.cbs)c.checked=!!st.cbs[i]});
+  lock();
+  if(msg){msg.textContent="✓ сдано: +"+st.pts+" на проверке — проверит учитель";msg.className="pmsg good"}
+ }
+ send.addEventListener("click",function(){
+  if(S.items[bid]&&S.items[bid].ok)return;
+  var vals=fields.map(function(x){return x.value});
+  var pts=0,err="";
+  if(kind==="lab"){
+   if(!vals[0])err="Выбери тип ошибки.";
+   else if(norm(vals[1]).length<15)err="Запиши заявление Навигатора — от 15 знаков.";
+   else if(norm(vals[2]).length<15)err="Запиши ключ: где ошибка и почему.";
+   pts=2;
+  }else if(kind==="prax"){
+   if(norm(vals[0]).length<20)err="Напиши исправленный запрос — от 20 знаков.";
+   pts=cbs.filter(function(c){return c.checked}).length;
+   if(!err&&!pts)err="Отметь пункты, которые есть в твоём запросе.";
+  }else{
+   for(var i=0;i<vals.length;i++){if(norm(vals[i]).length<15){err="Заполни ответ №"+(i+1)+" — от 15 знаков.";break}}
+   pts=8;
+  }
+  if(err){msg.textContent=err;msg.className="pmsg bad";return}
+  S.items[bid]={ok:1,pts:pts,vals:vals,cbs:cbs.map(function(c){return c.checked})};
+  S.pend+=pts;lock();
+  msg.textContent="✓ сдано: +"+pts+" на проверке — проверит учитель";msg.className="pmsg good";
+  if(!S.done[bid]){S.done[bid]=1;S.blocks++}
+  renderBoard();save();
+ });
+});
+/* ---- табло ---- */
+$("#nameA").addEventListener("input",function(){S.names.A=this.value;renderBoard();save()});
+$("#nameB").addEventListener("input",function(){S.names.B=this.value;renderBoard();save()});
+$$(".sw").forEach(function(b){b.addEventListener("click",function(){S.v=b.getAttribute("data-s");renderBoard();save()})});
+function reset(){if(confirm("Сбросить урок и начать заново? Все баллы пары будут удалены.")){try{localStorage.removeItem(KEY)}catch(e){}location.reload()}}
+$("#resetBtn").addEventListener("click",reset);
+$("#againBtn").addEventListener("click",reset);
+/* ---- итоги ---- */
+var modal=$("#modal");
+$("#showBtn").addEventListener("click",function(){renderResults();$("#mCard").innerHTML=$("#resultCard").innerHTML;modal.hidden=false});
+$("#printBtn").addEventListener("click",function(){renderResults();$("#mCard").innerHTML=$("#resultCard").innerHTML;modal.hidden=false;window.print()});
+$("#mClose").addEventListener("click",function(){modal.hidden=true});
+modal.addEventListener("click",function(e){if(e.target===modal)modal.hidden=true});
+$("#nameA").value=S.names.A||"";
+$("#nameB").value=S.names.B||"";
+renderBoard();
+})();
+</script>
+</body></html>
