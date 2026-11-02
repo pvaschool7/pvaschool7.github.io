@@ -50,7 +50,9 @@
 .b-barfill{height:100%;background:linear-gradient(90deg,var(--green),var(--blue));width:0;transition:.4s}
 .b-rules{font-size:13px;color:var(--mute);border-top:1px dashed var(--line);margin-top:12px;padding-top:10px;line-height:1.6}
 .b-rules b{color:var(--ink)}
-.b-reset{margin-top:12px;width:100%;padding:8px;border:2px dashed var(--red);background:none;color:var(--red);border-radius:10px;font-weight:600;cursor:pointer;font-size:14px}
+.b-save{margin-top:12px;width:100%;padding:9px;border:none;background:var(--green);color:#fff;border-radius:10px;font-weight:600;cursor:pointer;font-size:14px}
+.b-save:hover{filter:brightness(1.08)}
+.b-reset{margin-top:8px;width:100%;padding:8px;border:2px dashed var(--red);background:none;color:var(--red);border-radius:10px;font-weight:600;cursor:pointer;font-size:14px}
 .b-reset:hover{background:var(--red);color:#fff}
 .flt{position:absolute;right:10px;top:-4px;font-weight:800;color:var(--green);animation:flt 1s ease forwards;pointer-events:none}
 @keyframes flt{from{opacity:1;transform:translateY(0)}to{opacity:0;transform:translateY(-20px)}}
@@ -141,23 +143,19 @@ select.tin{max-width:250px;font-weight:600}
 @media print{body *{visibility:hidden}#modal,#modal *{visibility:visible}#modal{position:absolute;inset:0;background:#fff;display:block;padding:10px}.modal-box{box-shadow:none;max-height:none;max-width:none}.modal-bar{display:none}}
 </style></head><body>
 <div class="lhero"><div class="lwrap">
-<a class="back" href="../informatika.html">← На сайт учителя</a><br>
+<a class="back" href="../informatika-uchenikam.html">← Информатика · Ученикам</a><br>
 <span class="tag">Информатика · 7 класс · урок-экспедиция</span>
 <h1>Информационные процессы: бортовой центр</h1>
-<p class="lead">Пары-связисты обрабатывают данные станции «Самара‑1» и проверяют бортового ИИ. Работайте вдвоём за одним устройством: переключайте Ученика А и Ученика Б на табло, зарабатывайте баллы — а в конце покажите учителю итоговый балл и предварительную отметку.</p>
+<p class="lead">Работайте в паре за одним устройством: переключайте Ученика А и Ученика Б на табло, зарабатывайте баллы — в конце покажите учителю итоговый балл и предварительную отметку.</p>
 </div></div>
 <div class="lwrap lgrid">
 <main>
 <!-- 1. Легенда -->
 <section class="step"><div class="step-n">1</div><h2 class="step-title">Легенда: бортовой центр</h2>
-<p>Станция измеряет, хранит, считает и отправляет данные на Землю. Пять процессов: <b>сбор, хранение, обработка, передача, защита</b>. Позывной станции — «Самара‑1»: наш город работает на космос.</p>
-<p class="mute" style="font-size:14.5px">С 1958 года Самара (тогда Куйбышев) строит ракеты «Союз»; здесь собрана ракета «Восток» с Гагариным. РКЦ «Прогресс» — единственное предприятие серийной сборки «Союз‑2»: около 20 пусков в год.</p>
+<p>Станция измеряет, хранит, считает и отправляет данные на Землю. Пять процессов: <b>сбор, хранение, обработка, передача, защита</b>. Бортовой ИИ Навигатор докладывает уверенно, но иногда путает процессы и ошибается в расчётах — проверяйте его донесения теорией и счётом.</p>
 <div class="tgrid">
-<div class="tcard"><b>Бортовой ИИ Навигатор</b><p>Докладывает быстро и уверенно, но иногда путает процессы и ошибается в расчётах. Верить можно не всегда.</p></div>
-<div class="tcard"><b>Вы — связисты</b><p>Работаем парами: докладчик и писарь, роли меняются в каждом задании. Баллы пар суммируются.</p></div>
-<div class="tcard"><b>Радиомолчание</b><p>Личные телефоны создают помехи радиосвязи и сданы в «Шлюз». Проверяем теорией и счётом.</p></div>
+<div class="tcard"><b>Вы — связисты</b><p>Работаем парами: докладчик и писарь, роли меняются в каждом задании.</p></div>
 </div>
-<p class="mute">Впишите позывные (имена) на табло справа — они попадут в результат для учителя. Вердикты о донесениях ИИ поднимает тот, кто выбран на табло: переключайте Ученика А и Ученика Б.</p>
 </section>
 <!-- 2. Входная ловушка -->
 <section class="step"><div class="step-n">2</div><h2 class="step-title">Входная ловушка: датчик за бортом</h2>
@@ -251,7 +249,7 @@ select.tin{max-width:250px;font-weight:600}
 </section>
 <!-- 10. Сеансы 1–6 -->
 <section class="step"><div class="step-n">10</div><h2 class="step-title">Сеансы 1–6: ловим ошибки</h2>
-<p class="mute">Навигатор передаёт донесения. Вердикт поднимает тот, кто выбран на табло: за верный вердикт <b>+1</b>. Затем запишите доказательство — за него <b>+2</b>, но баллы «на проверке» утвердит учитель.</p>
+<p class="mute">За верный вердикт <b>+1</b>, за письменное доказательство <b>+2</b> — баллы «на проверке» утвердит учитель.</p>
 <div class="seans js-verdict" data-block="s1" data-ok="no">
 <span class="seans-n">Сеанс 1 · процессы</span>
 <div class="ai"><span class="ai-chip">Навигатор сообщает</span><p class="ai-say">«Когда бортовой компьютер записывает измерения в журнал, происходит обработка информации».</p></div>
@@ -311,7 +309,7 @@ select.tin{max-width:250px;font-weight:600}
 <textarea id="labS" class="ta field" rows="2" placeholder="Придумай уверенное заявление с одной ошибкой…"></textarea>
 <label for="labK">Ключ: где ошибка и почему</label>
 <textarea id="labK" class="ta field" rows="2" placeholder="Твой ключ для проверяющей пары…"></textarea>
-<p class="mute" style="font-size:13.5px">Нельзя придумывать обидное про людей: ловушки — только про информацию и ИИ. Лучшую ловушку зачитаем всему классу.</p>
+<p class="mute" style="font-size:13.5px">Ловушки — только про информацию и ИИ.</p>
 <div class="p-foot"><button class="btn sm js-send" type="button">Сдать ловушку (+2)</button><span class="pmsg"></span></div>
 </div>
 </section>
@@ -342,7 +340,7 @@ select.tin{max-width:250px;font-weight:600}
 </div>
 <div class="finw" data-block="finw" data-kind="finw">
 <h3 style="margin-bottom:4px">Письменный финал (каждый в паре)</h3>
-<p class="mute" style="font-size:14.5px">Переключайте Ученика А и Ученика Б на табло и отвечайте по очереди — учитель проверит тетради у обоих и оценит аргументацию по четырём критериям (до 8 баллов).</p>
+<p class="mute" style="font-size:14.5px">Отвечайте по очереди, письменно. Учитель проверит тетради у обоих (до 8 баллов).</p>
 <label for="fw1">1) Верю или не верю? Почему?</label>
 <textarea id="fw1" class="ta field" rows="2"></textarea>
 <label for="fw2">2) Где ошибка и какое доказательство?</label>
@@ -357,6 +355,7 @@ select.tin{max-width:250px;font-weight:600}
 <div class="rcard" id="resultCard"></div>
 <div class="res-actions">
 <button class="btn" id="showBtn" type="button">Показать результат учителю</button>
+<button class="btn ghost" id="xlsBtn2" type="button">Сохранить отчёт (XLSX)</button>
 <button class="btn ghost" id="printBtn" type="button">Печать результата</button>
 <button class="btn ghost" id="againBtn" type="button">Пройти заново</button>
 </div>
@@ -384,11 +383,12 @@ select.tin{max-width:250px;font-weight:600}
 <div class="b-bar"><div class="b-barfill" id="barFill"></div></div>
 <div class="b-sub"><span id="barPct">0%</span> от максимума урока · блоков пройдено: <b id="sBlocks">0 из 14</b></div>
 <div class="b-rules"><b>Как копятся баллы</b><br>+1 — верный вердикт или ответ (с первой попытки)<br>+2 — доказательство к донесению (проверит учитель)<br>+2 — своя ловушка в лаборатории<br>до +4 — исправленный запрос к ИИ<br>до +8 — письменный финал<br><b>Баллы «на проверке» получает пара</b> — учитель утвердит их в конце урока.</div>
+<button class="b-save" id="xlsBtn" type="button">Сохранить отчёт (XLSX)</button>
 <button class="b-reset" id="resetBtn" type="button">Сбросить урок</button>
 </aside>
 </div>
 <footer class="lfoot"><div class="lwrap">Интерактивный урок к презентации «Информационные процессы: бортовой центр» · <a href="../informatika-uchenikam.html">Информатика · 7 класс</a> · Плотников В. А. · МБОУ «Школа №7» г.о. Самара · <a href="../index.html">pvaschool7.github.io</a></div></footer>
-<div class="modal" id="modal" hidden><div class="modal-box"><div class="modal-bar"><b>Результат пары — для учителя</b><button class="btn ghost" id="mClose" type="button">Закрыть</button></div><div class="rcard" id="mCard" style="border:none"></div></div></div>
+<div class="modal" id="modal" hidden><div class="modal-box"><div class="modal-bar"><b>Результат пары — для учителя</b><span style="display:flex;gap:8px;align-items:center"><button class="btn ghost" id="mXls" type="button">XLSX</button><button class="btn ghost" id="mClose" type="button">Закрыть</button></span></div><div class="rcard" id="mCard" style="border:none"></div></div></div>
 <script>
 (function(){
 "use strict";
@@ -522,7 +522,7 @@ $$(".js-verdict").forEach(function(v){
  if(S.items[bid])apply(S.items[bid]);
  $$(".vbtn",v).forEach(function(b){b.addEventListener("click",function(){
   if(S.items[bid])return;
-  var rec={v:b.getAttribute("data-v"),proof:0};
+  var rec={v:b.getAttribute("data-v"),proof:0,own:S.v};
   S.items[bid]=rec;
   if(rec.v===ok&&!v.hasAttribute("data-nopoints")){S.auto[S.v]++;bump(S.v,"+1")}
   apply(rec);
@@ -582,9 +582,187 @@ $$("[data-kind]").forEach(function(box){
 $("#nameA").addEventListener("input",function(){S.names.A=this.value;renderBoard();save()});
 $("#nameB").addEventListener("input",function(){S.names.B=this.value;renderBoard();save()});
 $$(".sw").forEach(function(b){b.addEventListener("click",function(){S.v=b.getAttribute("data-s");renderBoard();save()})});
-function reset(){if(confirm("Сбросить урок и начать заново? Все баллы пары будут удалены.")){try{localStorage.removeItem(KEY)}catch(e){}location.reload()}}
+function freshState(){return {v:"A",names:{A:"",B:""},auto:{A:0,B:0},pend:0,blocks:0,items:{},done:{}}}
+function resetAll(){
+ S=freshState();try{localStorage.removeItem(KEY)}catch(e){}
+ $$(".js-task").forEach(function(task){
+  $$(".js-item",task).forEach(function(it){
+   it.classList.remove("ok","late","reveal","wrong");
+   var inp=$(".tin",it);if(inp){inp.value="";inp.disabled=false}
+   var st=$(".tstat",it);if(st)st.textContent="";
+  });
+  var b=$(".js-check",task);if(b){b.disabled=false;b.textContent="Проверить задание"}
+  var h=$(".js-hint",task);if(h)h.hidden=true;
+ });
+ $$(".js-verdict").forEach(function(v){
+  $$(".vbtn",v).forEach(function(b){b.disabled=false;b.classList.remove("picked")});
+  var f=$(".vfeed",v);if(f){f.hidden=true;f.className="vfeed";f.innerHTML=""}
+  var p=$(".proof",v);
+  if(p){p.hidden=true;var ta=$(".js-proof",v);if(ta){ta.value="";ta.disabled=false}
+   var sp=$(".js-saveproof",v);if(sp)sp.disabled=false;
+   var m=$(".pmsg",v);if(m){m.textContent="";m.className="pmsg"}}
+ });
+ $$("[data-kind]").forEach(function(box){
+  $$(".field",box).forEach(function(x){x.disabled=false;if(x.tagName==="SELECT"){x.selectedIndex=0}else{x.value=""}});
+  $$(".cb",box).forEach(function(c){c.checked=false;c.disabled=false});
+  var s=$(".js-send",box);if(s)s.disabled=false;
+  var m=$(".pmsg",box);if(m){m.textContent="";m.className="pmsg"}
+ });
+ ["nameA","nameB","rf1","rf2","rf3"].forEach(function(id){var el=document.getElementById(id);if(el)el.value=""});
+ var mdl=$("#modal");if(mdl)mdl.hidden=true;
+ renderBoard();
+}
+function reset(){if(confirm("Сбросить урок? Все заполненные формы станут пустыми, баллы пары удалятся.")){resetAll();window.scrollTo(0,0)}}
 $("#resetBtn").addEventListener("click",reset);
 $("#againBtn").addEventListener("click",reset);
+/* ---- автопереключение ученика при выборе вопроса ---- */
+$$(".js-item[data-owner]").forEach(function(it){
+ var own=it.getAttribute("data-owner");
+ function autoSw(){
+  if(S.v===own)return;
+  if(it.classList.contains("ok")||it.classList.contains("late")||it.classList.contains("reveal"))return;
+  S.v=own;renderBoard();save();
+ }
+ it.addEventListener("focusin",autoSw);
+ it.addEventListener("mousedown",autoSw);
+});
+/* ---- экспорт отчёта в XLSX ---- */
+var FILE_TAG="Информационные процессы";
+function xlEsc(s){return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;")}
+function xlCol(n){var s="";while(n>0){var m=(n-1)%26;s=String.fromCharCode(65+m)+s;n=(n-m-1)/26}return s}
+function u16(v){return [v&255,(v>>>8)&255]}
+function u32(v){return [v&255,(v>>>8)&255,(v>>>16)&255,(v>>>24)&255]}
+function crc32(b){var t=crc32.t||(crc32.t=function(){var c,n,k,t=[];for(n=0;n<256;n++){c=n;for(k=0;k<8;k++)c=c&1?3988292384^(c>>>1):c>>>1;t[n]=c>>>0}return t}());var c=-1;for(var i=0;i<b.length;i++)c=t[(c^b[i])&255]^(c>>>8);return (c^-1)>>>0}
+function buildZip(list){
+ var enc=new TextEncoder(),L=[],C=[],off=0,dt=new Date();
+ var tm=((dt.getHours()<<11)|(dt.getMinutes()<<5)|Math.floor(dt.getSeconds()/2))&65535;
+ var dd=(((dt.getFullYear()-1980)<<9)|((dt.getMonth()+1)<<5)|dt.getDate())&65535;
+ list.forEach(function(en){
+  var nb=enc.encode(en.name),db=enc.encode(en.data),crc=crc32(db),sz=db.length;
+  var lh=[].concat(u32(67324752),u16(20),u16(2048),u16(0),u16(tm),u16(dd),u32(crc),u32(sz),u32(sz),u16(nb.length),u16(0));
+  L=L.concat(lh,Array.prototype.slice.call(nb),Array.prototype.slice.call(db));
+  C=C.concat([].concat(u32(33639248),u16(20),u16(20),u16(2048),u16(0),u16(tm),u16(dd),u32(crc),u32(sz),u32(sz),u16(nb.length),u16(0),u16(0),u16(0),u16(0),u32(0),u32(off)),Array.prototype.slice.call(nb));
+  off+=lh.length+nb.length+sz;
+ });
+ var end=[].concat(u32(101010256),u16(0),u16(0),u16(list.length),u16(list.length),u32(C.length),u32(off),u16(0));
+ return new Uint8Array(L.concat(C,end));
+}
+function sheetXml(rows,cols){
+ var x='<?xml version="1.0" encoding="UTF-8" standalone="yes"?><worksheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main">';
+ if(cols)x+='<cols>'+cols.map(function(w,i){return '<col min="'+(i+1)+'" max="'+(i+1)+'" width="'+w+'" customWidth="1"/>'}).join("")+'</cols>';
+ x+='<sheetData>';
+ rows.forEach(function(r,ri){
+  x+='<row r="'+(ri+1)+'">';
+  r.forEach(function(c,ci){
+   if(c==null||c==="")return;
+   var ref=xlCol(ci+1)+(ri+1);
+   if(typeof c==="object"){
+    if(c.v==null||c.v==="")return;
+    if(typeof c.v==="number")x+='<c r="'+ref+'"'+(c.s?' s="'+c.s+'"':'')+'><v>'+c.v+'</v></c>';
+    else x+='<c r="'+ref+'" t="inlineStr"'+(c.s?' s="'+c.s+'"':'')+'><is><t xml:space="preserve">'+xlEsc(c.v)+'</t></is></c>';
+   }else x+='<c r="'+ref+'" t="inlineStr"><is><t xml:space="preserve">'+xlEsc(c)+'</t></is></c>';
+  });
+  x+='</row>';
+ });
+ return x+'</sheetData></worksheet>';
+}
+var XLSX_PARTS=[
+ {name:"[Content_Types].xml",data:'<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types"><Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/><Default Extension="xml" ContentType="application/xml"/><Override PartName="/xl/workbook.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet.main+xml"/><Override PartName="/xl/worksheets/sheet1.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.worksheet+xml"/><Override PartName="/xl/styles.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.styles+xml"/></Types>'},
+ {name:"_rels/.rels",data:'<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="xl/workbook.xml"/></Relationships>'},
+ {name:"xl/workbook.xml",data:'<?xml version="1.0" encoding="UTF-8" standalone="yes"?><workbook xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"><sheets><sheet name="Результат" sheetId="1" r:id="rId1"/></sheets></workbook>'},
+ {name:"xl/_rels/workbook.xml.rels",data:'<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/worksheet" Target="worksheets/sheet1.xml"/><Relationship Id="rId2" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/styles" Target="styles.xml"/></Relationships>'},
+ {name:"xl/styles.xml",data:'<?xml version="1.0" encoding="UTF-8" standalone="yes"?><styleSheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main"><fonts count="2"><font><sz val="11"/><name val="Calibri"/></font><font><b/><sz val="11"/><name val="Calibri"/></font></fonts><fills count="3"><fill><patternFill patternType="none"/></fill><fill><patternFill patternType="gray125"/></fill><fill><patternFill patternType="solid"><fgColor rgb="FFFFF3C4"/></patternFill></fill></fills><borders count="1"><border><left/><right/><top/><bottom/><diagonal/></border></borders><cellStyleXfs count="1"><xf numFmtId="0" fontId="0" fillId="0" borderId="0"/></cellStyleXfs><cellXfs count="4"><xf numFmtId="0" fontId="0" fillId="0" borderId="0" xfId="0"/><xf numFmtId="0" fontId="1" fillId="0" borderId="0" xfId="0" applyFont="1"/><xf numFmtId="0" fontId="1" fillId="2" borderId="0" xfId="0" applyFont="1" applyFill="1"/><xf numFmtId="0" fontId="0" fillId="0" borderId="0" xfId="0" applyAlignment="1"><alignment wrapText="1" vertical="top"/></xf></cellXfs><cellStyles count="1"><cellStyle name="Normal" xfId="0" builtinId="0"/></cellStyles><dxfs count="0"/></styleSheet>'}
+];
+function blockTitle(bid){var el=document.querySelector('[data-block="'+bid+'"]');if(!el)return bid;var st=el.closest?el.closest(".step"):null;var h=st?st.querySelector(".step-title"):null;return h?h.textContent.trim():bid}
+function reportRows(){
+ var half=PAIR_MAX/2,tA=S.auto.A+S.pend/2,tB=S.auto.B+S.pend/2;
+ var pA=Math.min(100,Math.round(tA/half*100)),pB=Math.min(100,Math.round(tB/half*100));
+ var tot=S.auto.A+S.auto.B+S.pend,R=[];
+ R.push([{v:LESSON_TITLE,s:1}]);
+ R.push(["МБОУ «Школа №7» г.о. Самара · учитель Плотников В. А. · pvaschool7.github.io"]);
+ R.push(["Дата прохождения: "+new Date().toLocaleDateString("ru-RU",{day:"numeric",month:"long",year:"numeric"})]);
+ R.push([]);
+ R.push([{v:"Ученик А",s:2},{v:sname("A"),s:1},{v:"Ученик Б",s:2},{v:sname("B"),s:1}]);
+ R.push([]);
+ R.push([{v:"Показатель",s:2},{v:"Ученик А",s:2},{v:"Ученик Б",s:2}]);
+ R.push(["Баллы за ответы",fmt(S.auto.A),fmt(S.auto.B)]);
+ R.push(["Половина баллов пары «на проверке»","+"+fmt(S.pend/2),"+"+fmt(S.pend/2)]);
+ R.push([{v:"Итоговый балл",s:1},{v:fmt(tA),s:1},{v:fmt(tB),s:1}]);
+ R.push([{v:"Предварительная отметка",s:2},{v:"«"+mark(pA)+"»",s:2},{v:"«"+mark(pB)+"»",s:2}]);
+ R.push(["Балл пары: "+fmt(tot)+" из "+PAIR_MAX+" · блоков пройдено: "+S.blocks+" из "+TOTAL_BLOCKS]);
+ R.push([]);
+ R.push([{v:"Детализация по блокам",s:1}]);
+ R.push([{v:"Блок",s:2},{v:"Баллы",s:2},{v:"Пояснение",s:2}]);
+ var seen={};
+ $$("[data-block]").forEach(function(el){
+  var bid=el.getAttribute("data-block");if(seen[bid])return;seen[bid]=1;
+  var st=S.items[bid],pts="—",expl=[];
+  if(el.classList.contains("js-task")){
+   var p=0;
+   $$(".js-item",el).forEach(function(it,i){
+    var s2=S.items[bid+"#"+i];if(!s2)return;
+    var who=(it.getAttribute("data-owner")==="B"?"Б":"А")+" №"+(i+1);
+    var v=s2.val!=null&&s2.val!==""?s2.val:(s2.stt==="reveal"?it.getAttribute("data-sol"):"");
+    if(s2.stt==="ok"){p++;expl.push(who+": "+v+" — верно, +1 ("+sname(it.getAttribute("data-owner"))+")")}
+    else if(s2.stt==="late")expl.push(who+": "+v+" — верно без балла (не с первой попытки)");
+    else if(s2.stt==="reveal")expl.push(who+": разобрали, ответ "+it.getAttribute("data-sol"));
+    else if(s2.stt==="wrong")expl.push(who+": ошибка");
+   });
+   if(p)pts="+"+p;
+  }else if(el.classList.contains("js-verdict")){
+   if(st){
+    var vs={yes:"верю ИИ",no:"не верю",maybe:"сомневаюсь"}[st.v]||st.v;
+    var good=st.v===el.getAttribute("data-ok")&&!el.hasAttribute("data-nopoints");
+    if(good){pts="+1";expl.push("вердикт: "+vs+" · "+sname(st.own||S.v))}
+    else expl.push("вердикт: "+vs+(el.hasAttribute("data-nopoints")?" (разминка, без баллов)":""));
+    if(st.proof){expl.push("доказательство записано (+2 на проверке)");pts=good?"+3":"+2"}
+   }
+  }else{
+   if(st&&st.ok){pts="+"+st.pts;expl.push("сдано, на проверке — утвердит учитель")}
+  }
+  R.push([{v:blockTitle(bid)},{v:pts},{v:expl.join("; ")||"—",s:3}]);
+ });
+ R.push([]);
+ R.push([{v:"Доказательства и письменные ответы — проверить учителю",s:1}]);
+ var any=false;
+ $$("[data-block]").forEach(function(el){
+  var bid=el.getAttribute("data-block"),st=S.items[bid];
+  if(!st)return;
+  if(el.classList.contains("js-verdict")&&st.txt){any=true;R.push([{v:blockTitle(bid)+" — доказательство ("+sname(st.own||S.v)+")"},{v:st.txt,s:3}])}
+  if(el.hasAttribute("data-kind")&&st.ok&&st.vals){
+   any=true;
+   $$(".field",el).forEach(function(f,i){
+    if(st.vals[i]==null||st.vals[i]==="")return;
+    var lab=f.id?document.querySelector('label[for="'+f.id+'"]'):null;
+    R.push([{v:blockTitle(bid)+(lab?" — "+lab.textContent.trim():" — поле "+(i+1))},{v:st.vals[i],s:3}]);
+   });
+   if(st.cbs){var marks=[];$$(".cb",el).forEach(function(c,i){if(st.cbs[i])marks.push("+ "+c.parentNode.textContent.trim())});
+    if(marks.length)R.push([{v:blockTitle(bid)+" — отмеченные критерии"},{v:marks.join(", "),s:3}])}
+  }
+ });
+ ["rf1","rf2","rf3"].forEach(function(id){
+  var el=document.getElementById(id);
+  if(el&&el.value.trim()){any=true;
+   var lab=document.querySelector('label[for="'+id+'"]');
+   R.push([{v:"Рефлексия"+(lab?" — "+lab.textContent.trim():"")},{v:el.value,s:3}])}
+ });
+ if(!any)R.push(["Пока нет записанных доказательств и письменных ответов."]);
+ R.push([]);
+ R.push(["Отметки предварительные: учитель проверяет доказательства, лабораторию, запрос и письменный финал — и утверждает результат."]);
+ return R;
+}
+function saveXls(){
+ var parts=XLSX_PARTS.concat([{name:"xl/worksheets/sheet1.xml",data:sheetXml(reportRows(),[46,36,46])}]);
+ var blob=new Blob([buildZip(parts)],{type:"application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"});
+ var a=document.createElement("a");
+ a.href=URL.createObjectURL(blob);
+ a.download="Отчёт урока — "+FILE_TAG+" — "+new Date().toISOString().slice(0,10)+".xlsx";
+ d.body.appendChild(a);a.click();
+ setTimeout(function(){URL.revokeObjectURL(a.href);if(a.parentNode)a.parentNode.removeChild(a)},500);
+}
+$("#xlsBtn").addEventListener("click",saveXls);
+var xb2=$("#xlsBtn2");if(xb2)xb2.addEventListener("click",saveXls);
+var mx=$("#mXls");if(mx)mx.addEventListener("click",saveXls);
 /* ---- итоги ---- */
 var modal=$("#modal");
 $("#showBtn").addEventListener("click",function(){renderResults();$("#mCard").innerHTML=$("#resultCard").innerHTML;modal.hidden=false});

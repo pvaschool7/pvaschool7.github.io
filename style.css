@@ -116,7 +116,7 @@ details[open]>summary .chev{transform:rotate(45deg)}
 @media(max-width:860px){.grade-bar{top:58px;padding:7px;border-radius:12px}.grade-nav{gap:6px}.grade-tab{font-size:14px;padding:3px 13px 3px 4px;gap:6px}.grade-tab .n{width:25px;height:25px;font-size:16px}.grade-panel{scroll-margin-top:132px}.grade-panel-head{padding:10px 14px}.grade-panel-head h2{font-size:25px}.grade-panel-body{padding:2px 14px 14px}.subsec>summary{font-size:16px;padding:10px 12px}.subsec-body{padding:12px}}
 
 /* ===== Кнопки «Пройти урок в классе» в карточках ===== */
-.card-actions{display:flex;flex-wrap:wrap;align-items:center;gap:14px;margin-top:14px}
+.card-actions{display:flex;flex-direction:column;align-items:flex-start;gap:12px;margin-top:16px;padding-top:14px;border-top:1px dashed var(--line)}
 .btn.sm{padding:9px 18px;font-size:15px;border-radius:10px}
 .card-link{font-weight:600;color:var(--blue);text-decoration:none;font-size:15px}
 .card-link:hover{text-decoration:underline}
