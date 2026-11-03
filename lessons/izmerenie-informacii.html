@@ -145,6 +145,29 @@ select.tin{max-width:250px;font-weight:600}
 .modal-box{background:var(--card);border-radius:16px;max-width:660px;width:100%;max-height:90vh;overflow:auto;box-shadow:0 22px 60px rgba(0,0,0,.4)}
 .modal-bar{display:flex;justify-content:space-between;align-items:center;padding:12px 18px;border-bottom:1px solid var(--line);position:sticky;top:0;background:var(--card)}
 .modal-bar .btn{padding:6px 14px;font-size:14px}
+/* ===== Чек-лист (шаг 0) и папка lessons ===== */
+.chk{position:relative;border:3px solid var(--yellow);background:linear-gradient(150deg,#fff6d8,#ffe9a8);border-radius:16px;box-shadow:6px 7px 0 rgba(201,162,39,.3);padding:20px 22px;margin:0 0 22px;animation:chkpulse 1.6s ease-in-out infinite}
+.chk.done{animation:none;border-color:var(--green);background:linear-gradient(150deg,#eefaf0,#dcf5e3);box-shadow:6px 7px 0 rgba(34,139,84,.16)}
+@keyframes chkpulse{0%,100%{box-shadow:6px 7px 0 rgba(201,162,39,.3)}50%{box-shadow:6px 7px 0 rgba(201,162,39,.3),0 0 0 9px rgba(255,215,110,.22)}}
+.chk-badge{display:inline-block;background:var(--red);color:#fff;border-radius:99px;padding:3px 14px;font-weight:700;font-size:12.5px;letter-spacing:.08em;text-transform:uppercase;margin-bottom:6px}
+.chk h2{margin:0 0 .3em}
+.chk .chk-actions{display:flex;flex-wrap:wrap;gap:12px;align-items:center;margin-top:12px}
+.chk-btn{background:var(--green);border-color:var(--green);color:#fff;font-size:17px;padding:12px 22px;box-shadow:3px 4px 0 rgba(0,0,0,.18)}
+.chk-btn:hover{filter:brightness(1.07);color:#fff}
+.chk-ok{font-weight:700;color:var(--green)}
+.fld{border:2px dashed var(--blue)}
+.fld-status{font-size:14px;color:var(--mute);font-weight:600;flex:1;min-width:200px}
+/* ===== Формы А и Б ===== */
+.duo{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:14px;margin:12px 0}
+.duo-form{border:2px solid var(--line);border-radius:12px;padding:14px 16px;background:var(--paper);min-width:0}
+.duo-form.ownA{border-color:rgba(47,111,208,.55)}
+.duo-form.ownB{border-color:rgba(34,139,84,.55)}
+.who-tag{display:inline-block;background:var(--yellow);border-radius:99px;padding:3px 13px;font-weight:700;font-size:13px;margin-bottom:10px}
+.duo-form.ownB .who-tag{background:#d9f2e4}
+.own-chip{display:inline-block;border:2px solid var(--blue);color:var(--blue);border-radius:99px;padding:2px 12px;font-weight:700;font-size:12.5px;margin-left:10px;vertical-align:middle;background:var(--card)}
+.own-chip.b{border-color:var(--green);color:var(--green)}
+.ord-note{border-left:4px solid var(--yellow);background:var(--paper);border-radius:0 10px 10px 0;padding:8px 12px;font-size:14.5px}
+@media(max-width:700px){.duo{grid-template-columns:1fr}}
 @media print{body *{visibility:hidden}#modal,#modal *{visibility:visible}#modal{position:absolute;inset:0;background:#fff;display:block;padding:10px}.modal-box{box-shadow:none;max-height:none;max-width:none}.modal-bar{display:none}}
 </style></head><body>
 <div class="lhero"><div class="lwrap">
@@ -155,11 +178,21 @@ select.tin{max-width:250px;font-weight:600}
 </div></div>
 <div class="lwrap lgrid">
 <main>
+<!-- 0. Чек-лист пары -->
+<section class="chk" id="chkCard"><div class="chk-badge">Шаг 0 · скачайте сразу</div><h2 class="step-title">Чек-лист пары</h2>
+<p>В файле — чек-листы к уроку «Измерение информации: бортовой центр»: чек-лист учителя, лист пары, чек-листы к каждому заданию, лист мастерской «Лаборатория ловушек» и лист финала. Скачайте в начале урока и держите перед глазами — так вы не пропустите ни одного шага.</p>
+<div class="chk-actions"><a class="btn chk-btn" id="chkBtn" href="cheklists/chek-list-izmerenie-informacii.docx" download>↓ Скачать чек-лист (DOCX)</a><a class="btn ghost sm" href="cheklists/chek-list-izmerenie-informacii.docx" target="_blank" rel="noopener">Открыть для просмотра</a><span class="chk-ok" id="chkOk" hidden>✓ Чек-лист скачан</span></div>
+</section>
+<!-- Папка lessons: живой журнал ответов -->
+<section class="step fld" id="fldCard"><h2 class="step-title" style="font-size:22px;margin-bottom:6px">Папка «lessons» — журнал ответов пары</h2>
+<p class="task-intro">Нажмите кнопку и выберите свою папку (например, «Загрузки» или личную папку пары) — внутри неё сайт создаст папку <b>lessons</b> и будет после каждого ответа автоматически обновлять в ней отчёт со всеми ответами: документ пары ведётся в реальном времени.</p>
+<div class="p-foot" style="margin-top:10px"><button class="btn sm" id="dirBtn" type="button">Выбрать папку «lessons»</button><span class="fld-status" id="dirStatus">Папка не выбрана — отчёт сохраняется вручную кнопкой «Сохранить отчёт (XLSX)» на табло.</span></div>
+</section>
 <!-- 1. Легенда -->
 <section class="step"><div class="step-n">1</div><h2 class="step-title">Легенда: бортовой центр</h2>
 <p>Станция «Самара‑1» шлёт донесения, а бортовой ИИ Навигатор докладывает уверенно, но часто ошибается: путает единицы, ошибается в расчётах. Проверяйте его донесения теорией и счётом.</p>
 <div class="tgrid">
-<div class="tcard"><b>Вы — связисты</b><p>Работаем парами: докладчик и писарь, роли меняются. В заданиях А решает 1–3, Б решает 4–5, затем взаимная проверка.</p></div>
+<div class="tcard"><b>Вы — связисты</b><p>Работаем парами: докладчик и писарь, роли меняются. В задании 2 порядок особый: сначала Б отвечает на 1–3, потом А — на 4–5. Сеансы 1–6 отвечаете строго по очереди: А — нечётные, Б — чётные.</p></div>
 <div class="tcard"><b>Главный вопрос урока</b><p>Сколько «весит» информация? В конце урока — итоговый балл пары и предварительная отметка каждому.</p></div>
 </div>
 </section>
@@ -215,12 +248,13 @@ select.tin{max-width:250px;font-weight:600}
 <!-- 6. Задание 2 -->
 <section class="step"><div class="step-n">6</div><h2 class="step-title">Задание 2: переводим единицы</h2>
 <p class="task-intro">Переведите: 1) 3 байта в биты; 2) 24 бита в байты; 3) 2 Кбайт в байты; 4) 4096 байт в Кбайт; 5) 2 Мбайт в Кбайт.</p>
-<div class="js-task" data-block="task2">
-<div class="titem js-item" data-owner="A" data-ok="24" data-sol="24"><span class="who">А</span><span class="tlabel">1) 3 байта =</span><input class="tin" type="text" inputmode="numeric" autocomplete="off" aria-label="Ответ 1"><span class="tunit">бит</span><span class="tstat" aria-live="polite"></span></div>
-<div class="titem js-item" data-owner="A" data-ok="3" data-sol="3"><span class="who">А</span><span class="tlabel">2) 24 бита =</span><input class="tin" type="text" inputmode="numeric" autocomplete="off" aria-label="Ответ 2"><span class="tunit">байта</span><span class="tstat" aria-live="polite"></span></div>
-<div class="titem js-item" data-owner="A" data-ok="2048" data-sol="2048"><span class="who">А</span><span class="tlabel">3) 2 Кбайт =</span><input class="tin" type="text" inputmode="numeric" autocomplete="off" aria-label="Ответ 3"><span class="tunit">байта</span><span class="tstat" aria-live="polite"></span></div>
-<div class="titem js-item" data-owner="B" data-ok="4" data-sol="4"><span class="who">Б</span><span class="tlabel">4) 4096 байт =</span><input class="tin" type="text" inputmode="numeric" autocomplete="off" aria-label="Ответ 4"><span class="tunit">Кбайт</span><span class="tstat" aria-live="polite"></span></div>
-<div class="titem js-item" data-owner="B" data-ok="2048" data-sol="2048"><span class="who">Б</span><span class="tlabel">5) 2 Мбайт =</span><input class="tin" type="text" inputmode="numeric" autocomplete="off" aria-label="Ответ 5"><span class="tunit">Кбайт</span><span class="tstat" aria-live="polite"></span></div>
+<p class="ord-note"><b>Порядок выполнения:</b> сначала <b>3 ответа даёт Ученик Б</b> (вопросы 1–3), затем <b>2 ответа — Ученик А</b> (вопросы 4–5). Вопросы А откроются автоматически, как только Б закончит свои три.</p>
+<div class="js-task" data-block="task2" data-gate="1">
+<div class="titem js-item" data-owner="B" data-ok="24" data-sol="24"><span class="who">Б</span><span class="tlabel">1) 3 байта =</span><input class="tin" type="text" inputmode="numeric" autocomplete="off" aria-label="Ответ 1"><span class="tunit">бит</span><span class="tstat" aria-live="polite"></span></div>
+<div class="titem js-item" data-owner="B" data-ok="3" data-sol="3"><span class="who">Б</span><span class="tlabel">2) 24 бита =</span><input class="tin" type="text" inputmode="numeric" autocomplete="off" aria-label="Ответ 2"><span class="tunit">байта</span><span class="tstat" aria-live="polite"></span></div>
+<div class="titem js-item" data-owner="B" data-ok="2048" data-sol="2048"><span class="who">Б</span><span class="tlabel">3) 2 Кбайт =</span><input class="tin" type="text" inputmode="numeric" autocomplete="off" aria-label="Ответ 3"><span class="tunit">байта</span><span class="tstat" aria-live="polite"></span></div>
+<div class="titem js-item" data-owner="A" data-ok="4" data-sol="4"><span class="who">А</span><span class="tlabel">4) 4096 байт =</span><input class="tin" type="text" inputmode="numeric" autocomplete="off" aria-label="Ответ 4"><span class="tunit">Кбайт</span><span class="tstat" aria-live="polite"></span></div>
+<div class="titem js-item" data-owner="A" data-ok="2048" data-sol="2048"><span class="who">А</span><span class="tlabel">5) 2 Мбайт =</span><input class="tin" type="text" inputmode="numeric" autocomplete="off" aria-label="Ответ 5"><span class="tunit">Кбайт</span><span class="tstat" aria-live="polite"></span></div>
 <div class="task-foot"><button class="btn sm js-check" type="button">Проверить задание</button><div class="hint js-hint" hidden>Вниз по лестнице — умножаем (×8, ×1024), вверх — делим (:8, :1024). Не забудь: 1 Кбайт = 1024 байта.</div></div>
 </div>
 </section>
@@ -256,49 +290,49 @@ select.tin{max-width:250px;font-weight:600}
 </section>
 <!-- 10. Сеансы 1–6 -->
 <section class="step"><div class="step-n">10</div><h2 class="step-title">Сеансы 1–6: ловим ошибки</h2>
-<p class="mute">За верный вердикт <b>+1</b>, за письменное доказательство <b>+2</b> — баллы «на проверке» утвердит учитель.</p>
-<div class="seans js-verdict" data-block="s1" data-ok="no">
-<span class="seans-n">Сеанс 1</span>
+<p class="mute">За верный вердикт <b>+1</b>, за письменное доказательство <b>+2</b> — баллы «на проверке» утвердит учитель.<br>Порядок: сеансы <b>1, 3, 5</b> отвечает <b>Ученик А</b>, сеансы <b>2, 4, 6</b> — <b>Ученик Б</b>; переключение произойдёт само.</p>
+<div class="seans js-verdict" data-block="s1" data-ok="no" data-owner="A">
+<span class="seans-n">Сеанс 1</span><span class="own-chip">отвечает Ученик А</span>
 <div class="ai"><span class="ai-chip">Навигатор сообщает</span><p class="ai-say">«Чтобы закодировать 8 разных сигналов, нужно 8 бит на каждый сигнал».</p></div>
 <div class="vrow" role="group" aria-label="Вердикт"><button class="vbtn yes" data-v="yes" type="button">ВЕРЮ ИИ</button><button class="vbtn no" data-v="no" type="button">НЕ ВЕРЮ</button><button class="vbtn maybe" data-v="maybe" type="button">СОМНЕВАЮСЬ</button></div>
 <div class="vfeed" hidden></div>
 <div class="expl">8 разных сигналов различаются тремя битами: 2<sup>3</sup> = 8. Навигатор перепутал число сигналов (N) с числом бит (i).</div>
 <div class="proof" hidden><label class="p-lab" for="pf1">Доказательство письменно (+2): где ошибка, почему Навигатор ошибся, как избежать?</label><textarea id="pf1" class="ta js-proof" rows="3" placeholder="Например: 8 сигналов различаются тремя битами, потому что 2 в кубе равно 8…"></textarea><div class="p-foot"><button class="btn sm ghost js-saveproof" type="button">Записать доказательство (+2)</button><span class="pmsg"></span></div></div>
 </div>
-<div class="seans js-verdict" data-block="s2" data-ok="no">
-<span class="seans-n">Сеанс 2</span>
+<div class="seans js-verdict" data-block="s2" data-ok="no" data-owner="B">
+<span class="seans-n">Сеанс 2</span><span class="own-chip b">отвечает Ученик Б</span>
 <div class="ai"><span class="ai-chip">Навигатор сообщает</span><p class="ai-say">«В 1 Кбайте 1000 байт, поэтому 2 Кбайт — это 2000 байт».</p></div>
 <div class="vrow" role="group" aria-label="Вердикт"><button class="vbtn yes" data-v="yes" type="button">ВЕРЮ ИИ</button><button class="vbtn no" data-v="no" type="button">НЕ ВЕРЮ</button><button class="vbtn maybe" data-v="maybe" type="button">СОМНЕВАЮСЬ</button></div>
 <div class="vfeed" hidden></div>
 <div class="expl">1 Кбайт = 1024 байта = 2<sup>10</sup>. Компьютер считает степенями двойки, поэтому 2 Кбайт = 2048 байта.</div>
 <div class="proof" hidden><label class="p-lab" for="pf2">Доказательство письменно (+2):</label><textarea id="pf2" class="ta js-proof" rows="3" placeholder="Запиши: сколько байт в 1 Кбайте и почему…"></textarea><div class="p-foot"><button class="btn sm ghost js-saveproof" type="button">Записать доказательство (+2)</button><span class="pmsg"></span></div></div>
 </div>
-<div class="seans js-verdict" data-block="s3" data-ok="no">
-<span class="seans-n">Сеанс 3</span>
+<div class="seans js-verdict" data-block="s3" data-ok="no" data-owner="A">
+<span class="seans-n">Сеанс 3</span><span class="own-chip">отвечает Ученик А</span>
 <div class="ai"><span class="ai-chip">Навигатор сообщает</span><p class="ai-say">«Чтобы перевести байты в биты, число делят на 8: 5 байт — это меньше одного бита».</p></div>
 <div class="vrow" role="group" aria-label="Вердикт"><button class="vbtn yes" data-v="yes" type="button">ВЕРЮ ИИ</button><button class="vbtn no" data-v="no" type="button">НЕ ВЕРЮ</button><button class="vbtn maybe" data-v="maybe" type="button">СОМНЕВАЮСЬ</button></div>
 <div class="vfeed" hidden></div>
 <div class="expl">Байт крупнее бита. Байты → биты — это вниз по лестнице, значит умножаем: 5 × 8 = 40 бит.</div>
 <div class="proof" hidden><label class="p-lab" for="pf3">Доказательство письменно (+2):</label><textarea id="pf3" class="ta js-proof" rows="3" placeholder="Когда умножаем, а когда делим: вниз или вверх по лестнице единиц…"></textarea><div class="p-foot"><button class="btn sm ghost js-saveproof" type="button">Записать доказательство (+2)</button><span class="pmsg"></span></div></div>
 </div>
-<div class="seans js-verdict" data-block="s4" data-ok="no">
-<span class="seans-n">Сеанс 4</span>
+<div class="seans js-verdict" data-block="s4" data-ok="no" data-owner="B">
+<span class="seans-n">Сеанс 4</span><span class="own-chip b">отвечает Ученик Б</span>
 <div class="ai"><span class="ai-chip">Навигатор сообщает</span><p class="ai-say">«Донесение из 20 знаков, алфавит из 16 знаков. Объём: 20 · 4 = 80 бит, то есть 8 байт».</p></div>
 <div class="vrow" role="group" aria-label="Вердикт"><button class="vbtn yes" data-v="yes" type="button">ВЕРЮ ИИ</button><button class="vbtn no" data-v="no" type="button">НЕ ВЕРЮ</button><button class="vbtn maybe" data-v="maybe" type="button">СОМНЕВАЮСЬ</button></div>
 <div class="vfeed" hidden></div>
 <div class="expl">Считаем вместе: 16 = 2<sup>4</sup>, значит i = 4 бита; I = 20 · 4 = 80 бит — здесь верно. Но 80 : 8 = 10 байт, а не 8. Ошибка в переводе единиц.</div>
 <div class="proof" hidden><label class="p-lab" for="pf4">Доказательство письменно (+2):</label><textarea id="pf4" class="ta js-proof" rows="3" placeholder="Посчитай на листе: 20 · 4, затем переведи в байты…"></textarea><div class="p-foot"><button class="btn sm ghost js-saveproof" type="button">Записать доказательство (+2)</button><span class="pmsg"></span></div></div>
 </div>
-<div class="seans js-verdict" data-block="s5" data-ok="yes">
-<span class="seans-n">Сеанс 5</span>
+<div class="seans js-verdict" data-block="s5" data-ok="yes" data-owner="A">
+<span class="seans-n">Сеанс 5</span><span class="own-chip">отвечает Ученик А</span>
 <div class="ai"><span class="ai-chip">Навигатор сообщает</span><p class="ai-say">«Если в алфавите 256 знаков, то один знак весит 8 бит, то есть 1 байт».</p></div>
 <div class="vrow" role="group" aria-label="Вердикт"><button class="vbtn yes" data-v="yes" type="button">ВЕРЮ ИИ</button><button class="vbtn no" data-v="no" type="button">НЕ ВЕРЮ</button><button class="vbtn maybe" data-v="maybe" type="button">СОМНЕВАЮСЬ</button></div>
 <div class="vfeed" hidden></div>
 <div class="expl">Верно: 256 = 2<sup>8</sup>, значит i = 8 бит = 1 байт. Это единственное верное донесение — ловушка не сработала.</div>
 <div class="proof" hidden><label class="p-lab" for="pf5">Обоснуй письменно (+2): почему это верно?</label><textarea id="pf5" class="ta js-proof" rows="3" placeholder="2 в восьмой степени равно 256, поэтому…"></textarea><div class="p-foot"><button class="btn sm ghost js-saveproof" type="button">Записать обоснование (+2)</button><span class="pmsg"></span></div></div>
 </div>
-<div class="seans js-verdict" data-block="s6" data-ok="no">
-<span class="seans-n">Сеанс 6</span>
+<div class="seans js-verdict" data-block="s6" data-ok="no" data-owner="B">
+<span class="seans-n">Сеанс 6</span><span class="own-chip b">отвечает Ученик Б</span>
 <div class="ai"><span class="ai-chip">Навигатор сообщает</span><p class="ai-say">«Согласно “Справочнику связиста Ларина” (1985), в одном байте 10 бит, поэтому станции считают по десяткам».</p></div>
 <div class="vrow" role="group" aria-label="Вердикт"><button class="vbtn yes" data-v="yes" type="button">ВЕРЮ ИИ</button><button class="vbtn no" data-v="no" type="button">НЕ ВЕРЮ</button><button class="vbtn maybe" data-v="maybe" type="button">СОМНЕВАЮСЬ</button></div>
 <div class="vfeed" hidden></div>
@@ -309,24 +343,42 @@ select.tin{max-width:250px;font-weight:600}
 <!-- 11. Лаборатория ловушек -->
 <section class="step"><div class="step-n">11</div><h2 class="step-title">Лаборатория ловушек: сочиняем сами</h2>
 <p class="task-intro">1. Выберите блок теории. 2. Придумайте заявление Навигатора с одной ошибкой (если расчёт — дайте исходные числа и неверный ответ). 3. На обороте листа напишите ключ: где ошибка и почему. 4. Обменяйтесь с соседней парой и найдите ошибку по «Инструментам связиста».</p>
-<div class="lab" data-block="lab" data-kind="lab">
-<label for="labT">Тип ошибки</label>
-<select id="labT" class="tin lab-type field"><option value="">— выбери тип —</option><option>путаница N и i (знаки и биты)</option><option>путаница бит и байт</option><option>1000 вместо 1024</option><option>перевод в не ту сторону</option><option>ошибка в расчёте I = K · i</option><option>фальшивый источник</option></select>
-<label for="labS">Заявление Навигатора</label>
-<textarea id="labS" class="ta field" rows="2" placeholder="Придумай уверенное заявление с одной ошибкой…"></textarea>
-<label for="labK">Ключ: где ошибка и почему</label>
-<textarea id="labK" class="ta field" rows="2" placeholder="Твой ключ для проверяющей пары…"></textarea>
-<p class="mute" style="font-size:13.5px">Ловушки — только про информацию и ИИ. Время: 2 мин — сочиняем, 1 мин — обмен, 1 мин — проверка.</p>
+<p class="ord-note">Форма у каждого: сначала заполняет <b>Ученик А</b>, затем <b>Ученик Б</b>. За каждую сданную ловушку +2 на проверке.</p>
+<div class="duo">
+<div class="duo-form ownA" data-block="labA" data-kind="lab" data-owner="A">
+<span class="who-tag">Форма Ученика А</span>
+<label for="labTA">Тип ошибки</label>
+<select id="labTA" class="tin lab-type field"><option value="">— выбери тип —</option><option>путаница N и i (знаки и биты)</option><option>путаница бит и байт</option><option>1000 вместо 1024</option><option>перевод в не ту сторону</option><option>ошибка в расчёте I = K · i</option><option>фальшивый источник</option></select>
+<label for="labSA">Заявление Навигатора</label>
+<textarea id="labSA" class="ta field" rows="2" placeholder="Придумай уверенное заявление с одной ошибкой…"></textarea>
+<label for="labKA">Ключ: где ошибка и почему</label>
+<textarea id="labKA" class="ta field" rows="2" placeholder="Твой ключ для проверяющей пары…"></textarea>
 <div class="p-foot"><button class="btn sm js-send" type="button">Сдать ловушку (+2)</button><span class="pmsg"></span></div>
 </div>
+<div class="duo-form ownB" data-block="labB" data-kind="lab" data-owner="B">
+<span class="who-tag">Форма Ученика Б</span>
+<label for="labTB">Тип ошибки</label>
+<select id="labTB" class="tin lab-type field"><option value="">— выбери тип —</option><option>путаница N и i (знаки и биты)</option><option>путаница бит и байт</option><option>1000 вместо 1024</option><option>перевод в не ту сторону</option><option>ошибка в расчёте I = K · i</option><option>фальшивый источник</option></select>
+<label for="labSB">Заявление Навигатора</label>
+<textarea id="labSB" class="ta field" rows="2" placeholder="Придумай уверенное заявление с одной ошибкой…"></textarea>
+<label for="labKB">Ключ: где ошибка и почему</label>
+<textarea id="labKB" class="ta field" rows="2" placeholder="Твой ключ для проверяющей пары…"></textarea>
+<div class="p-foot"><button class="btn sm js-send" type="button">Сдать ловушку (+2)</button><span class="pmsg"></span></div>
+</div>
+</div>
+<p class="mute" style="font-size:13.5px">Ловушки — только про информацию и ИИ. Время: 2 мин — сочиняем, 1 мин — обмен, 1 мин — проверка.</p>
 </section>
 <!-- 12. Практика -->
 <section class="step"><div class="step-n">12</div><h2 class="step-title">Практика: исправь запрос к ИИ</h2>
 <div class="q-was"><b>Было: слабый запрос</b><br>«Сколько весит донесение?» — ответ ИИ: «Много, зависит от длины» — неполно. Данные для запроса: 40 знаков, алфавит 32 знака.</div>
 <div class="q-now"><b>Стало: сильный запрос</b><br>«Донесение: 40 знаков, алфавит 32 знака. Найди вес знака по формуле N = 2<sup>i</sup>, объём в битах и в байтах. Покажи каждое действие. Если данных не хватает, напиши “не знаю”».</div>
-<div class="prax" data-block="prax" data-kind="prax">
-<label for="praxQ">Напишите свой исправленный запрос к ИИ</label>
-<textarea id="praxQ" class="ta field" rows="3" placeholder="Данные, формулы, порядок действий, единицы, разрешение ответить «не знаю»…"></textarea>
+<div class="prax-duo">
+<p class="ord-note">Свой исправленный запрос пишет каждый: сначала <b>Ученик А</b>, затем <b>Ученик Б</b>. До +4 за форму — по числу отмеченных критериев.</p>
+<div class="duo">
+<div class="duo-form ownA" data-block="praxA" data-kind="prax" data-owner="A">
+<span class="who-tag">Форма Ученика А</span>
+<label for="praxQA">Твой исправленный запрос к ИИ</label>
+<textarea id="praxQA" class="ta field" rows="3" placeholder="Данные, формулы, порядок действий, единицы, разрешение ответить «не знаю»…"></textarea>
 <div class="cbx">
 <label><input type="checkbox" class="cb"> Даны данные: число знаков и размер алфавита</label>
 <label><input type="checkbox" class="cb"> Названы формулы и порядок действий: сначала i, потом I</label>
@@ -334,6 +386,20 @@ select.tin{max-width:250px;font-weight:600}
 <label><input type="checkbox" class="cb"> Разрешено ответить «нет» или «не знаю»</label>
 </div>
 <div class="p-foot"><button class="btn sm js-send" type="button">Сдать запрос (до +4)</button><span class="pmsg"></span></div>
+</div>
+<div class="duo-form ownB" data-block="praxB" data-kind="prax" data-owner="B">
+<span class="who-tag">Форма Ученика Б</span>
+<label for="praxQB">Твой исправленный запрос к ИИ</label>
+<textarea id="praxQB" class="ta field" rows="3" placeholder="Данные, формулы, порядок действий, единицы, разрешение ответить «не знаю»…"></textarea>
+<div class="cbx">
+<label><input type="checkbox" class="cb"> Даны данные: число знаков и размер алфавита</label>
+<label><input type="checkbox" class="cb"> Названы формулы и порядок действий: сначала i, потом I</label>
+<label><input type="checkbox" class="cb"> Запрошены единицы в ответе: биты и байты</label>
+<label><input type="checkbox" class="cb"> Разрешено ответить «нет» или «не знаю»</label>
+</div>
+<div class="p-foot"><button class="btn sm js-send" type="button">Сдать запрос (до +4)</button><span class="pmsg"></span></div>
+</div>
+</div>
 </div>
 </section>
 <!-- 13. Финал -->
@@ -345,16 +411,30 @@ select.tin{max-width:250px;font-weight:600}
 <div class="vfeed" hidden></div>
 <div class="expl">У индикатора два состояния — выбор из двух вариантов несёт <b>1 бит</b>, а не 1 байт. Навигатор снова перепутал единицы.</div>
 </div>
-<div class="finw" data-block="finw" data-kind="finw">
-<h3 style="margin-bottom:4px">Письменный финал (каждый в паре)</h3>
-<p class="mute" style="font-size:14.5px">Отвечайте по очереди, письменно. Учитель проверит тетради у обоих (до 8 баллов).</p>
-<label for="fw1">1) Верю, не верю или сомневаюсь? Почему?</label>
-<textarea id="fw1" class="ta field" rows="2"></textarea>
-<label for="fw2">2) Где ошибка и какое доказательство?</label>
-<textarea id="fw2" class="ta field" rows="2"></textarea>
-<label for="fw3">3) Как переписать запрос, чтобы ИИ не ошибся?</label>
-<textarea id="fw3" class="ta field" rows="2"></textarea>
+<div class="finw-duo">
+<p class="ord-note">Письменный финал пишет каждый: сначала <b>Ученик А</b>, затем <b>Ученик Б</b>. До +8 за форму — проверит учитель.</p>
+<div class="duo">
+<div class="duo-form ownA" data-block="finwA" data-kind="finw" data-owner="A">
+<span class="who-tag">Форма Ученика А</span>
+<label for="fwA1">1) Верю, не верю или сомневаюсь? Почему?</label>
+<textarea id="fwA1" class="ta field" rows="2"></textarea>
+<label for="fwA2">2) Где ошибка и какое доказательство?</label>
+<textarea id="fwA2" class="ta field" rows="2"></textarea>
+<label for="fwA3">3) Как переписать запрос, чтобы ИИ не ошибся?</label>
+<textarea id="fwA3" class="ta field" rows="2"></textarea>
 <div class="p-foot"><button class="btn sm js-send" type="button">Сдать письменный финал (до +8)</button><span class="pmsg"></span></div>
+</div>
+<div class="duo-form ownB" data-block="finwB" data-kind="finw" data-owner="B">
+<span class="who-tag">Форма Ученика Б</span>
+<label for="fwB1">1) Верю, не верю или сомневаюсь? Почему?</label>
+<textarea id="fwB1" class="ta field" rows="2"></textarea>
+<label for="fwB2">2) Где ошибка и какое доказательство?</label>
+<textarea id="fwB2" class="ta field" rows="2"></textarea>
+<label for="fwB3">3) Как переписать запрос, чтобы ИИ не ошибся?</label>
+<textarea id="fwB3" class="ta field" rows="2"></textarea>
+<div class="p-foot"><button class="btn sm js-send" type="button">Сдать письменный финал (до +8)</button><span class="pmsg"></span></div>
+</div>
+</div>
 </div>
 </section>
 <!-- 14. Итоги -->
@@ -388,19 +468,25 @@ select.tin{max-width:250px;font-weight:600}
 <div class="b-row pair"><span class="b-who">Пара</span><span class="b-val"><b id="sPair">0</b> б.</span></div>
 <div class="b-sub" id="sPairSub">из них на проверке: 0</div>
 <div class="b-bar"><div class="b-barfill" id="barFill"></div></div>
-<div class="b-sub"><span id="barPct">0%</span> от максимума урока · блоков пройдено: <b id="sBlocks">0 из 14</b></div>
-<div class="b-rules"><b>Как копятся баллы</b><br>+1 — верный вердикт или ответ (с первой попытки)<br>+2 — доказательство к донесению (проверит учитель)<br>+2 — своя ловушка в лаборатории<br>до +4 — исправленный запрос к ИИ<br>до +8 — письменный финал<br><b>Баллы «на проверке» получает пара</b> — учитель утвердит их в конце урока.</div>
+<div class="b-sub"><span id="barPct">0%</span> от максимума урока · блоков пройдено: <b id="sBlocks">0 из 17</b></div>
+<div class="b-rules"><b>Как копятся баллы</b><br>+1 — верный вердикт или ответ (с первой попытки)<br>+2 — доказательство к донесению (проверит учитель)<br>+2 — своя ловушка в лаборатории (форма у каждого)<br>до +4 — исправленный запрос к ИИ (форма у каждого)<br>до +8 — письменный финал (форма у каждого)<br><b>Баллы «на проверке» получает пара</b> — учитель утвердит их в конце урока.</div>
 <button class="b-save" id="xlsBtn" type="button">Сохранить отчёт (XLSX)</button>
 <button class="b-reset" id="resetBtn" type="button">Сбросить урок</button>
 </aside>
 </div>
 <footer class="lfoot"><div class="lwrap">Интерактивный урок к презентации «Измерение информации: бортовой центр» · <a href="../informatika-uchenikam.html">Информатика · 7 класс</a> · Плотников В. А. · МБОУ «Школа №7» г.о. Самара · <a href="../index.html">pvaschool7.github.io</a></div></footer>
 <div class="modal" id="modal" hidden><div class="modal-box"><div class="modal-bar"><b>Результат пары — для учителя</b><span style="display:flex;gap:8px;align-items:center"><button class="btn ghost" id="mXls" type="button">XLSX</button><button class="btn ghost" id="mClose" type="button">Закрыть</button></span></div><div class="rcard" id="mCard" style="border:none"></div></div></div>
+<div class="modal" id="rmodal" hidden><div class="modal-box" style="max-width:540px"><div class="modal-bar"><b>Сброс — только после выгрузки отчёта</b><button class="btn ghost" id="rClose" type="button">Закрыть</button></div><div style="padding:18px 20px">
+<p>Отчёт (XLSX) со всеми ответами пары отправлен на сохранение: <b id="rFile"></b></p>
+<p class="mute" style="font-size:14.5px">Если выбрана папка «lessons» — файл уже обновлён в ней. Иначе проверьте «Загрузки»: файл должен скачаться.</p>
+<p style="font-weight:700">Файл скачался?</p>
+<div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:10px"><button class="btn" id="rYes" type="button">Да — сбросить урок</button><button class="btn ghost" id="rAgain" type="button">Скачать отчёт ещё раз</button><button class="btn ghost" id="rNo" type="button">Отмена</button></div>
+</div></div></div>
 <script>
 (function(){
 "use strict";
 var LESSON_ID="izmerenie";
-var PAIR_MAX=46;
+var PAIR_MAX=60;
 var LESSON_TITLE="Интерактивный урок «Измерение информации: бортовой центр», информатика, 7 класс";
 var KEY="pva-lesson-"+LESSON_ID;
 var d=document;
@@ -411,10 +497,12 @@ function nums(s){var m=norm(s).match(/-?\d+(?:\.\d+)?/g);return m?m.map(Number):
 function isOk(val,spec){var v=norm(val),ok=false;spec.split("|").forEach(function(x){if(norm(x)===v)ok=true});if(ok)return true;var vn=nums(val),sn=nums(spec);return !!(vn&&sn&&vn.length&&vn.join(",")===sn.join(","))}
 function fmt(n){n=Math.round(n*10)/10;return n%1?n.toFixed(1).replace(".",","):String(n)}
 function esc(s){return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;")}
-var S={v:"A",names:{A:"",B:""},auto:{A:0,B:0},pend:0,blocks:0,items:{},done:{}};
+function stamp(){var t=new Date(),p=function(n){return (n<10?"0":"")+n};return p(t.getDate())+"."+p(t.getMonth()+1)+"."+t.getFullYear()+" "+p(t.getHours())+"-"+p(t.getMinutes())+"-"+p(t.getSeconds())}
+var S={v:"A",names:{A:"",B:""},auto:{A:0,B:0},pend:0,blocks:0,items:{},done:{},ts:stamp()};
 var TOTAL_BLOCKS=$$("[data-block]").length;
 try{var x=JSON.parse(localStorage.getItem(KEY)||"null");if(x&&x.items)S=x}catch(e){}
-function save(){try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}}
+S.ts=S.ts||stamp();
+function save(){try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}queueSave()}
 function sname(k){return (S.names[k]||"").trim()||("Ученик "+(k==="A"?"А":"Б"))}
 function mark(p){return p>=90?"5":p>=75?"4":p>=55?"3":"2"}
 function renderResults(){
@@ -452,6 +540,17 @@ function bump(k,txt){
  var f=d.createElement("span");f.className="flt";f.textContent=txt;row.appendChild(f);
  setTimeout(function(){if(f.parentNode)f.parentNode.removeChild(f)},1100);
 }
+function applyGate(task,items,silent){
+ if(!task.hasAttribute("data-gate"))return;
+ function res(it){var c=it.classList;return c.contains("ok")||c.contains("late")||c.contains("reveal")}
+ var gOwn=items[0].getAttribute("data-owner");
+ var gate=items.filter(function(x){return x.getAttribute("data-owner")===gOwn});
+ var rest=items.filter(function(x){return x.getAttribute("data-owner")!==gOwn});
+ var done=gate.every(res);
+ rest.forEach(function(it){var inp=$(".tin",it);if(inp&&!res(it))inp.disabled=!done});
+ if(done&&!task._gateDone){if(!silent&&rest[0]){S.v=(rest[0].getAttribute("data-owner")==="B"?"B":"A");renderBoard();save()}}
+ task._gateDone=done;
+}
 /* ---- задачи с проверкой ---- */
 $$(".js-task").forEach(function(task){
  var bid=task.getAttribute("data-block");
@@ -473,6 +572,7 @@ $$(".js-task").forEach(function(task){
   else if(st.stt==="reveal")lock(it,it.getAttribute("data-sol"),"reveal","разобрали");
   else if(st.stt==="wrong"){it.classList.add("wrong");$(".tstat",it).textContent="✗"}
  });
+ applyGate(task,items,true);
  task.addEventListener("keydown",function(e){
   if(e.key==="Enter"&&e.target.classList&&e.target.classList.contains("tin")){e.preventDefault();if(btn&&!btn.disabled)btn.click()}
  });
@@ -483,7 +583,8 @@ $$(".js-task").forEach(function(task){
    var key=bid+"#"+idx,st=S.items[key]||{};
    var cl=it.classList;
    if(cl.contains("ok")||cl.contains("late")||cl.contains("reveal"))return;
-   var inp=$(".tin",it),val=inp?inp.value:"";
+   var inp=$(".tin",it);if(inp&&inp.disabled)return;
+   var val=inp?inp.value:"";
    if(!val.trim()){cl.add("wrong");$(".tstat",it).textContent="✗";S.items[key]={stt:"wrong",att:st.att||0,val:val};anyOpen=true;return}
    if(isOk(val,it.getAttribute("data-ok"))){
     if((st.att||0)===0){
@@ -506,6 +607,7 @@ $$(".js-task").forEach(function(task){
    }
   });
   var solved=items.every(function(it){var c=it.classList;return c.contains("ok")||c.contains("late")||c.contains("reveal")});
+  applyGate(task,items);
   if(hint)hint.hidden=solved;
   if(solved&&!S.done[bid]){S.done[bid]=1;S.blocks++;btn.textContent="Задание проверено ✓";btn.disabled=true}
   if(!solved)btn.textContent="Проверить ещё раз";
@@ -526,12 +628,18 @@ $$(".js-verdict").forEach(function(v){
   if(st.proof&&ta&&sp){ta.value=st.txt||"";ta.disabled=true;sp.disabled=true;if(msg){msg.textContent="✓ записано: +2 на проверке";msg.className="pmsg good"}}
  }
  if(S.items[bid])apply(S.items[bid]);
+ var own=v.getAttribute("data-owner");
+ if(own&&!S.items[bid]){
+  var sw=function(){if(S.items[bid]||S.v===own)return;S.v=own;renderBoard();save()};
+  $$(".vrow",v).forEach(function(r){r.addEventListener("mousedown",sw);r.addEventListener("focusin",sw)});
+ }
  $$(".vbtn",v).forEach(function(b){b.addEventListener("click",function(){
   if(S.items[bid])return;
-  var rec={v:b.getAttribute("data-v"),proof:0,own:S.v};
+  var act=own||S.v;
+  var rec={v:b.getAttribute("data-v"),proof:0,own:act};
   S.items[bid]=rec;
-  if(rec.v===ok&&!v.hasAttribute("data-nopoints")){S.auto[S.v]++;bump(S.v,"+1")}
-  S.v=(S.v==="A"?"B":"A");
+  if(rec.v===ok&&!v.hasAttribute("data-nopoints")){S.auto[act]++;bump(act,"+1")}
+  S.v=(act==="A"?"B":"A");
   apply(rec);
   if(!S.done[bid]){S.done[bid]=1;S.blocks++}
   renderBoard();save();
@@ -589,7 +697,7 @@ $$("[data-kind]").forEach(function(box){
 $("#nameA").addEventListener("input",function(){S.names.A=this.value;renderBoard();save()});
 $("#nameB").addEventListener("input",function(){S.names.B=this.value;renderBoard();save()});
 $$(".sw").forEach(function(b){b.addEventListener("click",function(){S.v=b.getAttribute("data-s");renderBoard();save()})});
-function freshState(){return {v:"A",names:{A:"",B:""},auto:{A:0,B:0},pend:0,blocks:0,items:{},done:{}}}
+function freshState(){return {v:"A",names:{A:"",B:""},auto:{A:0,B:0},pend:0,blocks:0,items:{},done:{},ts:stamp()}}
 function resetAll(){
  S=freshState();try{localStorage.removeItem(KEY)}catch(e){}
  $$(".js-task").forEach(function(task){
@@ -616,7 +724,9 @@ function resetAll(){
   var m=$(".pmsg",box);if(m){m.textContent="";m.className="pmsg"}
  });
  ["nameA","nameB","rf1","rf2","rf3"].forEach(function(id){var el=document.getElementById(id);if(el)el.value=""});
+ $$(".js-task[data-gate]").forEach(function(task){applyGate(task,$$(".js-item",task),true)});
  var mdl=$("#modal");if(mdl)mdl.hidden=true;
+ var rmd=$("#rmodal");if(rmd)rmd.hidden=true;
  renderBoard();
 }
 function hasProgress(){
@@ -627,12 +737,20 @@ function hasProgress(){
 }
 function reset(){
  if(!hasProgress()){resetAll();window.scrollTo(0,0);return}
- if(!confirm("Сначала сохранится отчёт (XLSX) с ответами пары, затем урок сбросится: все формы станут пустыми, баллы удалятся. Продолжить?"))return;
  saveXls();
- resetAll();window.scrollTo(0,0);
+ var rf=$("#rFile");if(rf)rf.textContent=lastFileName+(dirHandle?" (и обновлён в папке «"+dirHandle.name+"»)":"");
+ var rm=$("#rmodal");if(rm)rm.hidden=false;
 }
 $("#resetBtn").addEventListener("click",reset);
 $("#againBtn").addEventListener("click",reset);
+var rmodal=$("#rmodal");
+if(rmodal){
+ $("#rYes").addEventListener("click",function(){rmodal.hidden=true;resetAll();window.scrollTo(0,0);if(dirHandle)writeToFolder()});
+ $("#rNo").addEventListener("click",function(){rmodal.hidden=true});
+ $("#rClose").addEventListener("click",function(){rmodal.hidden=true});
+ $("#rAgain").addEventListener("click",function(){saveXls();var rf=$("#rFile");if(rf)rf.textContent=lastFileName+(dirHandle?" (и обновлён в папке «"+dirHandle.name+"»)":"")});
+ rmodal.addEventListener("click",function(e){if(e.target===rmodal)rmodal.hidden=true});
+}
 /* ---- автопереключение ученика при выборе вопроса ---- */
 $$(".js-item[data-owner]").forEach(function(it){
  var own=it.getAttribute("data-owner");
@@ -739,7 +857,9 @@ function reportRows(){
   }else{
    if(st&&st.ok){pts="+"+st.pts;expl.push("сдано, на проверке — утвердит учитель")}
   }
-  R.push([{v:blockTitle(bid)},{v:pts},{v:expl.join("; ")||"—",s:3}]);
+  var bt=blockTitle(bid);
+  if(el.hasAttribute("data-kind")&&el.getAttribute("data-owner"))bt+=" — форма "+(el.getAttribute("data-owner")==="B"?"Ученика Б":"Ученика А");
+  R.push([{v:bt},{v:pts},{v:expl.join("; ")||"—",s:3}]);
  });
  R.push([]);
  R.push([{v:"Доказательства и письменные ответы — проверить учителю",s:1}]);
@@ -747,16 +867,17 @@ function reportRows(){
  $$("[data-block]").forEach(function(el){
   var bid=el.getAttribute("data-block"),st=S.items[bid];
   if(!st)return;
+  var bt2=blockTitle(bid)+(el.hasAttribute("data-kind")&&el.getAttribute("data-owner")?" — форма "+(el.getAttribute("data-owner")==="B"?"Ученика Б":"Ученика А"):"");
   if(el.classList.contains("js-verdict")&&st.txt){any=true;R.push([{v:blockTitle(bid)+" — доказательство ("+sname(st.own||S.v)+")"},{v:st.txt,s:3}])}
   if(el.hasAttribute("data-kind")&&st.ok&&st.vals){
    any=true;
    $$(".field",el).forEach(function(f,i){
     if(st.vals[i]==null||st.vals[i]==="")return;
     var lab=f.id?document.querySelector('label[for="'+f.id+'"]'):null;
-    R.push([{v:blockTitle(bid)+(lab?" — "+lab.textContent.trim():" — поле "+(i+1))},{v:st.vals[i],s:3}]);
+    R.push([{v:bt2+(lab?" — "+lab.textContent.trim():" — поле "+(i+1))},{v:st.vals[i],s:3}]);
    });
    if(st.cbs){var marks=[];$$(".cb",el).forEach(function(c,i){if(st.cbs[i])marks.push("+ "+c.parentNode.textContent.trim())});
-    if(marks.length)R.push([{v:blockTitle(bid)+" — отмеченные критерии"},{v:marks.join(", "),s:3}])}
+    if(marks.length)R.push([{v:bt2+" — отмеченные критерии"},{v:marks.join(", "),s:3}])}
   }
  });
  ["rf1","rf2","rf3"].forEach(function(id){
@@ -770,22 +891,68 @@ function reportRows(){
  R.push(["Отметки предварительные: учитель проверяет доказательства, лабораторию, запрос и письменный финал — и утверждает результат."]);
  return R;
 }
+var lastFileName="";
+function buildXlsxArray(){var parts=XLSX_PARTS.concat([{name:"xl/worksheets/sheet1.xml",data:sheetXml(reportRows(),[46,36,46])}]);return buildZip(parts)}
 function saveXls(){
- var parts=XLSX_PARTS.concat([{name:"xl/worksheets/sheet1.xml",data:sheetXml(reportRows(),[46,36,46])}]);
- var blob=new Blob([buildZip(parts)],{type:"application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"});
+ var blob=new Blob([buildXlsxArray()],{type:"application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"});
  var a=document.createElement("a");
  a.href=URL.createObjectURL(blob);
  var dt=new Date(),pd=function(n){return (n<10?"0":"")+n};
  var sn=function(s){return String(s||"").replace(/[\\/:*?"<>|]+/g," ").replace(/\s+/g," ").trim().slice(0,40)};
  var nm=[sn(S.names.A),sn(S.names.B)].filter(Boolean).join(" и ");
- var stamp=dt.getFullYear()+"-"+pd(dt.getMonth()+1)+"-"+pd(dt.getDate())+" "+pd(dt.getHours())+"-"+pd(dt.getMinutes());
- a.download="Отчёт урока — "+FILE_TAG+(nm?" — "+nm:"")+" — "+stamp+".xlsx";
+ var tm=dt.getFullYear()+"-"+pd(dt.getMonth()+1)+"-"+pd(dt.getDate())+" "+pd(dt.getHours())+"-"+pd(dt.getMinutes());
+ lastFileName="Отчёт урока — "+FILE_TAG+(nm?" — "+nm:"")+" — "+tm+".xlsx";
+ a.download=lastFileName;
  d.body.appendChild(a);a.click();
  setTimeout(function(){URL.revokeObjectURL(a.href);if(a.parentNode)a.parentNode.removeChild(a)},500);
+ if(dirHandle)writeToFolder();
 }
 $("#xlsBtn").addEventListener("click",saveXls);
 var xb2=$("#xlsBtn2");if(xb2)xb2.addEventListener("click",saveXls);
 var mx=$("#mXls");if(mx)mx.addEventListener("click",saveXls);
+/* ---- папка «lessons»: документ пары в реальном времени ---- */
+var dirHandle=null,writeTimer=null,writing=false,dirtyAgain=false;
+function setStatus(t){var el=$("#dirStatus");if(el)el.textContent=t}
+function liveName(){return "Журнал пары — "+FILE_TAG+" — "+(S.ts||stamp())+".xlsx"}
+function writeToFolder(){
+ if(!dirHandle)return;
+ if(writing){dirtyAgain=true;return}
+ writing=true;
+ dirHandle.getFileHandle(liveName(),{create:true}).then(function(fh){return fh.createWritable().then(function(w){return w.write(buildXlsxArray()).then(function(){return w.close()})})}).then(function(){
+  writing=false;
+  setStatus("✓ Записано в папку «"+dirHandle.name+"»: "+liveName()+" · "+new Date().toLocaleTimeString("ru-RU"));
+  if(dirtyAgain){dirtyAgain=false;writeToFolder()}
+ }).catch(function(e){writing=false;dirtyAgain=false;setStatus("Не удалось записать в папку: "+((e&&e.message)||e))});
+}
+function queueSave(){if(!dirHandle)return;clearTimeout(writeTimer);writeTimer=setTimeout(writeToFolder,900)}
+$("#dirBtn").addEventListener("click",function(){
+ if(!window.showDirectoryPicker){setStatus("Этот браузер не умеет выбирать папку — отчёт сохраняется кнопкой «Сохранить отчёт (XLSX)» (попадёт в «Загрузки»). Рекомендуем Chrome или Яндекс.Браузер.");return}
+ window.showDirectoryPicker({mode:"readwrite"}).then(function(root){
+  var p=(root.name.toLowerCase()==="lessons")?Promise.resolve(root):root.getDirectoryHandle("lessons",{create:true});
+  return p.then(function(dir){
+   dirHandle=dir;
+   var b=$("#dirBtn");b.textContent="Папка выбрана: "+dir.name;b.disabled=true;
+   setStatus("✓ Журнал пары включён: после каждого ответа отчёт обновляется в папке «"+dir.name+"».");
+   writeToFolder();
+  });
+ }).catch(function(e){if(e&&e.name!=="AbortError")setStatus("Не удалось открыть папку: "+((e&&e.message)||e.name)+". Отчёт сохраняется кнопкой «Сохранить отчёт (XLSX)».")});
+});
+/* ---- чек-лист пары ---- */
+(function(){
+ var btn=$("#chkBtn"),card=$("#chkCard"),ok=$("#chkOk");
+ function done(){if(card)card.classList.add("done");if(ok)ok.hidden=false}
+ if(btn)btn.addEventListener("click",function(){try{localStorage.setItem(KEY+"-chk","1")}catch(e){}done()});
+ try{if(localStorage.getItem(KEY+"-chk")==="1")done()}catch(e){}
+})();
+/* ---- автопереключение на формы А/Б ---- */
+$$(".duo-form[data-owner]").forEach(function(box){
+ var own=box.getAttribute("data-owner"),bid=box.getAttribute("data-block");
+ function autoSw(){if(S.items[bid]&&S.items[bid].ok)return;if(S.v===own)return;S.v=own;renderBoard();save()}
+ box.addEventListener("focusin",autoSw);
+ box.addEventListener("mousedown",autoSw);
+});
+/* ---- служебный доступ для проверки (безопасно: только чтение состояния) ---- */
+window.__pvaTest={state:function(){return JSON.parse(JSON.stringify(S))},rows:reportRows,xlsx:buildXlsxArray};
 /* ---- запрет обновления страницы, пока урок не завершён и не сброшен ---- */
 d.addEventListener("keydown",function(e){
  if(!hasProgress())return;
