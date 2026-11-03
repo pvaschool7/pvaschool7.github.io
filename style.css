@@ -120,3 +120,15 @@ details[open]>summary .chev{transform:rotate(45deg)}
 .btn.sm{padding:9px 18px;font-size:15px;border-radius:10px}
 .card-link{font-weight:600;color:var(--blue);text-decoration:none;font-size:15px}
 .card-link:hover{text-decoration:underline}
+
+/* ===== Видео-области в «Если ты пропустил урок» (вставка с Яндекс.Диска) ===== */
+.cards .card.wide{grid-column:1/-1}
+.video-box{position:relative;margin-top:16px;border-radius:12px;overflow:hidden;background:#101820;border:1px solid var(--line);box-shadow:3px 4px 0 var(--line)}
+.video-embed{position:relative;aspect-ratio:16/9;background:#101820}
+.video-embed iframe{position:absolute;inset:0;width:100%;height:100%;border:0;display:block}
+.video-stub{display:grid;place-content:center;justify-items:center;gap:4px;aspect-ratio:16/9;padding:20px;text-align:center;color:#eef2ee;background:radial-gradient(120% 130% at 50% 0%,#253444 0%,#101820 72%)}
+.play-ico{display:grid;place-items:center;width:58px;height:58px;border-radius:50%;background:var(--blue);margin-bottom:8px;box-shadow:0 0 0 6px rgba(255,255,255,.14)}
+.play-ico::before{content:"";width:0;height:0;border-left:18px solid #fff;border-top:11px solid transparent;border-bottom:11px solid transparent;margin-left:4px}
+.video-stub b{font-size:17px;color:#fff}
+.video-stub span{font-size:14px;opacity:.85;max-width:52ch}
+@media(max-width:860px){.video-stub b{font-size:15px}.video-stub span{font-size:13px}}

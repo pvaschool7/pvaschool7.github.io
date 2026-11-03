@@ -155,8 +155,6 @@ select.tin{max-width:250px;font-weight:600}
 .chk-btn{background:var(--green);border-color:var(--green);color:#fff;font-size:17px;padding:12px 22px;box-shadow:3px 4px 0 rgba(0,0,0,.18)}
 .chk-btn:hover{filter:brightness(1.07);color:#fff}
 .chk-ok{font-weight:700;color:var(--green)}
-.fld{border:2px dashed var(--blue)}
-.fld-status{font-size:14px;color:var(--mute);font-weight:600;flex:1;min-width:200px}
 /* ===== Формы А и Б ===== */
 .duo{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:14px;margin:12px 0}
 .duo-form{border:2px solid var(--line);border-radius:12px;padding:14px 16px;background:var(--paper);min-width:0}
@@ -182,11 +180,6 @@ select.tin{max-width:250px;font-weight:600}
 <section class="chk" id="chkCard"><div class="chk-badge">Шаг 0 · скачайте сразу</div><h2 class="step-title">Чек-лист пары</h2>
 <p>В файле — чек-листы к уроку «Измерение информации: бортовой центр»: чек-лист учителя, лист пары, чек-листы к каждому заданию, лист мастерской «Лаборатория ловушек» и лист финала. Скачайте в начале урока и держите перед глазами — так вы не пропустите ни одного шага.</p>
 <div class="chk-actions"><a class="btn chk-btn" id="chkBtn" href="cheklists/chek-list-izmerenie-informacii.docx" download>↓ Скачать чек-лист (DOCX)</a><a class="btn ghost sm" href="cheklists/chek-list-izmerenie-informacii.docx" target="_blank" rel="noopener">Открыть для просмотра</a><span class="chk-ok" id="chkOk" hidden>✓ Чек-лист скачан</span></div>
-</section>
-<!-- Папка lessons: живой журнал ответов -->
-<section class="step fld" id="fldCard"><h2 class="step-title" style="font-size:22px;margin-bottom:6px">Папка «lessons» — журнал ответов пары</h2>
-<p class="task-intro">Нажмите кнопку и выберите свою папку (например, «Загрузки» или личную папку пары) — внутри неё сайт создаст папку <b>lessons</b> и будет после каждого ответа автоматически обновлять в ней отчёт со всеми ответами: документ пары ведётся в реальном времени.</p>
-<div class="p-foot" style="margin-top:10px"><button class="btn sm" id="dirBtn" type="button">Выбрать папку «lessons»</button><span class="fld-status" id="dirStatus">Папка не выбрана — отчёт сохраняется вручную кнопкой «Сохранить отчёт (XLSX)» на табло.</span></div>
 </section>
 <!-- 1. Легенда -->
 <section class="step"><div class="step-n">1</div><h2 class="step-title">Легенда: бортовой центр</h2>
@@ -502,7 +495,7 @@ var S={v:"A",names:{A:"",B:""},auto:{A:0,B:0},pend:0,blocks:0,items:{},done:{},t
 var TOTAL_BLOCKS=$$("[data-block]").length;
 try{var x=JSON.parse(localStorage.getItem(KEY)||"null");if(x&&x.items)S=x}catch(e){}
 S.ts=S.ts||stamp();
-function save(){try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}queueSave()}
+function save(){try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}}
 function sname(k){return (S.names[k]||"").trim()||("Ученик "+(k==="A"?"А":"Б"))}
 function mark(p){return p>=90?"5":p>=75?"4":p>=55?"3":"2"}
 function renderResults(){
@@ -738,17 +731,17 @@ function hasProgress(){
 function reset(){
  if(!hasProgress()){resetAll();window.scrollTo(0,0);return}
  saveXls();
- var rf=$("#rFile");if(rf)rf.textContent=lastFileName+(dirHandle?" (и обновлён в папке «"+dirHandle.name+"»)":"");
+ var rf=$("#rFile");if(rf)rf.textContent=lastFileName;
  var rm=$("#rmodal");if(rm)rm.hidden=false;
 }
 $("#resetBtn").addEventListener("click",reset);
 $("#againBtn").addEventListener("click",reset);
 var rmodal=$("#rmodal");
 if(rmodal){
- $("#rYes").addEventListener("click",function(){rmodal.hidden=true;resetAll();window.scrollTo(0,0);if(dirHandle)writeToFolder()});
+ $("#rYes").addEventListener("click",function(){rmodal.hidden=true;resetAll();window.scrollTo(0,0)});
  $("#rNo").addEventListener("click",function(){rmodal.hidden=true});
  $("#rClose").addEventListener("click",function(){rmodal.hidden=true});
- $("#rAgain").addEventListener("click",function(){saveXls();var rf=$("#rFile");if(rf)rf.textContent=lastFileName+(dirHandle?" (и обновлён в папке «"+dirHandle.name+"»)":"")});
+ $("#rAgain").addEventListener("click",function(){saveXls();var rf=$("#rFile");if(rf)rf.textContent=lastFileName});
  rmodal.addEventListener("click",function(e){if(e.target===rmodal)rmodal.hidden=true});
 }
 /* ---- автопереключение ученика при выборе вопроса ---- */
@@ -905,38 +898,10 @@ function saveXls(){
  a.download=lastFileName;
  d.body.appendChild(a);a.click();
  setTimeout(function(){URL.revokeObjectURL(a.href);if(a.parentNode)a.parentNode.removeChild(a)},500);
- if(dirHandle)writeToFolder();
 }
 $("#xlsBtn").addEventListener("click",saveXls);
 var xb2=$("#xlsBtn2");if(xb2)xb2.addEventListener("click",saveXls);
 var mx=$("#mXls");if(mx)mx.addEventListener("click",saveXls);
-/* ---- папка «lessons»: документ пары в реальном времени ---- */
-var dirHandle=null,writeTimer=null,writing=false,dirtyAgain=false;
-function setStatus(t){var el=$("#dirStatus");if(el)el.textContent=t}
-function liveName(){return "Журнал пары — "+FILE_TAG+" — "+(S.ts||stamp())+".xlsx"}
-function writeToFolder(){
- if(!dirHandle)return;
- if(writing){dirtyAgain=true;return}
- writing=true;
- dirHandle.getFileHandle(liveName(),{create:true}).then(function(fh){return fh.createWritable().then(function(w){return w.write(buildXlsxArray()).then(function(){return w.close()})})}).then(function(){
-  writing=false;
-  setStatus("✓ Записано в папку «"+dirHandle.name+"»: "+liveName()+" · "+new Date().toLocaleTimeString("ru-RU"));
-  if(dirtyAgain){dirtyAgain=false;writeToFolder()}
- }).catch(function(e){writing=false;dirtyAgain=false;setStatus("Не удалось записать в папку: "+((e&&e.message)||e))});
-}
-function queueSave(){if(!dirHandle)return;clearTimeout(writeTimer);writeTimer=setTimeout(writeToFolder,900)}
-$("#dirBtn").addEventListener("click",function(){
- if(!window.showDirectoryPicker){setStatus("Этот браузер не умеет выбирать папку — отчёт сохраняется кнопкой «Сохранить отчёт (XLSX)» (попадёт в «Загрузки»). Рекомендуем Chrome или Яндекс.Браузер.");return}
- window.showDirectoryPicker({mode:"readwrite"}).then(function(root){
-  var p=(root.name.toLowerCase()==="lessons")?Promise.resolve(root):root.getDirectoryHandle("lessons",{create:true});
-  return p.then(function(dir){
-   dirHandle=dir;
-   var b=$("#dirBtn");b.textContent="Папка выбрана: "+dir.name;b.disabled=true;
-   setStatus("✓ Журнал пары включён: после каждого ответа отчёт обновляется в папке «"+dir.name+"».");
-   writeToFolder();
-  });
- }).catch(function(e){if(e&&e.name!=="AbortError")setStatus("Не удалось открыть папку: "+((e&&e.message)||e.name)+". Отчёт сохраняется кнопкой «Сохранить отчёт (XLSX)».")});
-});
 /* ---- чек-лист пары ---- */
 (function(){
  var btn=$("#chkBtn"),card=$("#chkCard"),ok=$("#chkOk");
