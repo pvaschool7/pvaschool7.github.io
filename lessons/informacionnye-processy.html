@@ -569,7 +569,7 @@ $$(".js-task").forEach(function(task){
    if(cl.contains("ok")||cl.contains("late")||cl.contains("reveal"))return;
    var inp=$(".tin",it);if(inp&&inp.disabled)return;
    var val=inp?inp.value:"";
-   if(!val.trim()){cl.add("wrong");$(".tstat",it).textContent="✗";S.items[key]={stt:"wrong",att:st.att||0,val:val};anyOpen=true;return}
+   if(!val.trim()){cl.remove("wrong");$(".tstat",it).textContent="впиши ответ";anyOpen=true;return}
    if(isOk(val,it.getAttribute("data-ok"))){
     if((st.att||0)===0){
      S.items[key]={stt:"ok",att:0,val:val};
