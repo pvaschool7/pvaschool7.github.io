@@ -462,7 +462,7 @@ select.tin{max-width:250px;font-weight:600}
 <div class="modal" id="modal" hidden><div class="modal-box"><div class="modal-bar"><b>Результат пары — для учителя</b><span style="display:flex;gap:8px;align-items:center"><button class="btn ghost" id="mXls" type="button">XLSX</button><button class="btn ghost" id="mClose" type="button">Закрыть</button></span></div><div class="rcard" id="mCard" style="border:none"></div></div></div>
 <div class="modal" id="rmodal" hidden><div class="modal-box" style="max-width:540px"><div class="modal-bar"><b>Сброс — только после выгрузки отчёта</b><button class="btn ghost" id="rClose" type="button">Закрыть</button></div><div style="padding:18px 20px">
 <p>Отчёт (XLSX) со всеми ответами пары отправлен на сохранение: <b id="rFile"></b></p>
-<p class="mute" style="font-size:14.5px">Если выбрана папка «lessons» — файл уже обновлён в ней. Иначе проверьте «Загрузки»: файл должен скачаться.</p>
+<p class="mute" style="font-size:14.5px">Отчёт скачивается в «Загрузки», а при настроенном доступе автоматически отправляется в папку «Отчёты уроков» на Яндекс.Диске учителя.</p>
 <p style="font-weight:700">Файл скачался?</p>
 <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:10px"><button class="btn" id="rYes" type="button">Да — сбросить урок</button><button class="btn ghost" id="rAgain" type="button">Скачать отчёт ещё раз</button><button class="btn ghost" id="rNo" type="button">Отмена</button></div>
 </div></div></div>
@@ -889,10 +889,49 @@ function saveXls(){
  a.download=lastFileName;
  d.body.appendChild(a);a.click();
  setTimeout(function(){URL.revokeObjectURL(a.href);if(a.parentNode)a.parentNode.removeChild(a)},500);
+ ydUpload(blob,lastFileName);
 }
 $("#xlsBtn").addEventListener("click",saveXls);
 var xb2=$("#xlsBtn2");if(xb2)xb2.addEventListener("click",saveXls);
 var mx=$("#mXls");if(mx)mx.addEventListener("click",saveXls);
+/* ==== Отчёт на Яндекс.Диск ====
+   1) Откройте https://yandex.ru/dev/disk/poligon/ и нажмите «Получить OAuth-токен».
+   2) Разрешите доступ и скопируйте токен в кавычки ниже (и в первом уроке тоже).
+   Отчёты будут автоматически отправляться в папку «/Отчёты уроков» на Диске (создастся сама).
+   Пока токен пуст — отчёт просто скачивается на компьютер.
+   Важно: токен хранится в коде страницы — создавайте его с правами только на Диск и отзывайте по окончании работы. */
+var YD_TOKEN="";              // ← вставьте токен сюда
+var YD_DIR="/Отчёты уроков";  // папка на Диске; "" — класть отчёты в корень
+var ydBusy=false;
+function ydStatus(t){var b=$("#xlsBtn");if(b)b.textContent=t}
+function ydEnsureDir(token){
+ if(!YD_DIR)return Promise.resolve();
+ return fetch("https://cloud-api.yandex.net/v1/disk/resources?path="+encodeURIComponent(YD_DIR),{method:"PUT",headers:{"Authorization":"OAuth "+token}}).then(function(r){
+  if(r.status===201||r.status===409)return;
+  return r.json().then(function(j){throw new Error(j.message||("Яндекс ответил "+r.status))});
+ });
+}
+function ydUpload(blob,name){
+ var token=(typeof YD_TOKEN==="string"?YD_TOKEN:"").trim();
+ if(!token)return;
+ if(ydBusy)return;
+ ydBusy=true;
+ ydStatus("Отправка на Яндекс.Диск…");
+ ydEnsureDir(token).then(function(){
+  var path=(YD_DIR?YD_DIR:"")+"/"+name;
+  return fetch("https://cloud-api.yandex.net/v1/disk/resources/upload?overwrite=true&path="+encodeURIComponent(path),{headers:{"Authorization":"OAuth "+token}}).then(function(r){
+   return r.json().then(function(j){
+    if(!j.href)throw new Error(j.message||("Яндекс ответил "+r.status));
+    return fetch(j.href,{method:"PUT",body:blob});
+   });
+  });
+ }).then(function(){
+  ydStatus("✓ Отчёт скачан и отправлен на Диск");
+ }).catch(function(e){
+  ydStatus("⚠ Скачан, на Диск не отправлен");
+  try{console.warn("Яндекс.Диск:",(e&&e.message)||e)}catch(_){}
+ }).then(function(){ydBusy=false});
+}
 /* ---- чек-лист пары ---- */
 (function(){
  var btn=$("#chkBtn"),card=$("#chkCard"),ok=$("#chkOk");
