@@ -1,5 +1,5 @@
-:root{--paper:#fbf8ef;--ink:#1f2a37;--mute:#5b6675;--grid:#d6e4ee;--blue:#2f6fd0;--red:#d8473f;--green:#2e7d5b;--yellow:#ffe27a;--card:#fff;--line:#e4dfd0}
-@media(prefers-color-scheme:dark){:root{--paper:#16201c;--ink:#eef2ee;--mute:#a4b3ab;--grid:#22332c;--blue:#7aa8ff;--red:#ff8b82;--green:#7fd1a8;--yellow:#5c4d12;--card:#1d2a25;--line:#2e3f37}}
+:root{--paper:#fbf8ef;--ink:#1f2a37;--mute:#5b6675;--grid:#d6e4ee;--blue:#2f6fd0;--red:#d8473f;--green:#2e7d5b;--yellow:#ffe27a;--card:#fff;--line:#e4dfd0;--on-accent:#fff;color-scheme:light dark}
+@media(prefers-color-scheme:dark){:root{--paper:#16201c;--ink:#eef2ee;--mute:#a4b3ab;--grid:#22332c;--blue:#7aa8ff;--red:#ff8b82;--green:#7fd1a8;--yellow:#5c4d12;--card:#1d2a25;--line:#2e3f37;--on-accent:#0f1d33}}
 *{box-sizing:border-box}html{scroll-behavior:smooth}
 body{margin:0;font:17px/1.65 "Golos Text","PT Sans",system-ui,sans-serif;color:var(--ink);background:var(--paper);
 background-image:linear-gradient(var(--grid) 1px,transparent 1px),linear-gradient(90deg,var(--grid) 1px,transparent 1px);background-size:28px 28px}
@@ -12,7 +12,7 @@ h1{font-size:clamp(40px,7vw,68px)}h2{font-size:38px;margin-top:0}h3{font-size:25
 .formula{display:inline-block;font:italic 22px "PT Serif",Georgia,serif;border:2px dashed var(--blue);color:var(--blue);padding:6px 16px;border-radius:12px;transform:rotate(-2deg);margin:0 10px 12px 0;background:var(--card)}
 .formula.b{border-color:var(--green);color:var(--green);transform:rotate(1.5deg)}.formula.c{border-color:var(--red);color:var(--red);transform:rotate(-1deg)}
 section{padding:44px 0}
-.btn{display:inline-block;background:var(--blue);color:#fff;text-decoration:none;padding:12px 24px;border-radius:12px;font-weight:600;box-shadow:3px 4px 0 rgba(0,0,0,.18);transition:.15s}
+.btn{display:inline-block;background:var(--blue);color:var(--on-accent);text-decoration:none;padding:12px 24px;border-radius:12px;font-weight:600;box-shadow:3px 4px 0 rgba(0,0,0,.18);transition:.15s}
 .btn:hover{transform:translate(2px,2px);box-shadow:1px 2px 0 rgba(0,0,0,.18)}.btn.ghost{background:var(--card);color:var(--blue);border:2px solid var(--blue);box-shadow:none}
 .cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(270px,1fr));gap:22px}
 .card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:22px;box-shadow:4px 5px 0 var(--line);text-decoration:none;color:inherit;display:block;transition:.15s}
@@ -22,7 +22,7 @@ a.card:hover{transform:translateY(-3px) rotate(-.4deg)}.card.soon{opacity:.6;bor
 .two{display:grid;grid-template-columns:1fr 1fr;gap:28px}@media(max-width:700px){.two{grid-template-columns:1fr}}
 .note{background:var(--card);border-left:5px solid var(--green);padding:14px 20px;border-radius:0 12px 12px 0;margin:20px 0}
 .steps{counter-reset:s;list-style:none;padding:0}.steps li{counter-increment:s;position:relative;padding:14px 18px 14px 64px;background:var(--card);border:1px solid var(--line);border-radius:12px;margin-bottom:12px}
-.steps li::before{content:counter(s);position:absolute;left:16px;top:10px;width:36px;height:36px;border-radius:50%;background:var(--blue);color:#fff;font:22px "Marck Script",cursive;display:grid;place-items:center}
+.steps li::before{content:counter(s);position:absolute;left:16px;top:10px;width:36px;height:36px;border-radius:50%;background:var(--blue);color:var(--on-accent);font:22px "Marck Script",cursive;display:grid;place-items:center}
 .steps b{display:block}
 code{font:14px/1.5 ui-monospace,Consolas,monospace;background:var(--card);border:1px solid var(--line);padding:2px 7px;border-radius:6px;word-break:break-word}
 table{width:100%;border-collapse:collapse;background:var(--card);border-radius:12px;overflow:hidden;border:1px solid var(--line)}
@@ -97,8 +97,8 @@ footer.foot{position:relative;background:var(--card);padding:36px 0 20px;margin-
 .grade-tab{display:inline-flex;align-items:center;gap:9px;font-size:16px;font-weight:600;color:var(--ink);text-decoration:none;background:var(--paper);border:2px solid var(--line);border-radius:99px;padding:5px 18px 5px 6px;transition:.15s}
 .grade-tab .n{display:grid;place-items:center;width:29px;height:29px;border-radius:50%;background:var(--yellow);font-family:"Marck Script",cursive;font-size:19px;line-height:1;color:var(--ink)}
 .grade-tab:hover{border-color:var(--blue);color:var(--blue);transform:translateY(-2px)}
-.grade-tab.is-active{background:var(--blue);border-color:var(--blue);color:#fff;box-shadow:2px 3px 0 rgba(0,0,0,.16)}
-.grade-tab.is-active .n{background:#fff;color:var(--blue)}
+.grade-tab.is-active{background:var(--blue);border-color:var(--blue);color:var(--on-accent);box-shadow:2px 3px 0 rgba(0,0,0,.16)}
+.grade-tab.is-active .n{background:var(--on-accent);color:var(--blue)}
 .grade-panel{margin:0 0 20px;border:1px solid var(--line);border-radius:14px;background:var(--card);box-shadow:4px 5px 0 var(--line);scroll-margin-top:96px;animation:panel-in .25s ease}
 @keyframes panel-in{from{opacity:0;transform:translateY(7px)}to{opacity:1;transform:none}}
 .grade-panel[hidden]{display:none}
@@ -128,7 +128,7 @@ details[open]>summary .chev{transform:rotate(45deg)}
 .video-embed iframe{position:absolute;inset:0;width:100%;height:100%;border:0;display:block}
 .video-stub{display:grid;place-content:center;justify-items:center;gap:4px;aspect-ratio:16/9;padding:20px;text-align:center;color:#eef2ee;background:radial-gradient(120% 130% at 50% 0%,#253444 0%,#101820 72%)}
 .play-ico{display:grid;place-items:center;width:58px;height:58px;border-radius:50%;background:var(--blue);margin-bottom:8px;box-shadow:0 0 0 6px rgba(255,255,255,.14)}
-.play-ico::before{content:"";width:0;height:0;border-left:18px solid #fff;border-top:11px solid transparent;border-bottom:11px solid transparent;margin-left:4px}
+.play-ico::before{content:"";width:0;height:0;border-left:18px solid var(--on-accent);border-top:11px solid transparent;border-bottom:11px solid transparent;margin-left:4px}
 .video-stub b{font-size:17px;color:#fff}
 .video-stub span{font-size:14px;opacity:.85;max-width:52ch}
 @media(max-width:860px){.video-stub b{font-size:15px}.video-stub span{font-size:13px}}

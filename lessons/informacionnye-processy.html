@@ -1,4 +1,4 @@
-<!doctype html><html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<!doctype html><html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" media="(prefers-color-scheme: light)" content="#fbf8ef"><meta name="theme-color" media="(prefers-color-scheme: dark)" content="#16201c">
 <title>Информационные процессы: бортовой центр — интерактивный урок · Плотников В. А.</title>
 <meta name="description" content="Интерактивный урок информатики для 7 класса «Информационные процессы: бортовой центр»: работа в парах, баллы за ответы, проверка донесений бортового ИИ, итоговый балл и предварительная отметка.">
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Golos+Text:wght@400;600&family=Marck+Script&family=PT+Serif:ital@1&display=swap" rel="stylesheet"><link rel="stylesheet" href="../style.css"><link rel="icon" href="../favicon.ico" sizes="48x48"><link rel="icon" href="../icon-pva.svg" type="image/svg+xml">
@@ -6,7 +6,7 @@
 /* ===== Каркас интерактивного урока ===== */
 .lwrap{max-width:1180px;margin:0 auto;padding:0 24px}
 .lhero{position:relative;color:#fff;padding:30px 0 36px;margin-bottom:26px;overflow:hidden;background-image:radial-gradient(1.5px 1.5px at 12% 25%,rgba(255,255,255,.7) 50%,transparent 51%),radial-gradient(2px 2px at 78% 18%,rgba(255,255,255,.5) 50%,transparent 51%),radial-gradient(1.5px 1.5px at 55% 65%,rgba(255,255,255,.45) 50%,transparent 51%),radial-gradient(2.5px 2.5px at 88% 70%,rgba(255,215,110,.55) 50%,transparent 51%),radial-gradient(1.5px 1.5px at 35% 80%,rgba(255,255,255,.4) 50%,transparent 51%),linear-gradient(160deg,#0c1830,#16264a 55%,#20365f)}
-.lhero .tag{background:var(--yellow);color:#1f2a37;border:none}
+.lhero .tag{background:var(--yellow);color:var(--ink);border:none}
 .back{display:inline-block;color:#ffd76e;text-decoration:none;font-weight:600;font-size:15px}
 .back:hover{text-decoration:underline}
 .lhero h1{color:#fff;font-size:clamp(34px,5vw,54px);margin:.4em 0 .25em}
@@ -17,7 +17,7 @@
 @media(max-width:1020px){.lgrid{display:block}.board{position:sticky;top:60px;z-index:35;margin:0 0 20px}.b-rules{display:none}}
 /* ===== Шаги урока ===== */
 .step{background:var(--card);border:1px solid var(--line);border-radius:14px;box-shadow:4px 5px 0 var(--line);padding:22px 24px;margin:0 0 22px}
-.step-n{width:42px;height:42px;border-radius:50%;background:var(--blue);color:#fff;font:22px/42px "Marck Script",cursive;text-align:center;margin-bottom:8px}
+.step-n{width:42px;height:42px;border-radius:50%;background:var(--blue);color:var(--on-accent);font:22px/42px "Marck Script",cursive;text-align:center;margin-bottom:8px}
 .step-title{font-size:30px;margin:0 0 .35em}
 .step p{margin:.45em 0}
 .mute{color:var(--mute)}
@@ -39,7 +39,7 @@
 .b-switch{margin:12px 0 10px;font-size:13px;color:var(--mute)}
 .sw-wrap{display:flex;gap:8px;margin-top:6px}
 .sw{flex:1;padding:10px 6px;border:2px solid var(--line);border-radius:12px;background:var(--paper);font-weight:700;color:var(--ink);cursor:pointer;transition:.12s;font-size:14.5px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.sw.on{background:var(--blue);border-color:var(--blue);color:#fff;box-shadow:2px 3px 0 rgba(0,0,0,.15)}
+.sw.on{background:var(--blue);border-color:var(--blue);color:var(--on-accent);box-shadow:2px 3px 0 rgba(0,0,0,.15)}
 .b-row{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:8px 12px;border-radius:10px;border:1px dashed var(--line);margin:6px 0;background:var(--paper);position:relative}
 .b-row .b-who{font-weight:600;font-size:14.5px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .b-row .b-val{flex:none;color:var(--mute);font-size:13.5px}
@@ -50,10 +50,10 @@
 .b-barfill{height:100%;background:linear-gradient(90deg,var(--green),var(--blue));width:0;transition:.4s}
 .b-rules{font-size:13px;color:var(--mute);border-top:1px dashed var(--line);margin-top:12px;padding-top:10px;line-height:1.6}
 .b-rules b{color:var(--ink)}
-.b-save{margin-top:12px;width:100%;padding:9px;border:none;background:var(--green);color:#fff;border-radius:10px;font-weight:600;cursor:pointer;font-size:14px}
+.b-save{margin-top:12px;width:100%;padding:9px;border:none;background:var(--green);color:var(--on-accent);border-radius:10px;font-weight:600;cursor:pointer;font-size:14px}
 .b-save:hover{filter:brightness(1.08)}
 .b-reset{margin-top:8px;width:100%;padding:8px;border:2px dashed var(--red);background:none;color:var(--red);border-radius:10px;font-weight:600;cursor:pointer;font-size:14px}
-.b-reset:hover{background:var(--red);color:#fff}
+.b-reset:hover{background:var(--red);color:var(--on-accent)}
 .flt{position:absolute;right:10px;top:-4px;font-weight:800;color:var(--green);animation:flt 1s ease forwards;pointer-events:none}
 @keyframes flt{from{opacity:1;transform:translateY(0)}to{opacity:0;transform:translateY(-20px)}}
 /* ===== Задания ===== */
@@ -89,13 +89,13 @@ select.tin{max-width:250px;font-weight:600}
 .vbtn.yes{border-color:var(--green);color:var(--green)}
 .vbtn.no{border-color:var(--red);color:var(--red)}
 .vbtn.maybe{border-color:#c9a227;color:#8a6d00}
-.vbtn.yes:hover{background:var(--green);color:#fff}
-.vbtn.no:hover{background:var(--red);color:#fff}
+.vbtn.yes:hover{background:var(--green);color:var(--on-accent)}
+.vbtn.no:hover{background:var(--red);color:var(--on-accent)}
 .vbtn.maybe:hover{background:#e6c34a;color:#1f2a37}
 .vbtn:disabled{opacity:.45;cursor:default}
 .vbtn.picked{opacity:1}
-.vbtn.picked.yes{background:var(--green);color:#fff}
-.vbtn.picked.no{background:var(--red);color:#fff}
+.vbtn.picked.yes{background:var(--green);color:var(--on-accent)}
+.vbtn.picked.no{background:var(--red);color:var(--on-accent)}
 .vbtn.picked.maybe{background:#e6c34a;color:#1f2a37}
 .vfeed{border-radius:12px;padding:11px 15px;margin-top:12px;font-size:15px;line-height:1.55}
 .vfeed.good{background:color-mix(in srgb,var(--green) 13%,var(--card));border:1.5px solid var(--green)}
@@ -143,11 +143,11 @@ select.tin{max-width:250px;font-weight:600}
 .chk{position:relative;border:3px solid var(--yellow);background:linear-gradient(150deg,#fff6d8,#ffe9a8);border-radius:16px;box-shadow:6px 7px 0 rgba(201,162,39,.3);padding:20px 22px;margin:0 0 22px;animation:chkpulse 1.6s ease-in-out infinite}
 .chk.done{animation:none;border-color:var(--green);background:linear-gradient(150deg,#eefaf0,#dcf5e3);box-shadow:6px 7px 0 rgba(34,139,84,.16)}
 @keyframes chkpulse{0%,100%{box-shadow:6px 7px 0 rgba(201,162,39,.3)}50%{box-shadow:6px 7px 0 rgba(201,162,39,.3),0 0 0 9px rgba(255,215,110,.22)}}
-.chk-badge{display:inline-block;background:var(--red);color:#fff;border-radius:99px;padding:3px 14px;font-weight:700;font-size:12.5px;letter-spacing:.08em;text-transform:uppercase;margin-bottom:6px}
+.chk-badge{display:inline-block;background:var(--red);color:var(--on-accent);border-radius:99px;padding:3px 14px;font-weight:700;font-size:12.5px;letter-spacing:.08em;text-transform:uppercase;margin-bottom:6px}
 .chk h2{margin:0 0 .3em}
 .chk .chk-actions{display:flex;flex-wrap:wrap;gap:12px;align-items:center;margin-top:12px}
-.chk-btn{background:var(--green);border-color:var(--green);color:#fff;font-size:17px;padding:12px 22px;box-shadow:3px 4px 0 rgba(0,0,0,.18)}
-.chk-btn:hover{filter:brightness(1.07);color:#fff}
+.chk-btn{background:var(--green);border-color:var(--green);color:var(--on-accent);font-size:17px;padding:12px 22px;box-shadow:3px 4px 0 rgba(0,0,0,.18)}
+.chk-btn:hover{filter:brightness(1.07);color:var(--on-accent)}
 .chk-ok{font-weight:700;color:var(--green)}
 /* ===== Формы А и Б ===== */
 .duo{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:14px;margin:12px 0}
@@ -160,6 +160,8 @@ select.tin{max-width:250px;font-weight:600}
 .own-chip.b{border-color:var(--green);color:var(--green)}
 .ord-note{border-left:4px solid var(--yellow);background:var(--paper);border-radius:0 10px 10px 0;padding:8px 12px;font-size:14.5px}
 @media(max-width:700px){.duo{grid-template-columns:1fr}}
+/* ===== Тёмная тема ===== */
+@media(prefers-color-scheme:dark){.vbtn.maybe{color:#e6c34a}.duo-form.ownB .who-tag{background:#1e3a2c}.chk{border-color:#e6c34a;background:linear-gradient(150deg,#3a2f0e,#4a3d14)}.chk.done{background:linear-gradient(150deg,#122b1e,#173828)}}
 @media print{body *{visibility:hidden}#modal,#modal *{visibility:visible}#modal{position:absolute;inset:0;background:#fff;display:block;padding:10px}.modal-box{box-shadow:none;max-height:none;max-width:none}.modal-bar{display:none}}
 </style></head><body>
 <div class="lhero"><div class="lwrap">
