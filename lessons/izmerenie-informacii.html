@@ -40,6 +40,7 @@
 .frm{display:inline-block;font:italic 20px "PT Serif",Georgia,serif;border:2px dashed var(--blue);color:var(--blue);padding:6px 18px;border-radius:12px;background:var(--paper);margin:6px 0}
 /* ===== Табло пары ===== */
 .board{order:-1;position:sticky;top:8px;z-index:20;display:flex;flex-wrap:wrap;align-items:center;gap:12px 18px;background:var(--card);border:2px solid var(--blue);border-radius:16px;box-shadow:4px 5px 0 rgba(47,111,208,.22);padding:16px 20px;margin:0 0 24px}
+.board-sentinel{order:-2;height:0;margin:0;padding:0;border:0;visibility:hidden;pointer-events:none}
 .board::before{content:"";order:3;flex-basis:100%;height:0}
 .b-head{order:1;flex:none;font-weight:700;letter-spacing:.07em;font-size:13px;text-transform:uppercase;color:var(--mute);margin:0}
 .b-names{order:2;display:flex;flex:none;gap:10px;margin:0}
@@ -64,7 +65,11 @@
 .b-reset{order:10;flex:none;margin:0;width:auto;padding:8px 14px;border:2px dashed var(--red);background:none;color:var(--red);border-radius:10px;font-weight:600;cursor:pointer;font-size:14px}
 .b-reset:hover{background:var(--red);color:var(--on-accent)}
 @media(max-width:900px){
-  .board{position:static;padding:14px 16px;gap:10px 14px;margin-bottom:20px}
+  .board{position:sticky;top:73px;padding:14px 16px;gap:10px 14px;margin-bottom:20px}
+  .board.mini{padding:9px 12px;gap:7px;box-shadow:0 10px 22px rgba(0,0,0,.22)}
+  .board.mini .b-head,.board.mini .b-names,.board.mini .b-switch,.board.mini .b-sub,.board.mini .b-bar,.board.mini .b-reset{display:none}
+  .board.mini .b-row{flex:1 1 42%}
+  .board.mini .b-save{flex:1 1 100%;padding:8px 14px;font-size:13.5px}
   .board::before{display:none}
   .b-head,.b-names,.b-switch{order:1;flex:1 1 100%}
   .b-names label{flex:1 1 140px}
@@ -466,7 +471,7 @@ select.tin{max-width:250px;font-weight:600}
 <div class="note"><b>Домашнее задание</b><br>Придумай ещё одно донесение станции с ошибкой по теме урока и напиши ключ. Лучшие войдут в следующий урок.</div>
 </section>
 </main>
-<aside class="board" aria-label="Табло пары">
+<div class="board-sentinel" aria-hidden="true"></div><aside class="board" aria-label="Табло пары">
 <div class="b-head">Бортовой журнал пары</div>
 <div class="b-names">
 <label>Ученик А<input id="nameA" type="text" placeholder="позывной (имя)" autocomplete="off"></label>
@@ -483,6 +488,7 @@ select.tin{max-width:250px;font-weight:600}
 <button class="b-save" id="xlsBtn" type="button">Сохранить отчёт (XLSX)</button>
 <button class="b-reset" id="resetBtn" type="button">Сбросить урок</button>
 </aside>
+<script>(function(){var b=document.querySelector(".board"),s=document.querySelector(".board-sentinel");if(!b||!s||!("IntersectionObserver" in window))return;function fit(){if(window.matchMedia&&matchMedia("(max-width:900px)").matches){var t=8,bar=document.querySelector(".side");if(bar){var r=bar.getBoundingClientRect();if(r.bottom>0&&getComputedStyle(bar).position==="sticky")t=Math.ceil(r.bottom)}b.style.top=t+"px"}else{b.style.top=""}}fit();if(window.addEventListener)window.addEventListener("resize",fit);new IntersectionObserver(function(en){for(var i=0;i<en.length;i++)b.classList.toggle("mini",!en[i].isIntersecting)},{rootMargin:"-70px 0px 0px 0px",threshold:0}).observe(s)})();</script>
 </div>
 <footer class="lfoot"><div class="lwrap">Интерактивный урок к презентации «Измерение информации: бортовой центр» · <a href="../informatika-uchenikam.html">Информатика · 7 класс</a> · Плотников В. А. · МБОУ «Школа №7» г.о. Самара · <a href="../index.html">pvaschool7.github.io</a></div></footer>
 <div class="modal" id="modal" hidden><div class="modal-box"><div class="modal-bar"><b>Результат пары — для учителя</b><span style="display:flex;gap:8px;align-items:center"><button class="btn ghost" id="mXls" type="button">XLSX</button><button class="btn ghost" id="mClose" type="button">Закрыть</button></span></div><div class="rcard" id="mCard" style="border:none"></div></div></div>
