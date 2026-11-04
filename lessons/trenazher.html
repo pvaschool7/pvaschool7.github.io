@@ -1,0 +1,242 @@
+<!doctype html><html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" media="(prefers-color-scheme: light)" content="#fbf8ef"><meta name="theme-color" media="(prefers-color-scheme: dark)" content="#16201c">
+<title>Тренажёр · Плотников В. А.</title>
+<meta name="description" content="Тренажёр для одного ученика: случайный вариант из 10, задания по блокам в стиле презентации, результат показывается после выполнения всех заданий. Информатика и математика, 7 класс.">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Golos+Text:wght@400;600&family=Marck+Script&family=PT+Serif:ital@1&display=swap" rel="stylesheet"><link rel="stylesheet" href="../style.css"><link rel="icon" href="../favicon.ico" sizes="48x48"><link rel="icon" href="../icon-pva.svg" type="image/svg+xml">
+<style>
+/* ===== Каркас (как на страницах уроков) ===== */
+.lwrap{max-width:1280px;margin:0 auto;padding:0 24px}
+.lhero{position:relative;color:#fff;padding:30px 0 34px;margin-bottom:24px;overflow:hidden;background-image:radial-gradient(1.5px 1.5px at 12% 25%,rgba(255,255,255,.7) 50%,transparent 51%),radial-gradient(2px 2px at 78% 18%,rgba(255,255,255,.5) 50%,transparent 51%),radial-gradient(1.5px 1.5px at 55% 65%,rgba(255,255,255,.45) 50%,transparent 51%),radial-gradient(2.5px 2.5px at 88% 70%,rgba(255,215,110,.55) 50%,transparent 51%),radial-gradient(1.5px 1.5px at 35% 80%,rgba(255,255,255,.4) 50%,transparent 51%),linear-gradient(160deg,#0c1830,#16264a 55%,#20365f)}
+.lhero .tag{background:var(--yellow);color:var(--ink);border:none}
+.back{display:inline-block;color:#ffd76e;text-decoration:none;font-weight:600;font-size:15px;margin-right:20px}
+.back:hover{text-decoration:underline}
+.lhero h1{color:#fff;font-size:clamp(34px,5vw,54px);margin:.4em 0 .25em}
+.lhero .lead{color:#c9d6ef;max-width:820px;font-size:18px;margin:.4em 0 0}
+.lfoot{border-top:1px solid var(--line);margin-top:34px;padding:22px 0 30px;color:var(--mute);font-size:14px;background:var(--card)}
+.lfoot a{color:var(--blue)}
+/* ===== Выбор темы ===== */
+.tz-cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:22px;margin:18px 0 8px}
+.tz-cards .card p{margin:.3em 0}
+.tz-meta{font-size:14px;color:var(--mute);border-top:1px dashed var(--line);padding-top:10px;margin-top:12px}
+.tz-h2{text-align:center;margin:6px 0 4px}
+.tz-sub{text-align:center;color:var(--mute);max-width:720px;margin:0 auto 10px}
+/* ===== Панель прогресса ===== */
+.tz-top{position:sticky;top:8px;z-index:30;background:color-mix(in srgb,var(--card) 93%,transparent);backdrop-filter:blur(6px);border:1px solid var(--line);border-radius:14px;box-shadow:3px 4px 0 var(--line);padding:10px 16px;margin:0 0 18px;display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+.tz-top .ttl{font-weight:700;font-size:15px}
+.tz-top .cnt{margin-left:auto;font-size:14px;color:var(--mute);white-space:nowrap}
+.tz-bar{flex-basis:100%;height:10px;border-radius:99px;background:var(--paper);border:1px solid var(--line);overflow:hidden}
+.tz-fill{height:100%;background:linear-gradient(90deg,var(--green),var(--blue));width:0;transition:width .35s}
+/* ===== Слайды ===== */
+.slide{background:var(--card);border:1px solid var(--line);border-radius:16px;box-shadow:5px 6px 0 var(--line);padding:30px 34px;margin:0 auto 26px;min-height:280px;max-width:960px;animation:tzin .22s ease}
+@keyframes tzin{from{opacity:0;transform:translateY(9px)}to{opacity:1;transform:none}}
+.tz-badge{display:inline-block;font-size:13.5px;font-weight:600;letter-spacing:.05em;text-transform:uppercase;color:var(--mute);border:1.5px dashed var(--line);border-radius:99px;padding:4px 14px;margin:0 0 12px}
+.tz-n{width:46px;height:46px;border-radius:50%;background:var(--blue);color:var(--on-accent);font:24px/46px "Marck Script",cursive;text-align:center;margin-bottom:6px}
+.tz-q{font-size:23px;line-height:1.5;margin:6px 0 20px}
+.tz-q sup{font-size:.62em}
+.tz-answer{display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin:16px 0}
+.tz-num{font:600 19px "Golos Text",sans-serif;padding:11px 14px;border:2.5px solid var(--blue);border-radius:12px;background:var(--paper);color:var(--ink);width:190px}
+.tz-num:focus{outline:none;border-color:var(--green)}
+.tz-unit{font-weight:600;color:var(--mute);font-size:17px}
+.tz-unit sup{font-size:.62em}
+.tz-opts{display:grid;gap:10px;margin:16px 0}
+.tz-opt{text-align:left;padding:13px 18px;border:2px solid var(--line);border-radius:12px;background:var(--paper);font:600 16.5px "Golos Text",sans-serif;color:var(--ink);cursor:pointer;transition:.12s}
+.tz-opt:hover{border-color:var(--blue)}
+.tz-opt.sel{background:var(--blue);border-color:var(--blue);color:var(--on-accent);box-shadow:2px 3px 0 rgba(0,0,0,.16)}
+.tz-hint{font-size:14.5px;color:var(--mute);border-left:4px solid var(--yellow);padding:4px 12px;margin:14px 0 0}
+.tz-nav{display:flex;gap:12px;margin-top:24px;flex-wrap:wrap;align-items:center}
+.tz-nav .spacer{flex:1}
+.tz-warn{flex-basis:100%;font-size:14px;color:var(--mute)}
+/* ===== Слайд-разделитель и старт ===== */
+.slide.div{text-align:center;display:grid;place-content:center;min-height:340px}
+.slide.div .big{font-family:"Marck Script",cursive;font-size:clamp(40px,7vw,62px);margin:.15em 0 .1em;line-height:1.15}
+.slide.div .rng{color:var(--mute);font-size:16px}
+.slide.start{text-align:center}
+.plan{max-width:520px;margin:6px auto 14px;text-align:left}
+.plan li{margin:7px 0}
+/* ===== Результаты ===== */
+.tz-res{display:flex;gap:24px;align-items:center;flex-wrap:wrap;margin:10px 0 4px}
+.tz-score{font-family:"Marck Script",cursive;font-size:56px;line-height:1.05}
+.tz-score small{display:block;font:15px "Golos Text",sans-serif;color:var(--mute)}
+.tz-mark{display:inline-grid;place-items:center;flex:none;width:78px;height:78px;border-radius:50%;background:var(--yellow);font-family:"Marck Script",cursive;font-size:42px;border:2px solid var(--line)}
+.tz-brow{display:flex;align-items:center;gap:12px;margin:9px 0;flex-wrap:wrap}
+.tz-brow .nm{flex:1;font-weight:600;min-width:180px}
+.tz-brow .vv{color:var(--mute);white-space:nowrap}
+.tz-mini{flex-basis:100%;height:8px;border-radius:99px;background:var(--paper);border:1px solid var(--line);overflow:hidden}
+.tz-mini i{display:block;height:100%;background:linear-gradient(90deg,var(--green),var(--blue))}
+.rev{border:1.5px dashed var(--line);border-radius:12px;padding:11px 15px;margin:10px 0;background:var(--paper)}
+.rev .st{font-weight:800;margin-right:8px}
+.rev .ok{color:var(--green)}.rev .no{color:var(--red)}.rev .na{color:var(--mute)}
+.rev p{margin:.15em 0;font-size:15px}
+.rev .ans{color:var(--mute);font-size:14.5px}
+.rev .ans b{color:var(--ink)}
+@media(max-width:700px){.slide{padding:22px 18px}.tz-q{font-size:20px}.tz-top{gap:8px;padding:9px 12px}}
+</style></head><body><div class="layout"><aside class="side"><a class="logo" href="../index.html"><img class="logo-ico" src="../icon-pva.svg" alt="" width="44" height="44"><span>Плотников В. А.</span></a><input type="checkbox" id="menu-toggle" aria-label="Открыть меню"><label for="menu-toggle" class="burger">Меню</label><nav class="menu" aria-label="Разделы сайта"><ul><li><a href="../index.html">Главная</a></li><li><a href="../informatika.html">Информатика</a><ul><li><a href="../informatika-uchenikam.html">Ученикам</a></li><li><a href="../informatika-uchitelyam.html">Учителям</a></li><li><a href="../informatika-propushel-urok.html">Если ты пропустил урок</a></li></ul></li><li><a href="../matematika.html">Математика</a><ul><li><a href="../matematika-uchenikam.html">Ученикам</a></li><li><a href="../matematika-uchitelyam.html">Учителям</a></li><li><a href="../matematika-propushel-urok.html">Если ты пропустил урок</a></li></ul></li><li><a href="../kontakty.html">Контакты</a></li></ul></nav></aside><div class="col">
+<div class="lwrap">
+<header class="lhero">
+<div><a class="back" href="../informatika-uchenikam.html">← Информатика: ученикам</a><a class="back" href="../matematika-uchenikam.html">← Математика: ученикам</a></div>
+<span class="tag">Тренажёр</span>
+<h1>Тренажёр</h1>
+<p class="lead">Работа для одного ученика. Выбери тему — вариант (один из 10) выберется случайным образом. Задания идут по блокам, как слайды презентации: ответил — жми «Далее». Результат покажем после всех заданий. Ответы никуда не сохраняются и не отправляются.</p>
+</header>
+<main id="app" aria-live="polite"></main>
+<footer class="lfoot">© Плотников В. А. · МБОУ Школа №7 г.о. Самара · <a href="../index.html">На главную</a></footer>
+</div>
+<script src="trenazher-data.js"></script>
+<script>
+(function(){
+"use strict";
+var D=window.TZ,app=document.getElementById("app");
+if(!D||!D.TOPICS){app.innerHTML="<div class='slide start'><h2>Тренажёр</h2><p>Не удалось загрузить список тем (файл trenazher-data.js).</p></div>";return}
+var S=null; /* текущий сеанс */
+
+function esc(s){return String(s)}
+function markFor(pct){return pct>=90?"5":(pct>=70?"4":(pct>=50?"3":"2"))}
+
+/* ================= Экран: выбор темы ================= */
+function renderPick(){
+ var h="<h2 class='tz-h2'>Выбери тему</h2><p class='tz-sub'>Каждая тема — 3 блока по 4 задания. Вариант выбирается случайно из "+D.VARIANTS+", результат — в конце.</p><div class='tz-cards'>";
+ D.TOPICS.forEach(function(t){
+  h+="<div class='card'><span class='tag'>"+t.subject+"</span><span class='tag'>"+t.grade+"</span><h3>"+t.title+"</h3><p>"+t.desc+"</p><div class='tz-meta'>3 блока · "+(3*D.TASKS_PER_BLOCK)+" заданий · "+D.VARIANTS+" вариантов</div><div class='card-actions'><button class='btn sm' type='button' data-topic='"+t.id+"'>Пройти тренажёр →</button></div></div>";
+ });
+ h+="</div><p class='tz-sub' style='margin-top:14px;font-size:14px'>Список тем будет пополняться по мере прохождения программы.</p>";
+ app.innerHTML=h;
+ var btns=app.querySelectorAll("[data-topic]");
+ for(var i=0;i<btns.length;i++)btns[i].addEventListener("click",function(){startTopic(this.getAttribute("data-topic"))});
+ window.scrollTo(0,0);
+}
+
+/* ================= Старт темы: случайный вариант ================= */
+function startTopic(id){
+ var topic=null,i;
+ for(i=0;i<D.TOPICS.length;i++){if(D.TOPICS[i].id===id)topic=D.TOPICS[i]}
+ if(!topic){renderPick();return}
+ var v=1+Math.floor(Math.random()*D.VARIANTS);
+ var data=D.buildVariant(id,v);
+ S={data:data,ans:[],slides:[],cur:0};
+ var g=0;
+ data.blocks.forEach(function(b,bi){
+  S.slides.push({kind:"div",bi:bi});
+  b.tasks.forEach(function(t,ti){S.slides.push({kind:"task",bi:bi,ti:ti,g:g});g++});
+ });
+ S.total=g;S.ans=new Array(g);S.answered=0;
+ try{history.replaceState(null,"","#t="+id)}catch(e){}
+ renderStart();
+}
+function renderStart(){
+ var d=S.data,h="<div class='slide start'><span class='tz-badge'>"+d.subject+" · "+d.grade+"</span><h2 class='tz-h2'>"+d.title+"</h2><p class='tz-sub'>Вариант выбран случайным образом. Внутри — "+S.total+" заданий в "+d.blocks.length+" блоках:</p><ul class='plan'>";
+ d.blocks.forEach(function(b,i){h+="<li><b>Блок "+(i+1)+".</b> "+b.name+" — "+b.tasks.length+" задания</li>"});
+ h+="</ul><div class='tz-nav' style='justify-content:center'><button class='btn' type='button' id='go'>Начать выполнение →</button><button class='btn ghost' type='button' id='back'>Сменить тему</button></div></div>";
+ app.innerHTML=h;
+ document.getElementById("go").addEventListener("click",function(){S.cur=0;renderRun()});
+ document.getElementById("back").addEventListener("click",renderPick);
+ window.scrollTo(0,0);
+}
+
+/* ================= Прохождение: слайды ================= */
+function topBar(extra){
+ var pct=Math.round(100*(S.answered/S.total));
+ return "<div class='tz-top'><span class='ttl'>"+S.data.title+"</span><span class='cnt'>"+extra+" · Отвечено: "+S.answered+" из "+S.total+"</span><div class='tz-bar'><div class='tz-fill' style='width:"+pct+"%'></div></div></div>";
+}
+function slideBadge(bi){return "<span class='tz-badge'>Блок "+(bi+1)+" · "+S.data.blocks[bi].name+"</span>"}
+function saveCurrent(){
+ var sl=S.slides[S.cur];
+ if(!sl||sl.kind!=="task")return;
+ var prev=S.ans[sl.g],val=null;
+ if(S.data.blocks[sl.bi].tasks[sl.ti].type==="mc"){
+  var sel=app.querySelector(".tz-opt.sel");
+  val=sel?sel.getAttribute("data-v"):null;
+ }else{
+  var inp=document.getElementById("tzin");
+  val=inp&&inp.value.trim()!==""?inp.value.trim():null;
+ }
+ var was=(prev!==null&&prev!==undefined&&prev!=="");
+ var now=(val!==null&&val!=="");
+ if(was&&!now)S.answered--;
+ if(!was&&now)S.answered++;
+ S.ans[sl.g]=val;
+}
+function renderRun(){
+ var sl=S.slides[S.cur],i;
+ var h=topBar(sl.kind==="task"?("Задание "+(sl.g+1)+" из "+S.total):("Блок "+(sl.bi+1)+" из "+S.data.blocks.length));
+ if(sl.kind==="div"){
+  var b=S.data.blocks[sl.bi],from=0;
+  for(i=0;i<sl.bi;i++)from+=S.data.blocks[i].tasks.length;
+  h+="<div class='slide div'><span class='tz-badge'>Блок "+(sl.bi+1)+" из "+S.data.blocks.length+"</span><div class='big'>"+b.name+"</div><p class='rng'>Задания "+(from+1)+"–"+(from+b.tasks.length)+" · отвечай и жми «Далее»</p></div>";
+ }else{
+  var task=S.data.blocks[sl.bi].tasks[sl.ti];
+  var saved=S.ans[sl.g];
+  h+="<div class='slide'>"+slideBadge(sl.bi)+"<div class='tz-n'>"+(sl.g+1)+"</div><div class='tz-q'>"+task.q+"</div>";
+  if(task.type==="num"){
+   h+="<div class='tz-answer'><input class='tz-num' id='tzin' type='text' inputmode='text' autocomplete='off' value='"+(saved||"")+"' aria-label='Ответ'>"+(task.unit?"<span class='tz-unit'>"+task.unit+"</span>":"")+"</div>";
+  }else{
+   h+="<div class='tz-opts'>";
+   task.opts.forEach(function(o){
+    h+="<button class='tz-opt"+(saved===o?" sel":"")+"' type='button' data-v='"+o+"'>"+o+"</button>";
+   });
+   h+="</div>";
+  }
+  if(task.hint)h+="<p class='tz-hint'>Подсказка, если застрял: "+task.hint+"</p>";
+  h+="</div>";
+ }
+ var last=(S.cur===S.slides.length-1),unanswered=S.total-S.answered;
+ h+="<div class='tz-nav' style='max-width:960px;margin:0 auto 26px'>"+(S.cur>0?"<button class='btn ghost' type='button' id='prev'>← Назад</button>":"")+"<span class='spacer'></span>"+(last?"<button class='btn' type='button' id='fin'>Показать результат →</button>":"<button class='btn' type='button' id='next'>"+(sl.kind==="div"?"К заданиям →":"Далее →")+"</button>")+"</div>";
+ if(last&&sl.kind==="task"&&unanswered>0)h+="<p class='tz-warn' style='max-width:960px;margin:0 auto 26px'>Не отвечено заданий: "+unanswered+". Можно вернуться «Назад» — или показать результат как есть.</p>";
+ app.innerHTML=h;
+ var np=document.getElementById("next"),pv=document.getElementById("prev"),fin=document.getElementById("fin");
+ if(np)np.addEventListener("click",next);
+ if(pv)pv.addEventListener("click",prev);
+ if(fin)fin.addEventListener("click",finish);
+ var opts=app.querySelectorAll(".tz-opt");
+ for(i=0;i<opts.length;i++)opts[i].addEventListener("click",function(){
+  var cur=app.querySelector(".tz-opt.sel");if(cur)cur.classList.remove("sel");
+  this.classList.add("sel");
+ });
+ var inp=document.getElementById("tzin");
+ if(inp){
+  inp.addEventListener("keydown",function(e){if(e.key==="Enter"){e.preventDefault();(last&&fin?fin:np||fin).click()}});
+  inp.focus();
+ }
+ if(sl.kind==="div"&&np)np.focus();
+ window.scrollTo(0,0);
+}
+function next(){saveCurrent();if(S.cur<S.slides.length-1){S.cur++;renderRun()}}
+function prev(){saveCurrent();if(S.cur>0){S.cur--;renderRun()}}
+
+/* ================= Результаты ================= */
+function finish(){
+ saveCurrent();
+ var perBlock=[],score=0,g=0,review="";
+ S.data.blocks.forEach(function(b,bi){
+  var got=0;
+  b.tasks.forEach(function(task,ti){
+   var a=S.ans[g],right=false;
+   if(task.type==="num")right=a!==null&&D.checkNum(a,task.a);
+   else right=(a===task.c);
+   if(right)got++;
+   var st=right?"<span class='st ok'>✓</span>":(a===null||a===""?"<span class='st na'>—</span>":"<span class='st no'>✗</span>");
+   var my=a===null||a===""?"нет ответа":a;
+   var corr=task.type==="num"?(task.a+(task.unit?" "+task.unit.replace(/<[^>]+>/g,""):"")):task.c;
+   review+="<div class='rev'><p>"+st+"<b>Задание "+(g+1)+"</b></p><p>"+task.q+"</p><p class='ans'>Твой ответ: <b>"+esc(my)+"</b>"+(right?"":" · Верно: <b>"+esc(corr)+"</b>")+(task.type==="num"&&task.hint?" · <span style='color:var(--mute)'>"+task.hint.replace(/<[^>]+>/g,"")+"</span>":"")+"</p></div>";
+   g++;
+  });
+  perBlock.push({name:b.name,got:got,of:b.tasks.length});
+  score+=got;
+ });
+ var pct=Math.round(100*score/S.total),mk=markFor(pct);
+ var h=topBar("Завершено")+"<div class='slide'><span class='tz-badge'>"+S.data.subject+" · "+S.data.grade+"</span><h2 class='tz-h2' style='text-align:left'>Результат</h2><div class='tz-res'><div class='tz-mark'>"+mk+"</div><div class='tz-score'>"+score+" из "+S.total+"<small>"+pct+"% · отметка «"+mk+"» · шкала: 90–100% «5», 70–89% «4», 50–69% «3»</small></div></div>";
+ perBlock.forEach(function(pb){
+  var p=Math.round(100*pb.got/pb.of);
+  h+="<div class='tz-brow'><span class='nm'>"+pb.name+"</span><span class='vv'>"+pb.got+" из "+pb.of+"</span><div class='tz-mini'><i style='width:"+p+"%'></i></div></div>";
+ });
+ h+="<h3 style='margin-top:22px'>Разбор заданий</h3>"+review;
+ h+="<div class='tz-nav'><button class='btn' type='button' id='again'>Пройти ещё раз · новый случайный вариант</button><button class='btn ghost' type='button' id='pick'>Сменить тему</button></div><p class='tz-warn' style='margin-top:12px'>Результат показан только здесь и нигде не сохраняется: при перезагрузке страницы он исчезнет. Если отметка нужна в журнале — запиши её.</p></div>";
+ app.innerHTML=h;
+ document.getElementById("again").addEventListener("click",function(){startTopic(S.data.topicId)});
+ document.getElementById("pick").addEventListener("click",function(){S=null;try{history.replaceState(null,"","#")}catch(e){};renderPick()});
+ window.scrollTo(0,0);
+}
+
+/* ================= Инициализация (в т.ч. глубокая ссылка #t=…) ================= */
+var m=(location.hash||"").match(/^#t=([a-zа-я-]+)/i);
+if(m){startTopic(m[1])}else{renderPick()}
+})();
+</script></div></div></body></html>
