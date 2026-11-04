@@ -1,0 +1,144 @@
+<!doctype html><html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" media="(prefers-color-scheme: light)" content="#f7f4ec"><meta name="theme-color" media="(prefers-color-scheme: dark)" content="#111916">
+<title>Конспект урока «Измерение информации: бортовой центр» · Плотников В. А.</title>
+<meta name="description" content="Конспект ученика к уроку информатики 7 класса «Измерение информации: бортовой центр»: бит и алфавит, единицы измерения, объём сообщения, задания и домашняя работа.">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Golos+Text:wght@400;600&family=Marck+Script&family=PT+Serif:ital@1&display=swap" rel="stylesheet"><link rel="stylesheet" href="../style.css"><link rel="icon" href="../favicon.ico" sizes="48x48"><link rel="icon" href="../icon-pva.svg" type="image/svg+xml">
+<style>
+/* ===== Каркас (как на страницах уроков) ===== */
+.lwrap{max-width:1240px;margin:0 auto;padding:0 clamp(20px,3.4vw,40px)}
+.lhero{position:relative;color:#fff;padding:30px 0 36px;margin-bottom:26px;overflow:hidden;background-image:radial-gradient(1.5px 1.5px at 12% 25%,rgba(255,255,255,.7) 50%,transparent 51%),radial-gradient(2px 2px at 78% 18%,rgba(255,255,255,.5) 50%,transparent 51%),radial-gradient(1.5px 1.5px at 55% 65%,rgba(255,255,255,.45) 50%,transparent 51%),radial-gradient(2.5px 2.5px at 88% 70%,rgba(255,215,110,.55) 50%,transparent 51%),radial-gradient(1.5px 1.5px at 35% 80%,rgba(255,255,255,.4) 50%,transparent 51%),linear-gradient(160deg,#0c1830,#16264a 55%,#20365f)}
+.lhero .tag{background:var(--yellow);color:var(--ink);border:none}
+.back{display:inline-block;color:#ffd76e;text-decoration:none;font-weight:600;font-size:15px;margin-right:20px}
+.back:hover{text-decoration:underline}
+.lhero h1{color:#fff;font-size:clamp(30px,4.4vw,48px);margin:.4em 0 .25em}
+.lhero .lead{color:#c9d6ef;max-width:880px;font-size:17.5px;margin:.4em 0 0}
+.lfoot{border-top:1px solid var(--line);margin-top:34px;padding:22px 0 30px;color:var(--mute);font-size:14px;background:var(--card)}
+.lfoot a{color:var(--blue)}
+/* ===== Блоки конспекта: прямоугольные, скруглённые, с отступами ===== */
+.kb{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:clamp(22px,2.6vw,32px) clamp(22px,3vw,36px);margin:0 0 22px;box-shadow:5px 6px 0 var(--offset),var(--shadow-sm)}
+.kb>h2{font-size:clamp(26px,2.6vw,34px);margin:.15em 0 .45em}
+.kb h3{font-size:21px;margin:1.15em 0 .35em}
+.kb p{margin:.5em 0}
+.kb ul,.kb ol{margin:.45em 0 .45em;padding-left:1.4em}
+.kb li{margin:.34em 0}
+.kb sup{font-size:.66em}
+.kb .tag{margin:0 8px 0 0;vertical-align:middle}
+/* цепочки в одну строку */
+.chain{display:flex;align-items:center;flex-wrap:nowrap;gap:7px;margin:15px 0;padding:6px 2px 8px;overflow-x:auto}
+.chain b{flex:none;background:color-mix(in srgb,var(--yellow) 78%,var(--card));border:1px solid color-mix(in srgb,var(--yellow-deep) 45%,var(--line));border-radius:11px;padding:7px 13px;font-size:14.5px;white-space:nowrap}
+.chain .u{flex:none;background:var(--card-2);border:2px solid var(--green);border-radius:11px;padding:6px 13px;font-size:14.5px;font-weight:600;white-space:nowrap}
+.chain .x{flex:none;color:var(--mute);font-weight:600;font-size:13px;white-space:nowrap}
+.chain .a{flex:none;color:var(--blue);font-weight:700;white-space:nowrap}
+/* заметки и формулы */
+.knote{background:linear-gradient(135deg,color-mix(in srgb,var(--yellow) 15%,var(--card)),var(--card));border:1px solid color-mix(in srgb,var(--yellow-deep) 40%,var(--line));border-left:5px solid var(--yellow-deep);border-radius:14px;padding:14px 18px;margin:15px 0}
+.knote.g{background:linear-gradient(135deg,color-mix(in srgb,var(--green) 8%,var(--card)),var(--card));border-color:color-mix(in srgb,var(--green) 35%,var(--line));border-left-color:var(--green)}
+.knote.b{background:linear-gradient(135deg,color-mix(in srgb,var(--blue) 8%,var(--card)),var(--card));border-color:color-mix(in srgb,var(--blue) 35%,var(--line));border-left-color:var(--blue)}
+.frm{display:inline-block;font:italic 20px "PT Serif",Georgia,serif;border:2px dashed var(--blue);color:var(--blue);padding:6px 18px;border-radius:12px;background:var(--paper);margin:6px 10px 6px 0}
+.frm.g{border-color:var(--green);color:var(--green)}
+.ask{border-left:4px solid var(--blue);background:var(--blue-soft);border-radius:0 14px 14px 0;padding:13px 17px;margin:13px 0;font-style:italic}
+/* навигация по конспекту */
+.knav{display:flex;flex-wrap:wrap;gap:8px;margin:2px 0 20px}
+.knav a{font-size:14.5px;font-weight:600;text-decoration:none;color:var(--blue);background:var(--card);border:1.5px solid var(--line);border-radius:99px;padding:6px 14px;transition:.15s}
+.knav a:hover{border-color:var(--blue);background:var(--blue-soft)}
+/* домашнее задание */
+.hw{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:14px;margin:15px 0}
+.hw>div{border:1.5px dashed var(--line-strong);border-radius:14px;padding:16px 18px;background:var(--card-2)}
+.hw b{color:var(--blue)}
+.hw p{margin:.4em 0;font-size:15.5px}
+/* материалы */
+.mlinks{display:flex;flex-wrap:wrap;gap:10px 22px;margin:4px 0 0;padding:0;list-style:none}
+.mlinks a{font-weight:600}
+@media(max-width:700px){.kb{padding:18px 16px;border-radius:16px}}
+@media print{.side,.lhero,.lfoot,.knav{display:none}.kb{box-shadow:none;break-inside:avoid}}
+</style></head><body>
+<div class="layout"><aside class="side"><a class="logo" href="../index.html"><img class="logo-ico" src="../icon-pva.svg" alt="" width="44" height="44"><span>Плотников В. А.</span></a><input type="checkbox" id="menu-toggle" aria-label="Открыть меню"><label for="menu-toggle" class="burger">Меню</label><nav class="menu" aria-label="Разделы сайта"><ul><li><a href="../index.html">Главная</a></li><li><a href="../informatika.html">Информатика</a><ul><li><a href="../informatika-uchenikam.html">Ученикам</a></li><li><a href="../informatika-uchitelyam.html">Учителям</a></li><li><a href="../informatika-propushel-urok.html" aria-current="page">Если ты пропустил урок</a></li></ul></li><li><a href="../matematika.html">Математика</a><ul><li><a href="../matematika-uchenikam.html">Ученикам</a></li><li><a href="../matematika-uchitelyam.html">Учителям</a></li><li><a href="../matematika-propushel-urok.html">Если ты пропустил урок</a></li></ul></li><li><a href="../kontakty.html">Контакты</a></li></ul></nav></aside><div class="col">
+<div class="lhero"><div class="lwrap">
+<div><a class="back" href="../informatika-propushel-urok.html">← Если ты пропустил урок</a><a class="back" href="../informatika-uchenikam.html">← Информатика: ученикам</a></div>
+<span class="tag">Конспект ученика · Информатика · 7 класс</span>
+<h1>Измерение информации: бортовой центр</h1>
+<p class="lead"><b>Легенда.</b> Ты — связист бортового центра станции «Самара-1». Станция шлёт на Землю донесения по узкому каналу: каждый бит на счету. Бортовой ИИ «Навигатор» докладывает быстро и уверенно, но путает единицы и ошибается в расчётах — верить можно не всегда.</p>
+<p class="lead" style="margin-top:.35em"><b>Главный вопрос урока: сколько «весит» информация?</b></p>
+</div></div>
+<div class="lwrap">
+<nav class="knav" aria-label="Разделы конспекта"><a href="#t1">Теория 1</a><a href="#t2">Теория 2</a><a href="#t3">Теория 3</a><a href="#tasks">Задания</a><a href="#ai">Проверка ИИ</a><a href="#main">Главное</a><a href="#hw">Домашнее задание</a><a href="../materials/konspekt-izmerenie-informacii.pdf">⬇ PDF</a></nav>
+
+<section class="kb" id="t1"><span class="tag">Теория 1</span><h2>Бит и алфавит</h2>
+<ul>
+<li><b>Бит</b> — наименьшая единица информации: выбор из двух вариантов («да / нет», 0 или 1).</li>
+<li><b>Алфавит</b> — набор знаков сообщения; <b>N</b> — мощность алфавита (число знаков).</li>
+<li><b>Вес знака i</b> — сколько бит несёт один знак. Связь: <span class="frm">N = 2<sup>i</sup></span></li>
+</ul>
+<p style="margin-bottom:.2em">Каждый новый бит удваивает число различимых знаков — вся цепочка в одной строке:</p>
+<div class="chain"><b>1 бит — 2 знака</b><span class="a">→</span><b>2 бита — 4</b><span class="a">→</span><b>3 бита — 8</b><span class="a">→</span><b>4 бита — 16</b><span class="a">→</span><b>5 бит — 32</b></div>
+<div class="knote"><b>Запиши в тетрадь:</b> бит — выбор из двух вариантов; N = 2<sup>i</sup> (N — число знаков, i — бит на знак); больше знаков — больше бит: 8 знаков — 3 бита, 256 знаков — 8 бит.</div>
+</section>
+
+<section class="kb" id="t2"><span class="tag">Теория 2</span><h2>Единицы измерения</h2>
+<p style="margin-bottom:.2em">Лестница единиц в одну строку (читай слева направо, стрелка — во что переводим):</p>
+<div class="chain"><span class="u">бит</span><span class="x">×8</span><span class="u">байт</span><span class="x">×1024</span><span class="u">Кбайт</span><span class="x">×1024</span><span class="u">Мбайт</span><span class="x">×1024</span><span class="u">Гбайт</span></div>
+<p><b>Вниз</b> (крупная → мелкая) — умножаем: 2 байта × 8 = 16 бит; 3 Кбайт × 1024 = 3072 байта.<br>
+<b>Вверх</b> (мелкая → крупная) — делим: 24 бита : 8 = 3 байта; 4096 байт : 1024 = 4 Кбайта.</p>
+<div class="knote g"><b>Запомни:</b> 1 байт = 8 бит; знак алфавита из 256 знаков весит ровно 1 байт; 1 Кбайт = 1024 байта (1024 = 2<sup>10</sup>), а не 1000.</div>
+</section>
+
+<section class="kb" id="t3"><span class="tag">Теория 3</span><h2>Объём сообщения</h2>
+<p><span class="frm">I = K · i</span> где I — объём сообщения, K — число знаков, i — вес одного знака.</p>
+<p><b>Пример:</b> «СВЯЗЬ ЕСТЬ» — 10 знаков (пробел тоже знак), алфавит 256 знаков. i = 8 бит, значит I = 10 · 8 = 80 бит = 10 байт.</p>
+<h3>Порядок решения</h3>
+<ol>
+<li>По N найти i: 2<sup>i</sup> = N.</li>
+<li>Найти объём: I = K · i.</li>
+<li>Перевести в нужную единицу (вниз умножаем, вверх делим).</li>
+</ol>
+<div class="knote b"><b>Важно:</b> пробелы и знаки препинания — тоже знаки. Канал связи узкий: чем меньше вес донесения, тем быстрее оно дойдёт.</div>
+</section>
+
+<section class="kb" id="tasks"><span class="tag">Практика</span><h2>Задания</h2>
+<ol>
+<li><b>Сколько бит несёт один знак</b>, если в алфавите: 1) 64; 2) 128; 3) 256; 4) 512; 5) 1024 знака? Запиши 2<sup>i</sup> = N и найди i.</li>
+<li><b>Переведи:</b> 1) 3 байта в биты; 2) 24 бита в байты; 3) 2 Кбайта в байты; 4) 4096 байт в Кбайты; 5) 2 Мбайта в Кбайты. Умножай или дели с подписью единицы.</li>
+<li><b>Донесение:</b> 40 знаков, алфавит станции — 32 знака. 1) Найди вес знака i. 2) Найди объём I в битах. 3) Переведи объём в байты. Проверь ответ обратным действием.</li>
+</ol>
+<p class="mute" style="font-size:15px">Потренироваться на задачах с случайными числами можно в <a href="trenazher.html#t=izmerenie">тренажёре по этой теме</a>.</p>
+</section>
+
+<section class="kb" id="ai"><span class="tag">Инструменты связиста</span><h2>Как проверять ИИ</h2>
+<p>Не просто «не верю» — докажи:</p>
+<ul>
+<li>Где ошибка?</li>
+<li>Почему ИИ ошибся: перепутал единицы, ошибся в счёте, противоречие?</li>
+<li>Как избежать: как улучшить запрос?</li>
+</ul>
+<p><b>Проверяй:</b> факты (формулы и числа: N = 2<sup>i</sup>, 1 байт = 8 бит, 1 Кбайт = 1024 байта), логику (не перепутаны ли биты и байты), источник (назван ли, можно ли найти), противоречия (сходится ли пересчёт).</p>
+<p style="margin-bottom:.25em"><b>Сильный запрос к ИИ:</b></p>
+<div class="ask">«Донесение: 40 знаков, алфавит 32 знака. Найди вес знака по формуле N = 2<sup>i</sup>, объём в битах и байтах. Покажи каждое действие. Если данных не хватает, напиши “не знаю”».</div>
+</section>
+
+<section class="kb" id="main"><span class="tag">Итог</span><h2>Главное из урока</h2>
+<div class="chain"><span class="u">бит</span><span class="a">→</span><span class="u">байт</span><span class="a">→</span><span class="u">Кбайт</span><span class="a">→</span><span class="u">Мбайт</span><span class="a">→</span><span class="u">Гбайт</span></div>
+<ul>
+<li><span class="frm g">N = 2<sup>i</sup></span> <span class="frm g">1 байт = 8 бит</span> <span class="frm g">1 Кбайт = 1024 байта</span> <span class="frm g">I = K · i</span></li>
+<li>ИИ — помощник, а не источник истины: проверяй, сомневайся, аргументируй!</li>
+</ul>
+</section>
+
+<section class="kb" id="hw"><span class="tag">Домашнее задание</span><h2>Выбери уровень</h2>
+<div class="hw">
+<div><b>Базовый («3»)</b><p>Алфавит станции — 64 знака, донесение — 40 знаков. Найди вес знака i и объём I в битах и байтах.</p></div>
+<div><b>Повышенный («4»)</b><p>Навигатор говорит: «40 знаков, алфавит 32 знака, объём 40 · 32 = 1280 бит». Найди ошибку, объясни и исправь.</p></div>
+<div><b>Творческий («5»)</b><p>Придумай своё донесение Навигатора с ошибкой и ключ: где ошибка и как её проверить. Лучшие войдут в урок.</p></div>
+</div>
+</section>
+
+<section class="kb"><span class="tag">Материалы</span><h2>Скачать и пройти</h2>
+<ul class="mlinks">
+<li><a href="../materials/konspekt-izmerenie-informacii.pdf">⬇ Конспект в PDF</a></li>
+<li><a href="izmerenie-informacii.html">Пройти интерактивный урок в классе →</a></li>
+<li><a href="cheklists/chek-list-izmerenie-informacii.docx">⬇ Чек-лист урока (DOCX)</a></li>
+<li><a href="trenazher.html#t=izmerenie">Тренажёр по теме «Измерение информации» →</a></li>
+</ul>
+</section>
+
+</div>
+<footer class="lfoot"><div class="lwrap">Конспект к уроку «Измерение информации: бортовой центр» · <a href="../informatika-propushel-urok.html">Если ты пропустил урок</a> · Плотников В. А. · МБОУ «Школа №7» г.о. Самара · <a href="../index.html">pvaschool7.github.io</a></div></footer>
+</div></div>
+</body></html>

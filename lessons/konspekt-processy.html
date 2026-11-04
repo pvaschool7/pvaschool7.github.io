@@ -1,0 +1,143 @@
+<!doctype html><html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" media="(prefers-color-scheme: light)" content="#f7f4ec"><meta name="theme-color" media="(prefers-color-scheme: dark)" content="#111916">
+<title>Конспект урока «Информационные процессы: бортовой центр» · Плотников В. А.</title>
+<meta name="description" content="Конспект ученика к уроку информатики 7 класса «Информационные процессы: бортовой центр»: сбор, хранение, обработка, передача и защита информации, схема передачи, задания и домашняя работа.">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Golos+Text:wght@400;600&family=Marck+Script&family=PT+Serif:ital@1&display=swap" rel="stylesheet"><link rel="stylesheet" href="../style.css"><link rel="icon" href="../favicon.ico" sizes="48x48"><link rel="icon" href="../icon-pva.svg" type="image/svg+xml">
+<style>
+/* ===== Каркас (как на страницах уроков) ===== */
+.lwrap{max-width:1240px;margin:0 auto;padding:0 clamp(20px,3.4vw,40px)}
+.lhero{position:relative;color:#fff;padding:30px 0 36px;margin-bottom:26px;overflow:hidden;background-image:radial-gradient(1.5px 1.5px at 12% 25%,rgba(255,255,255,.7) 50%,transparent 51%),radial-gradient(2px 2px at 78% 18%,rgba(255,255,255,.5) 50%,transparent 51%),radial-gradient(1.5px 1.5px at 55% 65%,rgba(255,255,255,.45) 50%,transparent 51%),radial-gradient(2.5px 2.5px at 88% 70%,rgba(255,215,110,.55) 50%,transparent 51%),radial-gradient(1.5px 1.5px at 35% 80%,rgba(255,255,255,.4) 50%,transparent 51%),linear-gradient(160deg,#0c1830,#16264a 55%,#20365f)}
+.lhero .tag{background:var(--yellow);color:var(--ink);border:none}
+.back{display:inline-block;color:#ffd76e;text-decoration:none;font-weight:600;font-size:15px;margin-right:20px}
+.back:hover{text-decoration:underline}
+.lhero h1{color:#fff;font-size:clamp(30px,4.4vw,48px);margin:.4em 0 .25em}
+.lhero .lead{color:#c9d6ef;max-width:880px;font-size:17.5px;margin:.4em 0 0}
+.lfoot{border-top:1px solid var(--line);margin-top:34px;padding:22px 0 30px;color:var(--mute);font-size:14px;background:var(--card)}
+.lfoot a{color:var(--blue)}
+/* ===== Блоки конспекта: прямоугольные, скруглённые, с отступами ===== */
+.kb{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:clamp(22px,2.6vw,32px) clamp(22px,3vw,36px);margin:0 0 22px;box-shadow:5px 6px 0 var(--offset),var(--shadow-sm)}
+.kb>h2{font-size:clamp(26px,2.6vw,34px);margin:.15em 0 .45em}
+.kb h3{font-size:21px;margin:1.15em 0 .35em}
+.kb p{margin:.5em 0}
+.kb ul,.kb ol{margin:.45em 0 .45em;padding-left:1.4em}
+.kb li{margin:.34em 0}
+.kb sup{font-size:.66em}
+.kb .tag{margin:0 8px 0 0;vertical-align:middle}
+/* цепочки в одну строку */
+.chain{display:flex;align-items:center;flex-wrap:nowrap;gap:7px;margin:15px 0;padding:6px 2px 8px;overflow-x:auto}
+.chain b{flex:none;background:color-mix(in srgb,var(--yellow) 78%,var(--card));border:1px solid color-mix(in srgb,var(--yellow-deep) 45%,var(--line));border-radius:11px;padding:7px 13px;font-size:14.5px;white-space:nowrap}
+.chain .u{flex:none;background:var(--card-2);border:2px solid var(--blue);border-radius:11px;padding:6px 13px;font-size:14.5px;font-weight:600;white-space:nowrap}
+.chain .x{flex:none;color:var(--mute);font-weight:600;font-size:13px;white-space:nowrap}
+.chain .a{flex:none;color:var(--blue);font-weight:700;white-space:nowrap}
+/* заметки и формулы */
+.knote{background:linear-gradient(135deg,color-mix(in srgb,var(--yellow) 15%,var(--card)),var(--card));border:1px solid color-mix(in srgb,var(--yellow-deep) 40%,var(--line));border-left:5px solid var(--yellow-deep);border-radius:14px;padding:14px 18px;margin:15px 0}
+.knote.g{background:linear-gradient(135deg,color-mix(in srgb,var(--green) 8%,var(--card)),var(--card));border-color:color-mix(in srgb,var(--green) 35%,var(--line));border-left-color:var(--green)}
+.knote.b{background:linear-gradient(135deg,color-mix(in srgb,var(--blue) 8%,var(--card)),var(--card));border-color:color-mix(in srgb,var(--blue) 35%,var(--line));border-left-color:var(--blue)}
+.ask{border-left:4px solid var(--blue);background:var(--blue-soft);border-radius:0 14px 14px 0;padding:13px 17px;margin:13px 0;font-style:italic}
+/* навигация по конспекту */
+.knav{display:flex;flex-wrap:wrap;gap:8px;margin:2px 0 20px}
+.knav a{font-size:14.5px;font-weight:600;text-decoration:none;color:var(--blue);background:var(--card);border:1.5px solid var(--line);border-radius:99px;padding:6px 14px;transition:.15s}
+.knav a:hover{border-color:var(--blue);background:var(--blue-soft)}
+/* домашнее задание */
+.hw{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:14px;margin:15px 0}
+.hw>div{border:1.5px dashed var(--line-strong);border-radius:14px;padding:16px 18px;background:var(--card-2)}
+.hw b{color:var(--blue)}
+.hw p{margin:.4em 0;font-size:15.5px}
+/* материалы */
+.mlinks{display:flex;flex-wrap:wrap;gap:10px 22px;margin:4px 0 0;padding:0;list-style:none}
+.mlinks a{font-weight:600}
+@media(max-width:700px){.kb{padding:18px 16px;border-radius:16px}}
+@media print{.side,.lhero,.lfoot,.knav{display:none}.kb{box-shadow:none;break-inside:avoid}}
+</style></head><body>
+<div class="layout"><aside class="side"><a class="logo" href="../index.html"><img class="logo-ico" src="../icon-pva.svg" alt="" width="44" height="44"><span>Плотников В. А.</span></a><input type="checkbox" id="menu-toggle" aria-label="Открыть меню"><label for="menu-toggle" class="burger">Меню</label><nav class="menu" aria-label="Разделы сайта"><ul><li><a href="../index.html">Главная</a></li><li><a href="../informatika.html">Информатика</a><ul><li><a href="../informatika-uchenikam.html">Ученикам</a></li><li><a href="../informatika-uchitelyam.html">Учителям</a></li><li><a href="../informatika-propushel-urok.html" aria-current="page">Если ты пропустил урок</a></li></ul></li><li><a href="../matematika.html">Математика</a><ul><li><a href="../matematika-uchenikam.html">Ученикам</a></li><li><a href="../matematika-uchitelyam.html">Учителям</a></li><li><a href="../matematika-propushel-urok.html">Если ты пропустил урок</a></li></ul></li><li><a href="../kontakty.html">Контакты</a></li></ul></nav></aside><div class="col">
+<div class="lhero"><div class="lwrap">
+<div><a class="back" href="../informatika-propushel-urok.html">← Если ты пропустил урок</a><a class="back" href="../informatika-uchenikam.html">← Информатика: ученикам</a></div>
+<span class="tag">Конспект ученика · Информатика · 7 класс</span>
+<h1>Информационные процессы: бортовой центр</h1>
+<p class="lead"><b>Легенда.</b> Ты — связист бортового центра станции «Самара-1». Станция измеряет, хранит, считает и отправляет данные на Землю. Бортовой ИИ «Навигатор» докладывает быстро и уверенно, но путает процессы и ошибается в расчётах — верить можно не всегда.</p>
+<p class="lead" style="margin-top:.35em"><b>Чему научишься:</b> называть информационные процессы и приводить примеры, объяснять схему передачи, различать виды обработки, подбирать меру защиты к угрозе — и проверять утверждения ИИ по фактам, логике и источникам.</p>
+</div></div>
+<div class="lwrap">
+<nav class="knav" aria-label="Разделы конспекта"><a href="#t1">Теория 1</a><a href="#t2">Теория 2</a><a href="#t3">Теория 3</a><a href="#tasks">Задания</a><a href="#ai">Проверка ИИ</a><a href="#main">Главное</a><a href="#hw">Домашнее задание</a><a href="../materials/konspekt-informacionnye-processy.pdf">⬇ PDF</a></nav>
+
+<section class="kb" id="t1"><span class="tag">Теория 1</span><h2>Пять информационных процессов</h2>
+<ul>
+<li><b>Сбор</b> — получение сведений: датчики измеряют температуру, давление, заряд.</li>
+<li><b>Хранение</b> — запись на носитель: бортовой журнал, память компьютера.</li>
+<li><b>Передача</b> — от источника к приёмнику по каналу связи: радио на Землю.</li>
+<li><b>Обработка</b> — из имеющейся информации получаем новую: расчёт, сортировка, подсчёт.</li>
+<li><b>Защита</b> — защита информации от потери, кражи и искажения.</li>
+</ul>
+<p style="margin-bottom:.2em"><b>Схема передачи информации</b> — в одну строку:</p>
+<div class="chain"><span class="u">источник (станция)</span><span class="a">→</span><span class="u">кодировщик</span><span class="a">→</span><span class="u">канал связи</span><span class="a">→</span><span class="u">декодировщик</span><span class="a">→</span><span class="u">приёмник (Земля)</span></div>
+<p class="mute" style="font-size:15.5px">Помехи (ионосфера, тропосфера, шум приёмника) искажают сообщение в пути.</p>
+<div class="knote"><b>Запиши в тетрадь:</b> 1) процессы: сбор, хранение, обработка, передача, защита; 2) передача: источник → канал связи → приёмник, помехи искажают сообщение; 3) кодирует источник, декодирует приёмник.</div>
+</section>
+
+<section class="kb" id="t2"><span class="tag">Теория 2</span><h2>Обработка информации</h2>
+<ul>
+<li><b>Сортировка</b> — упорядочить (например, показания по заряду батареи).</li>
+<li><b>Поиск</b> — найти нужное (наименьшее значение).</li>
+<li><b>Подсчёт</b> — вычислить разницу между наибольшим и наименьшим.</li>
+<li><b>Преобразование</b> — измерение → радиосигнал.</li>
+</ul>
+<div class="knote g"><b>Главное:</b> при обработке получается новая информация (порядок, разница значений). Простое копирование новой информации не даёт.</div>
+</section>
+
+<section class="kb" id="t3"><span class="tag">Теория 3</span><h2>Хранение и защита</h2>
+<ul>
+<li><b>Носитель</b> — то, на чём хранится информация: бортовой журнал, память компьютера.</li>
+<li><b>Угрозы:</b> потеря (сбой памяти), кража (чужой подключился), искажение (радиопомехи).</li>
+<li><b>Меры защиты:</b> копия на другом носителе, пароль и права доступа, повторить передачу.</li>
+<li>Радиосигнал идёт с задержкой, поэтому важное повторяют и сверяют.</li>
+</ul>
+<div class="knote b"><b>Правило:</b> от каждой угрозы — своя мера. Копия в той же памяти от сбоя этой памяти не спасёт.</div>
+</section>
+
+<section class="kb" id="tasks"><span class="tag">Практика</span><h2>Задания</h2>
+<ol>
+<li><b>Какой это процесс?</b> Соедини ситуацию и процесс (сбор, хранение, передача, обработка, защита) и рядом запиши признак: 1) датчик измерил давление; 2) измерения записаны в бортовой журнал; 3) данные отправлены на Землю; 4) вычислена разница двух измерений; 5) бортовой компьютер закрыт паролем.</li>
+<li><b>Сортируй и считай.</b> Заряд батарей: 80, 45, 95, 60. А) запиши значения по убыванию; Б) найди наименьшее и посчитай разницу между наибольшим и наименьшим. Назови новую информацию, которая получилась.</li>
+<li><b>Угроза и мера.</b> Соедини угрозу с мерой защиты и объясни, почему другие меры не подходят. Угрозы: 1) сбой памяти журнала; 2) посторонний подключился к компьютеру; 3) помехи исказили радиосигнал. Меры: пароль и права доступа; резервная копия на другом носителе; повторить передачу.</li>
+</ol>
+<p class="mute" style="font-size:15px">Проверить себя по этой теме можно в <a href="trenazher.html#t=processy">тренажёре «Информационные процессы»</a>.</p>
+</section>
+
+<section class="kb" id="ai"><span class="tag">Инструменты связиста</span><h2>Как проверять ИИ (Навигатора)</h2>
+<p>Не просто «не верю» — докажи:</p>
+<ul>
+<li>Где ошибка?</li>
+<li>Почему ИИ ошибся: подменил процесс, ошибся в подсчёте, противоречие?</li>
+<li>Как избежать: как улучшить запрос?</li>
+</ul>
+<p><b>Проверяй:</b> факты (верны ли определения и подсчёты), логику (не подменили ли процесс), источник (назван ли, можно ли его найти), противоречия (не спорит ли ответ сам с собой).</p>
+<p style="margin-bottom:.25em"><b>Сильный запрос к ИИ:</b></p>
+<div class="ask">«Опиши путь измерения по процессам: сбор, хранение, обработка, передача, защита. Для каждого приведи действие станции или напиши “нет”».</div>
+</section>
+
+<section class="kb" id="main"><span class="tag">Итог</span><h2>Главное из урока</h2>
+<div class="chain"><span class="u">сбор</span><span class="a">→</span><span class="u">хранение</span><span class="a">→</span><span class="u">обработка</span><span class="a">→</span><span class="u">передача</span><span class="a">→</span><span class="u">защита</span></div>
+<ul>
+<li>Передача: источник → кодировщик → канал связи → декодировщик → приёмник; помехи искажают сообщение.</li>
+<li>При обработке получается новая информация.</li>
+<li>От каждой угрозы — своя мера защиты.</li>
+<li>ИИ — помощник, а не источник истины: проверяй, сомневайся, аргументируй!</li>
+</ul>
+</section>
+
+<section class="kb" id="hw"><span class="tag">Домашнее задание</span><h2>Придумай донесение с ошибкой</h2>
+<p>Придумай ещё одно донесение станции с ошибкой по теме урока и напиши ключ: где ошибка и как её проверить. Лучшие работы войдут в следующий урок.</p>
+</section>
+
+<section class="kb"><span class="tag">Материалы</span><h2>Скачать и пройти</h2>
+<ul class="mlinks">
+<li><a href="../materials/konspekt-informacionnye-processy.pdf">⬇ Конспект в PDF</a></li>
+<li><a href="informacionnye-processy.html">Пройти интерактивный урок в классе →</a></li>
+<li><a href="cheklists/chek-list-informacionnye-processy.docx">⬇ Чек-лист урока (DOCX)</a></li>
+<li><a href="trenazher.html#t=processy">Тренажёр по теме «Информационные процессы» →</a></li>
+</ul>
+</section>
+
+</div>
+<footer class="lfoot"><div class="lwrap">Конспект к уроку «Информационные процессы: бортовой центр» · <a href="../informatika-propushel-urok.html">Если ты пропустил урок</a> · Плотников В. А. · МБОУ «Школа №7» г.о. Самара · <a href="../index.html">pvaschool7.github.io</a></div></footer>
+</div></div>
+</body></html>

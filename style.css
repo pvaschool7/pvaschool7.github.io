@@ -186,8 +186,8 @@ a.card:hover{
 
 .note{
   background:linear-gradient(135deg,color-mix(in srgb,var(--green) 7%,var(--card)),var(--card));
-  border-left:5px solid var(--green);padding:16px 22px;
-  border-radius:0 14px 14px 0;margin:22px 0;box-shadow:var(--shadow-sm);
+  border-left:5px solid var(--green);padding:17px 22px;
+  border-radius:14px;margin:22px 0;box-shadow:var(--shadow-sm);
 }
 
 .steps{counter-reset:s;list-style:none;padding:0}
@@ -356,12 +356,12 @@ svg text{font-family:"PT Sans",sans-serif;fill:var(--ink)}
 @keyframes panel-in{from{opacity:0;transform:translateY(7px)}to{opacity:1;transform:none}}
 .grade-panel[hidden]{display:none}
 .grade-panel-head{
-  display:flex;align-items:center;gap:12px;padding:15px 24px;
+  display:flex;align-items:center;gap:12px;padding:16px clamp(20px,2.4vw,26px);
   background:color-mix(in srgb,var(--paper-2) 55%,var(--card));
   border-bottom:1px dashed var(--line);
 }
 .grade-panel-head h2{margin:0;font-size:32px}
-.grade-panel-body{padding:8px 24px 22px}
+.grade-panel-body{padding:10px clamp(20px,2.4vw,26px) 24px}
 
 .chev{
   flex:none;width:12px;height:12px;border-right:3px solid var(--blue);
@@ -380,18 +380,18 @@ details[open]>summary .chev{transform:rotate(45deg)}
 .subsec>summary:hover{color:var(--blue)}
 .subsec[open]{border-color:var(--line-strong);background:color-mix(in srgb,var(--card) 60%,transparent)}
 .subsec[open]>summary{border-bottom:1px dashed var(--line)}
-.subsec-body{padding:18px}
+.subsec-body{padding:20px}
 @media(max-width:900px){
   .grade-bar{top:58px;padding:7px;border-radius:14px}
   .grade-nav{gap:6px}
   .grade-tab{font-size:14px;padding:3px 13px 3px 4px;gap:6px}
   .grade-tab .n{width:25px;height:25px;font-size:16px}
   .grade-panel{scroll-margin-top:132px;border-radius:16px}
-  .grade-panel-head{padding:11px 15px}
+  .grade-panel-head{padding:12px 16px}
   .grade-panel-head h2{font-size:25px}
-  .grade-panel-body{padding:4px 15px 16px}
+  .grade-panel-body{padding:6px 16px 18px}
   .subsec>summary{font-size:16px;padding:10px 13px}
-  .subsec-body{padding:13px}
+  .subsec-body{padding:16px}
 }
 
 /* ---------- Кнопки в карточках ---------- */
