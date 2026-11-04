@@ -460,6 +460,11 @@ footer.foot::before{
   border-top:1px dashed var(--line);padding-top:18px;
   display:flex;flex-wrap:wrap;gap:8px 24px;justify-content:space-between;font-size:14px;
 }
+.foot-counter{
+  margin-top:16px;text-align:center;font-size:13px;opacity:.85;
+}
+.foot-counter b{font-size:15px;letter-spacing:.04em}
+.foot-counter[hidden]{display:none}
 @media(max-width:760px){.foot-grid{grid-template-columns:1fr;gap:22px}}
 
 /* ---------- Доступность / анимации ---------- */
