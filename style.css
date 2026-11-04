@@ -72,6 +72,7 @@
 
 /* ---------- База ---------- */
 *{box-sizing:border-box}
+[hidden]{display:none!important}
 html{scroll-behavior:smooth;-webkit-text-size-adjust:100%}
 body{
   margin:0;
@@ -403,20 +404,8 @@ details[open]>summary .chev{transform:rotate(45deg)}
 .card-link{font-weight:600;color:var(--blue);text-decoration:none;font-size:15px}
 .card-link:hover{text-decoration:underline}
 
-/* ---------- Видео-области ---------- */
+/* ---------- Видеокарточки: ссылка на Яндекс.Диск ---------- */
 .cards .card.wide{grid-column:1/-1}
-.video-box{
-  position:relative;margin-top:16px;border-radius:14px;overflow:hidden;
-  background:#101820;border:1px solid var(--line);
-  box-shadow:4px 5px 0 var(--offset),var(--shadow-sm);
-}
-.video-embed{position:relative;aspect-ratio:16/9;background:#101820}
-.video-embed iframe,.video-embed video{position:absolute;inset:0;width:100%;height:100%;border:0;display:block}
-.video-stub{
-  display:grid;place-content:center;justify-items:center;gap:4px;
-  aspect-ratio:16/9;padding:20px;text-align:center;color:#eef2ee;
-  background:radial-gradient(120% 130% at 50% 0%,#253444 0%,#101820 72%);
-}
 .play-ico{
   display:grid;place-items:center;width:58px;height:58px;border-radius:50%;
   background:var(--blue);margin-bottom:8px;box-shadow:0 0 0 6px rgba(255,255,255,.14);
@@ -425,11 +414,55 @@ details[open]>summary .chev{transform:rotate(45deg)}
   content:"";width:0;height:0;border-left:18px solid var(--on-accent);
   border-top:11px solid transparent;border-bottom:11px solid transparent;margin-left:4px;
 }
-.video-stub b{font-size:17px;color:#fff}
-.video-stub span{font-size:14px;opacity:.85;max-width:52ch}
-.video-stub a{color:#a8c7fa;font-weight:600;text-decoration:underline}
-.video-stub a:hover{color:#cfe0ff}
-@media(max-width:900px){.video-stub b{font-size:15px}.video-stub span{font-size:13px}}
+.video-card{
+  display:flex;align-items:stretch;margin-top:16px;border-radius:14px;overflow:hidden;
+  background:var(--card-2);border:1px solid var(--line);
+  box-shadow:4px 5px 0 var(--offset),var(--shadow-sm);
+  text-decoration:none;color:var(--ink);
+  transition:transform .18s ease,box-shadow .18s ease,border-color .18s ease;
+}
+.video-card:hover{transform:translateY(-2px);border-color:var(--blue);box-shadow:6px 8px 0 var(--offset),var(--shadow)}
+.video-card:focus-visible{outline:3px solid var(--focus);outline-offset:2px}
+.vc-thumb{
+  position:relative;flex:none;width:236px;display:grid;place-items:center;
+  background:radial-gradient(120% 150% at 50% 0%,#2b3d55 0%,#141d29 70%);
+}
+.vc-thumb::before{
+  content:"";position:absolute;inset:0;opacity:.45;
+  background:repeating-linear-gradient(90deg,rgba(255,255,255,.055) 0 2px,transparent 2px 26px);
+}
+.vc-thumb .play-ico{position:relative;margin-bottom:0;transition:transform .18s ease}
+.video-card:hover .play-ico{transform:scale(1.09)}
+.vc-len{
+  position:absolute;right:10px;bottom:10px;padding:3px 9px;border-radius:8px;
+  background:rgba(5,11,19,.72);color:#fff;font-size:13px;font-weight:600;letter-spacing:.04em;
+}
+.vc-body{display:flex;flex-direction:column;gap:8px;padding:15px 18px 14px;min-width:0}
+.vc-top{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.vc-src{
+  display:inline-flex;align-items:center;gap:7px;padding:3px 11px;border-radius:999px;
+  background:var(--blue-soft);color:var(--blue);font-size:12.5px;font-weight:600;letter-spacing:.02em;
+}
+.vc-src::before{content:"";width:7px;height:7px;border-radius:50%;background:currentColor}
+.vc-open{margin-left:auto;color:var(--blue);font-weight:600;font-size:14.5px;white-space:nowrap}
+.video-card:hover .vc-open{text-decoration:underline}
+.vc-title{font-size:17px;line-height:1.3;color:var(--ink)}
+.vc-warn{
+  display:flex;align-items:flex-start;gap:9px;padding:9px 12px;border-radius:10px;
+  font-size:13.5px;line-height:1.45;color:var(--ink-soft);
+  background:color-mix(in srgb,var(--yellow) 26%,transparent);
+  border:1px solid color-mix(in srgb,var(--yellow-deep) 50%,transparent);
+}
+.vc-warn::before{
+  content:"!";flex:none;width:17px;height:17px;margin-top:1px;border-radius:50%;
+  background:var(--yellow-deep);color:#26200a;font:700 11.5px/1 "Golos Text",sans-serif;
+  display:grid;place-items:center;
+}
+@media(max-width:640px){
+  .video-card{flex-direction:column}
+  .vc-thumb{width:100%;min-height:170px;aspect-ratio:16/9}
+  .vc-open{margin-left:0}
+}
 
 /* ---------- Футер ---------- */
 footer.foot{

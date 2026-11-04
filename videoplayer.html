@@ -1,6 +1,6 @@
 <!doctype html><html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" media="(prefers-color-scheme: light)" content="#f7f4ec"><meta name="theme-color" media="(prefers-color-scheme: dark)" content="#111916">
 <title>Видеоплеер — Плотников В. А.</title>
-<meta name="description" content="Встроенный видеоплеер сайта: видео и звук по ссылке с Яндекс.Диска прямо на странице, без скачивания.">
+<meta name="description" content="Работа с видео-ссылками: записи с Яндекс.Диска открываются в новой вкладке с предупреждением, прямые файлы .mp4/.webm проигрываются на странице.">
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Golos+Text:wght@400;600&family=Marck+Script&family=PT+Serif:ital@1&display=swap" rel="stylesheet"><link rel="stylesheet" href="style.css"><link rel="icon" href="favicon.ico" sizes="48x48"><link rel="icon" href="icon-pva.svg" type="image/svg+xml"><link rel="apple-touch-icon" href="apple-touch-icon.png">
 <style>
 /* ---------- Видеоплеер ---------- */
@@ -28,12 +28,21 @@
 .vp-idle span{font-size:13.5px;opacity:.85;max-width:46ch}
 .vp-status{min-height:20px;margin-top:10px;font-size:14px;color:var(--mute)}
 .vp-status.is-warn{color:#b3541e;font-weight:600}
+.vp-yd{
+  position:absolute;inset:0;display:flex;flex-direction:column;gap:10px;align-items:center;justify-content:center;
+  text-align:center;padding:18px;color:#fff;
+  background:radial-gradient(120% 150% at 50% 0%,#2b3d55 0%,#141d29 72%);
+}
+.vp-yd[hidden]{display:none}
+.vp-yd .play-ico{margin-bottom:0}
+.vp-yd b{font-size:17px}
+.vp-yd-warn{max-width:46ch;font-size:13.5px;line-height:1.5;padding:9px 13px;border-radius:10px;background:rgba(231,194,74,.14);border:1px solid rgba(231,194,74,.42)}
 .vp-note{margin-top:6px;font-size:13.5px;color:var(--mute);line-height:1.55}
 .vp-note[hidden]{display:none}
-@media(max-width:560px){.vp-idle b{font-size:14.5px}.vp-idle span{font-size:12.5px}}
+@media(max-width:560px){.vp-idle b{font-size:14.5px}.vp-idle span{font-size:12.5px}.vp-yd b{font-size:15px}.vp-yd-warn{font-size:12.5px}}
 </style></head><body>
 <div class="layout"><aside class="side"><a class="logo" href="index.html"><img class="logo-ico" src="icon-pva.svg" alt="" width="44" height="44"><span>Плотников В. А.</span></a><input type="checkbox" id="menu-toggle" aria-label="Открыть меню"><label for="menu-toggle" class="burger">Меню</label><nav class="menu" aria-label="Разделы сайта"><ul><li><a href="index.html">Главная</a></li><li class="menu-search"><input type="search" id="site-search" class="site-search" placeholder="Поиск по сайту…" aria-label="Поиск по сайту" autocomplete="off" spellcheck="false"><div class="search-drop" id="search-drop" hidden></div></li><li><a href="informatika.html">Информатика</a><ul><li><a href="informatika-uchenikam.html">Ученикам</a></li><li><a href="informatika-uchitelyam.html">Учителям</a></li><li><a href="informatika-propushel-urok.html">Если ты пропустил урок</a></li></ul></li><li><a href="matematika.html">Математика</a><ul><li><a href="matematika-uchenikam.html">Ученикам</a></li><li><a href="matematika-uchitelyam.html">Учителям</a></li><li><a href="matematika-propushel-urok.html">Если ты пропустил урок</a></li></ul></li><li><a href="videoplayer.html" aria-current="page">Видеоплеер</a></li><li><a href="kontakty.html">Контакты</a></li></ul></nav></aside><div class="col">
-<main class="wrap"><p class="crumb"><a href="index.html">Главная</a> / Видеоплеер</p><div class="hero" style="padding:24px 0 8px"><span class="tag">Инструмент</span><h1>Видеоплеер</h1><p class="lead">Вставьте ссылку на видео с Яндекс.Диска — видео и звук проиграются прямо на этой странице, без скачивания. Поддерживаются и прямые ссылки на файлы .mp4 / .webm.</p></div>
+<main class="wrap"><p class="crumb"><a href="index.html">Главная</a> / Видеоплеер</p><div class="hero" style="padding:24px 0 8px"><span class="tag">Инструмент</span><h1>Видеоплеер</h1><p class="lead">Вставьте ссылку на видео с Яндекс.Диска — запись откроется на Яндекс.Диске в новой вкладке браузера (Яндекс не разрешает встраивать свои видео в чужие страницы). Прямые ссылки на файлы .mp4 / .webm по-прежнему проигрываются прямо на странице.</p></div>
 <div class="card wide vp-card">
   <div class="vp-row">
     <input class="vp-input" id="vp-url" type="url" inputmode="url" placeholder="https://disk.yandex.ru/i/…" aria-label="Ссылка на видео">
@@ -43,13 +52,14 @@
   <div class="vp-stage" id="vp-stage">
     <video id="vp-video" controls playsinline preload="metadata" hidden></video>
     <div class="vp-idle" id="vp-idle"><span class="play-ico" aria-hidden="true"></span><b>Видео ещё не выбрано</b><span>Вставьте ссылку выше и нажмите «Воспроизвести», либо выберите запись урока.</span></div>
+    <div class="vp-yd" id="vp-yd" hidden><span class="play-ico" aria-hidden="true"></span><b>Видео на Яндекс.Диске</b><span class="vp-yd-warn">Видео будет проигрываться на ресурсе Яндекс.Диска — по кнопке ниже откроется новая вкладка браузера.</span><a class="btn" id="vp-yd-open" href="#" target="_blank" rel="noopener noreferrer">Открыть на Яндекс.Диске ↗</a></div>
   </div>
   <p class="vp-status" id="vp-status" aria-live="polite">Видео не выбрано.</p>
   <div class="vp-chips" id="vp-err" hidden>
     <button class="btn ghost sm" id="vp-retry" type="button">Повторить ↻</button>
-    <a class="btn ghost sm" id="vp-disk" href="#" target="_blank" rel="noopener">Открыть на Яндекс.Диске ↗</a>
+    <a class="btn ghost sm" id="vp-disk" href="#" target="_blank" rel="noopener">Открыть файл в новой вкладке ↗</a>
   </div>
-  <p class="vp-note">Как это работает: сайт запрашивает у Яндекс.Диска временную прямую ссылку на файл и проигрывает её плеером браузера — видео и звук идут прямо на странице, без скачивания, а файл остаётся на Диске.</p>
+  <p class="vp-note">Почему так: Яндекс запрещает встраивать свои страницы в чужие сайты (CSP frame-ancestors), поэтому записи уроков с Яндекс.Диска открываются на самом Диске — в новой вкладке, с предупреждением, что видео проигрывается на ресурсе Яндекса. Прямые файлы .mp4 / .webm сайт проигрывает прямо на странице.</p>
   <p class="vp-note">Как получить ссылку: откройте файл на Яндекс.Диске → кнопка «Поделиться» → «Скопировать ссылку» → вставьте её в поле выше.</p>
 </div>
 </main><footer class="foot"><div class="wrap"><div class="foot-grid"><div><a class="foot-brand" href="index.html"><img class="logo-ico" src="icon-pva.svg" alt="" width="44" height="44"><span>Плотников В. А.</span></a><p>Учитель математики и информатики</p><p>МБОУ ШКОЛА №7 г.о. Самара</p></div><div><b class="foot-h">Разделы</b><ul><li><a href="informatika.html">Информатика</a></li><li><a href="matematika.html">Математика</a></li><li><a href="obo-mne.html">Обо мне</a></li><li><a href="materials.html">Материалы</a></li><li><a href="videoplayer.html">Видеоплеер</a></li><li><a href="kontakty.html">Контакты</a></li></ul></div><div><b class="foot-h">Связаться</b><p>Школа: МБОУ ШКОЛА №7 г.о. Самара</p><p>Эл. почта: <a href="mailto:wyach1slav@mail.ru">wyach1slav@mail.ru</a></p></div></div><div class="foot-bottom"><span>© 2026 Плотников В. А. · Материалы можно свободно использовать в учебных целях</span><a href="#">Наверх ↑</a></div><div class="foot-counter" hidden>Посещений сайта: <b id="pva-visits">0</b></div></div></footer></div></div>
@@ -61,43 +71,38 @@
       ST=document.getElementById('vp-status'),
       IDLE=document.getElementById('vp-idle'),
       ERR=document.getElementById('vp-err'),
-      DISK=document.getElementById('vp-disk');
+      DISK=document.getElementById('vp-disk'),
+      YD=document.getElementById('vp-yd');
   var tries=0,cur='';
   function say(t,warn){ST.textContent=t||'';ST.className='vp-status'+(warn?' is-warn':'');}
   function hideIdle(){if(IDLE&&IDLE.parentNode)IDLE.parentNode.removeChild(IDLE);}
   function isYandex(u){return /^https?:\/\/(www\.)?(disk\.yandex\.[a-z.]+|yadi\.sk)\//i.test(u);}
   function isDirect(u){return /^https?:\/\/\S+\.(mp4|webm|ogv|ogg|m4v|mov)(\?\S*)?(#\S*)?$/i.test(u);}
-  function fileName(href){
-    var m=(href||'').match(/filename=([^&]+)/);
-    try{return m?decodeURIComponent(m[1]):'';}catch(e){return '';}
+  function resetStage(){
+    V.pause&&V.pause();V.removeAttribute('src');V.load&&V.load();V.hidden=true;
+    ERR.hidden=true;if(YD)YD.hidden=true;
+    if(DISK)DISK.removeAttribute('href');
   }
-  function fetchDirect(u){
-    return fetch('https://cloud-api.yandex.net/v1/disk/public/resources/download?public_key='+encodeURIComponent(u))
-      .then(function(r){if(!r.ok)throw new Error('HTTP '+r.status);return r.json();})
-      .then(function(d){if(!d||!d.href)throw new Error('нет прямой ссылки');return d.href;});
-  }
-  function startPlay(msg){
-    hideIdle();ERR.hidden=true;V.hidden=false;
-    var p=V.play&&V.play();
-    if(p&&p.then)p.then(function(){say(msg);},function(){say('Видео готово — нажмите ▶ в плеере.');});
-    else say(msg);
+  function showYandex(u){
+    resetStage();hideIdle();
+    var a=document.getElementById('vp-yd-open');
+    if(a)a.setAttribute('href',u);
+    if(YD)YD.hidden=false;
+    say('Видео с Яндекс.Диска откроется в новой вкладке — воспроизведение на ресурсе Яндекса.');
   }
   function fail(u){
-    V.pause&&V.pause();V.removeAttribute('src');V.load&&V.load();V.hidden=true;
+    resetStage();hideIdle();
     ERR.hidden=false;if(DISK)DISK.setAttribute('href',u||cur);
-    say('Не получилось воспроизвести видео по этой ссылке. Проверьте, что она открывает видео и доступ «по ссылке» включён. Нажмите «Повторить» или откройте запись на Яндекс.Диске.',true);
+    say('Не получилось воспроизвести файл по этой ссылке. Проверьте, что она открывает видео. Нажмите «Повторить» или откройте файл в новой вкладке.',true);
   }
   function attempt(u){
-    if(isYandex(u)){
-      say(tries>0?'Повторяю попытку ('+tries+')…':'Получаю прямую ссылку на видео…');
-      fetchDirect(u).then(function(href){
-        V.src=href;
-        var n=fileName(href);
-        startPlay(n?('Играю: '+n):'Играю: видео и звук — прямо на странице.');
-      }).catch(function(){next(u);});
-    }else{
-      V.src=u;startPlay('Играю: видео и звук — прямо на странице.');
-    }
+    if(isYandex(u)){showYandex(u);return;}
+    resetStage();hideIdle();
+    V.hidden=false;say('Загружаю видео…');
+    V.src=u;
+    var p=V.play&&V.play();
+    if(p&&p.then)p.then(function(){say('Играю: видео и звук — прямо на странице.');},function(){if(!V.error&&V.getAttribute('src'))say('Видео готово — нажмите ▶ в плеере.');});
+    else say('Играю: видео и звук — прямо на странице.');
   }
   function next(u){
     if(tries<2){tries++;setTimeout(function(){attempt(u);},600*tries);}
