@@ -26,7 +26,7 @@ def detect_root():
 
 ROOT = detect_root()
 OUT = os.path.join(ROOT, "search-index.js")
-MAXLEN = 3500
+MAXLEN = 60000  # страницы с темами КТП выросли (~45–50 тыс. знаков), не обрезаем
 
 PAGES = [
     "index.html",
@@ -39,7 +39,6 @@ PAGES = [
     "matematika-uchitelyam.html",
     "matematika-propushel-urok.html",
     "materials.html",
-    "videoplayer.html",
     "obo-mne.html",
     "kontakty.html",
     "lessons/izmerenie-informacii.html",
@@ -47,7 +46,6 @@ PAGES = [
     "lessons/konspekt-izmerenie.html",
     "lessons/konspekt-processy.html",
     "lessons/trenazher.html",
-    "materials/uslovnaya-veroyatnost.html",
 ]
 
 
