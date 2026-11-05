@@ -464,26 +464,14 @@ details[open]>summary .chev{transform:rotate(45deg)}
   .vc-open{margin-left:0}
 }
 
-/* ---------- КТП: разделы и темы уроков ---------- */
+/* ---------- КТП: темы уроков карточками ---------- */
 .ktp-note{margin:2px 0 16px;font-size:14px;color:var(--mute)}
-.ktp-sec{
-  background:var(--card-2);border:1px solid var(--line);border-radius:13px;
-  padding:15px 18px 13px;margin:0 0 12px;
+.tp-h{
+  margin:20px 0 10px;font-size:17.5px;font-weight:700;line-height:1.35;color:var(--ink);
 }
-.ktp-sec:last-child{margin-bottom:0}
-.ktp-name{margin:0 0 9px;font-size:16.5px;font-weight:700;line-height:1.35;color:var(--ink)}
-.ktp-topics{
-  list-style:none;margin:0;padding:0;
-  display:grid;grid-template-columns:repeat(auto-fill,minmax(290px,1fr));gap:7px 28px;
-}
-.ktp-topics li{position:relative;padding-left:22px;font-size:15.5px;line-height:1.5;color:var(--ink-soft)}
-.ktp-topics li::before{
-  content:"";position:absolute;left:5px;top:.6em;width:8px;height:8px;border-radius:50%;
-  background:var(--yellow-deep);
-}
-@media(max-width:640px){
-  .ktp-topics{grid-template-columns:1fr;gap:6px}
-  .ktp-sec{padding:13px 14px 11px}
+.tp-h:first-child{margin-top:0}
+.tp-sub{
+  margin:18px 0 10px;font-size:14px;font-weight:600;color:var(--mute);letter-spacing:.01em;
 }
 
 /* ---------- Футер ---------- */
