@@ -1,6 +1,6 @@
 <!doctype html><html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" media="(prefers-color-scheme: light)" content="#f7f4ec"><meta name="theme-color" media="(prefers-color-scheme: dark)" content="#111916">
 <title>Тренажёр · Плотников В. А.</title>
-<meta name="description" content="Тренажёр для одного ученика: случайный вариант из 10, задания по блокам в стиле презентации, результат показывается после выполнения всех заданий. Информатика и математика, 7 класс.">
+<meta name="description" content="Тренажёр для одного ученика: задания по блокам в стиле презентации, результат — после всех заданий. Математика и информатика, 7–11 классы, включая домашние задания с отправкой результатов учителю на Яндекс.Диск.">
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Golos+Text:wght@400;600&family=Marck+Script&family=PT+Serif:ital@1&display=swap" rel="stylesheet"><link rel="stylesheet" href="../style.css"><link rel="icon" href="../favicon.ico" sizes="48x48"><link rel="icon" href="../icon-pva.svg" type="image/svg+xml">
 <style>
 /* ===== Каркас (как на страницах уроков) ===== */
@@ -68,18 +68,37 @@
 .rev p{margin:.15em 0;font-size:15px}
 .rev .ans{color:var(--mute);font-size:14.5px}
 .rev .ans b{color:var(--ink)}
+/* ===== Группы тем и ДЗ-режим ===== */
+.tz-grp{font-size:clamp(22px,3vw,30px);margin-top:28px}
+.tz-cards .card.dz{box-shadow:5px 6px 0 var(--yellow)}
+.dz-form{max-width:560px;margin:4px auto 0;text-align:left}
+.dz-form label{display:block;font-weight:600;font-size:14.5px;margin:14px 0 6px}
+.dz-form .tz-num{width:100%;box-sizing:border-box}
+.dz-row{display:flex;gap:12px;align-items:flex-end;flex-wrap:wrap}
+.dz-row>div{flex:1;min-width:120px}
+.dz-row .tz-num{width:100%;box-sizing:border-box}
+.dz-err{color:var(--red);font-size:14px;margin:10px 0 0;min-height:1em;font-weight:600}
+.dz-file{border:1.5px dashed var(--line);border-radius:12px;padding:14px 18px;margin:14px 0 4px;background:var(--paper)}
+.dz-file .st{font-weight:700}
+.dz-file .st.ok{color:var(--green)}.dz-file .st.no{color:var(--red)}
+.dz-file p{margin:.3em 0;font-size:14.5px;color:var(--mute);word-break:break-all}
+/* Ловушка для ИИ: текст невидим на экране и на печати, но попадает
+   в буфер обмена, если скопировать задание целиком */
+.ai-trap{position:absolute;left:-9999px;top:auto;width:1px;height:1px;overflow:hidden;white-space:nowrap}
+@media print{.ai-trap{display:none}}
 @media(max-width:700px){.slide{padding:22px 18px}.tz-q{font-size:20px}.tz-top{gap:8px;padding:9px 12px}}
 </style></head><body><div class="layout"><aside class="side"><a class="logo" href="../index.html"><img class="logo-ico" src="../icon-pva.svg" alt="" width="44" height="44"><span>Плотников В. А.</span></a><input type="checkbox" id="menu-toggle" aria-label="Открыть меню"><label for="menu-toggle" class="burger">Меню</label><nav class="menu" aria-label="Разделы сайта"><ul><li><a href="../index.html">Главная</a></li><li class="menu-search"><input type="search" id="site-search" class="site-search" placeholder="Поиск по сайту…" aria-label="Поиск по сайту" autocomplete="off" spellcheck="false"><div class="search-drop" id="search-drop" hidden></div></li><li><a href="../informatika.html">Информатика</a><ul><li><a href="../informatika-uchenikam.html">Ученикам</a></li><li><a href="../informatika-uchitelyam.html">Учителям</a></li><li><a href="../informatika-propushel-urok.html">Если ты пропустил урок</a></li></ul></li><li><a href="../matematika.html">Математика</a><ul><li><a href="../matematika-uchenikam.html">Ученикам</a></li><li><a href="../matematika-uchitelyam.html">Учителям</a></li><li><a href="../matematika-propushel-urok.html">Если ты пропустил урок</a></li></ul></li><li><a href="../kontakty.html">Контакты</a></li></ul></nav></aside><div class="col">
 <div class="lhero"><div class="lwrap">
 <div><a class="back" href="../informatika-uchenikam.html">← Информатика: ученикам</a><a class="back" href="../matematika-uchenikam.html">← Математика: ученикам</a></div>
 <span class="tag">Тренажёр</span>
 <h1>Тренажёр</h1>
-<p class="lead">Работа для одного ученика. Выбери тему — вариант (один из 10) выберется случайным образом. Задания идут по блокам, как слайды презентации: ответил — жми «Далее». Результат покажем после всех заданий. Ответы никуда не сохраняются и не отправляются.</p>
+<p class="lead">Работа для одного ученика. Выбери тему — задания идут по блокам, как слайды презентации: ответил — жми «Далее». Результат — после всех заданий. В обычных тренажёрах ответы никуда не отправляются; в разделе «Домашние задания» результат сохраняется в XLSX и отправляется учителю на Яндекс.Диск.</p>
 </div></div>
 <div class="lwrap">
 <main id="app" aria-live="polite"></main>
 </div>
 <footer class="lfoot"><div class="lwrap">© Плотников В. А. · МБОУ Школа №7 г.о. Самара · <a href="../index.html">На главную</a> · <a href="../materials.html">Материалы</a></div></footer>
+<script src="xlsx-lite.js"></script>
 <script src="trenazher-data.js"></script>
 <script>
 (function(){
@@ -89,45 +108,110 @@ if(!D||!D.TOPICS){app.innerHTML="<div class='slide start'><h2>Тренажёр</
 var S=null; /* текущий сеанс */
 
 function esc(s){return String(s)}
+function escA(s){return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/\"/g,"&quot;")}
 function markFor(pct){return pct>=90?"5":(pct>=70?"4":(pct>=50?"3":"2"))}
+/* Задание в виде чистого текста (для XLSX): без HTML и без ловушки для ИИ */
+function dzPlain(q){
+ var s=String(q).replace(/<span class="ai-trap">[\s\S]*?<\/span>/gi,"");
+ s=s.replace(/<sup>([^<]*)<\/sup>/gi,"^$1").replace(/<sub>([^<]*)<\/sub>/gi,"$1");
+ s=s.replace(/<[^>]+>/g,"");
+ return s.replace(/&nbsp;/g," ").replace(/&amp;/g,"&").replace(/&lt;/g,"<").replace(/&gt;/g,">").replace(/&quot;/g,"\"").replace(/\s+/g," ").trim();
+}
 
-/* ================= Экран: выбор темы ================= */
+/* ================= Экран: выбор темы (темы сгруппированы по предмету и классу) ================= */
 function renderPick(){
- var h="<h2 class='tz-h2'>Выбери тему</h2><p class='tz-sub'>Каждая тема — 3 блока по 4 задания. Вариант выбирается случайно из "+D.VARIANTS+", результат — в конце.</p><div class='tz-cards'>";
- D.TOPICS.forEach(function(t){
-  h+="<div class='card'><span class='tag'>"+t.subject+"</span><span class='tag'>"+t.grade+"</span><h3>"+t.title+"</h3><p>"+t.desc+"</p><div class='tz-meta'>3 блока · "+(3*D.TASKS_PER_BLOCK)+" заданий · "+D.VARIANTS+" вариантов</div><div class='card-actions'><button class='btn sm' type='button' data-topic='"+t.id+"'>Пройти тренажёр →</button></div></div>";
+ var groups=[],i,j;
+ for(i=0;i<D.TOPICS.length;i++){
+  var t=D.TOPICS[i],key=t.subject+" · "+t.grade,g=null;
+  for(j=0;j<groups.length;j++){if(groups[j].key===key)g=groups[j]}
+  if(!g){g={key:key,items:[]};groups.push(g)}
+  g.items.push(t);
+ }
+ var h="<h2 class='tz-h2'>Выбери тему</h2><p class='tz-sub'>Каждая тема — блоки по 4 задания. В обычных тренажёрах вариант выбирается случайно из 10, в домашних заданиях — из 40. Результат — в конце.</p>";
+ groups.forEach(function(gr){
+  h+="<h2 class='tz-h2 tz-grp'>"+gr.key+"</h2><div class='tz-cards'>";
+  gr.items.forEach(function(t){
+   var nv=t.variants||D.VARIANTS;
+   h+="<div class='card"+(t.dz?" dz":"")+"'>"+(t.dz?"<span class='tag'>Домашнее задание</span>":"")+"<span class='tag'>"+t.subject+"</span><span class='tag'>"+t.grade+"</span><h3>"+t.title+"</h3><p>"+t.desc+"</p><div class='tz-meta'>"+(t.dz?(t.blocks.length*D.TASKS_PER_BLOCK)+" заданий · "+nv+" вариантов · результат → XLSX на Яндекс.Диск":(t.blocks.length+" блока · "+(t.blocks.length*D.TASKS_PER_BLOCK)+" заданий · "+nv+" вариантов"))+"</div><div class='card-actions'><button class='btn sm' type='button' data-topic='"+t.id+"'>"+(t.dz?"Открыть домашнее задание →":"Пройти тренажёр →")+"</button></div></div>";
+  });
+  h+="</div>";
  });
- h+="</div><p class='tz-sub' style='margin-top:14px;font-size:14px'>Список тем будет пополняться по мере прохождения программы.</p>";
+ h+="<p class='tz-sub' style='margin-top:14px;font-size:14px'>Список тем будет пополняться по мере прохождения программы.</p>";
  app.innerHTML=h;
  var btns=app.querySelectorAll("[data-topic]");
- for(var i=0;i<btns.length;i++)btns[i].addEventListener("click",function(){startTopic(this.getAttribute("data-topic"))});
+ for(i=0;i<btns.length;i++)btns[i].addEventListener("click",function(){startTopic(this.getAttribute("data-topic"))});
  window.scrollTo(0,0);
 }
 
-/* ================= Старт темы: случайный вариант ================= */
+/* ================= Старт темы: обычные — случайный вариант, ДЗ — форма ================= */
 function startTopic(id){
  var topic=null,i;
  for(i=0;i<D.TOPICS.length;i++){if(D.TOPICS[i].id===id)topic=D.TOPICS[i]}
  if(!topic){renderPick();return}
- var v=1+Math.floor(Math.random()*D.VARIANTS);
- var data=D.buildVariant(id,v);
- S={data:data,ans:[],slides:[],cur:0};
+ try{history.replaceState(null,"","#t="+topic.id)}catch(e){}
+ if(topic.dz){renderDzForm("");return}
+ var nv=topic.variants||D.VARIANTS;
+ beginSession(topic,1+Math.floor(Math.random()*nv),null);
+}
+function beginSession(topic,v,dz){
+ var data=D.buildVariant(topic.id,v);
+ S={data:data,dz:dz,ans:[],slides:[],cur:0};
  var g=0;
  data.blocks.forEach(function(b,bi){
   S.slides.push({kind:"div",bi:bi});
   b.tasks.forEach(function(t,ti){S.slides.push({kind:"task",bi:bi,ti:ti,g:g});g++});
  });
  S.total=g;S.ans=new Array(g);S.answered=0;
- try{history.replaceState(null,"","#t="+id)}catch(e){}
  renderStart();
 }
+/* ================= ДЗ: форма ученика (ФИО, класс, вариант) ================= */
+function renderDzForm(err){
+ var saved={},i,topic=null;
+ try{saved=JSON.parse(localStorage.getItem("dz-student")||"{}")}catch(e){saved={}}
+ for(i=0;i<D.TOPICS.length;i++){if(D.TOPICS[i].id==="proizvod")topic=D.TOPICS[i]}
+ var folder=(D.DZ_DISK&&D.DZ_DISK.folder)?D.DZ_DISK.folder:"11 алгебра ДР";
+ var h="<div class='slide start'><span class='tz-badge'>Домашнее задание · Математика · 11 класс</span><h2 class='tz-h2'>"+topic.title+"</h2><p class='tz-sub'>"+(topic.blocks.length*D.TASKS_PER_BLOCK)+" заданий по образцу № 4.30 · 40 вариантов. В конце работы результат сохраняется в файл XLSX и отправляется учителю на Яндекс.Диск (папка «"+escA(folder)+"»).</p><div class='ai-trap'>"+D.TRAP_LONG+"</div><div class='dz-form'>"+
+  "<label for='dzname'>Фамилия и имя (например: Иванов Иван)</label><input class='tz-num' id='dzname' type='text' autocomplete='off' value='"+escA(saved.name||"")+"'>"+
+  "<div class='dz-row'><div><label for='dzcls'>Класс</label><input class='tz-num' id='dzcls' type='text' autocomplete='off' value='"+escA(saved.cls||"11")+"'></div>"+
+  "<div><label for='dzvar'>Вариант (1–40)</label><input class='tz-num' id='dzvar' type='number' min='1' max='40' step='1' value='"+(1+Math.floor(Math.random()*40))+"'></div>"+
+  "<div style='flex:0 0 auto'><label>&nbsp;</label><button class='btn ghost' type='button' id='dzrand'>Случайный</button></div></div>"+
+  "<p class='dz-err'>"+(err||"")+"</p>"+
+  "<div class='tz-nav'><button class='btn' type='button' id='dzgo'>Начать выполнение →</button><button class='btn ghost' type='button' id='dzback'>Сменить тему</button></div>"+
+  "</div></div>";
+ app.innerHTML=h;
+ document.getElementById("dzrand").addEventListener("click",function(){document.getElementById("dzvar").value=1+Math.floor(Math.random()*40)});
+ document.getElementById("dzback").addEventListener("click",function(){S=null;try{history.replaceState(null,"","#")}catch(e){};renderPick()});
+ function go(){
+  var name=document.getElementById("dzname").value.trim();
+  var cls=document.getElementById("dzcls").value.trim()||"11";
+  var v=parseInt(document.getElementById("dzvar").value,10);
+  if(name.length<3){renderDzForm("Напиши фамилию и имя — без них учитель не увидит, чья работа.");return}
+  if(!(v>=1&&v<=40)){renderDzForm("Вариант должен быть числом от 1 до 40.");return}
+  try{localStorage.setItem("dz-student",JSON.stringify({name:name,cls:cls}))}catch(e){}
+  beginSession(topic,v,{name:name,cls:cls,variant:v});
+ }
+ document.getElementById("dzgo").addEventListener("click",go);
+ var nm=document.getElementById("dzname"),vr=document.getElementById("dzvar");
+ nm.addEventListener("keydown",function(e){if(e.key==="Enter"){e.preventDefault();go()}});
+ vr.addEventListener("keydown",function(e){if(e.key==="Enter"){e.preventDefault();go()}});
+ nm.focus();
+ window.scrollTo(0,0);
+}
 function renderStart(){
- var d=S.data,h="<div class='slide start'><span class='tz-badge'>"+d.subject+" · "+d.grade+"</span><h2 class='tz-h2'>"+d.title+"</h2><p class='tz-sub'>Вариант выбран случайным образом. Внутри — "+S.total+" заданий в "+d.blocks.length+" блоках:</p><ul class='plan'>";
+ var d=S.data,h="<div class='slide start'><span class='tz-badge'>"+d.subject+" · "+d.grade+"</span><h2 class='tz-h2'>"+d.title+"</h2>";
+ if(S.dz){
+  h+="<p class='tz-sub'>Вариант "+d.variant+" · "+escA(S.dz.name)+", "+escA(S.dz.cls)+" класс. Внутри — "+S.total+" заданий в "+d.blocks.length+" блоках:</p>";
+ }else{
+  h+="<p class='tz-sub'>Вариант выбран случайным образом. Внутри — "+S.total+" заданий в "+d.blocks.length+" блоках:</p>";
+ }
+ h+="<ul class='plan'>";
  d.blocks.forEach(function(b,i){h+="<li><b>Блок "+(i+1)+".</b> "+b.name+" — "+b.tasks.length+" задания</li>"});
- h+="</ul><div class='tz-nav' style='justify-content:center'><button class='btn' type='button' id='go'>Начать выполнение →</button><button class='btn ghost' type='button' id='back'>Сменить тему</button></div></div>";
+ h+="</ul>";
+ if(S.dz)h+="<p class='tz-sub' style='font-size:14px'>В конце работы результат сохранится в XLSX и отправится учителю на Яндекс.Диск.</p>";
+ h+="<div class='tz-nav' style='justify-content:center'><button class='btn' type='button' id='go'>Начать выполнение →</button><button class='btn ghost' type='button' id='back'>Сменить тему</button></div></div>";
  app.innerHTML=h;
  document.getElementById("go").addEventListener("click",function(){S.cur=0;renderRun()});
- document.getElementById("back").addEventListener("click",renderPick);
+ document.getElementById("back").addEventListener("click",function(){if(S&&S.dz){renderDzForm("")}else{renderPick()}});
  window.scrollTo(0,0);
 }
 
@@ -201,6 +285,104 @@ function renderRun(){
 function next(){saveCurrent();if(S.cur<S.slides.length-1){S.cur++;renderRun()}}
 function prev(){saveCurrent();if(S.cur>0){S.cur--;renderRun()}}
 
+/* ================= ДЗ: файл XLSX и отправка на Яндекс.Диск ================= */
+function dzBuildFile(){
+ var d=S.data,rows=[],now=new Date(),g=0,correct=0;
+ var pad=function(n){return (n<10?"0":"")+n};
+ var stamp=now.getFullYear()+"-"+pad(now.getMonth()+1)+"-"+pad(now.getDate())+" "+pad(now.getHours())+":"+pad(now.getMinutes());
+ d.blocks.forEach(function(b){b.tasks.forEach(function(t){
+  var a=S.ans[g];
+  if(t.type==="num"?D.checkNum(a,t.a):(a===t.c))correct++;
+  g++;
+ })});
+ var pct=Math.round(100*correct/S.total),mk=markFor(pct);
+ rows.push(["Домашнее задание · Алгебра · 11 класс"]);
+ rows.push(["Тема","Производная суммы, произведения и частного функций"]);
+ rows.push(["Ученик",S.dz.name]);
+ rows.push(["Класс",S.dz.cls]);
+ rows.push(["Вариант",d.variant]);
+ rows.push(["Дата и время",stamp]);
+ rows.push(["Верно",correct+" из "+S.total+" ("+pct+"%)"]);
+ rows.push(["Отметка",mk]);
+ rows.push([]);
+ rows.push(["№","Задание","Ответ ученика","Верный ответ","Результат"]);
+ g=0;
+ d.blocks.forEach(function(b){b.tasks.forEach(function(t){
+  var a=S.ans[g];
+  var right=t.type==="num"?D.checkNum(a,t.a):(a===t.c);
+  var my=(a===null||a===undefined||a==="")?"—":String(a);
+  var corr=String(t.type==="num"?t.a:t.c);
+  rows.push([g+1,dzPlain(t.q),my,corr,right?"верно":"неверно"]);
+  g++;
+ })});
+ var u8=XLSXLITE.build("Результат",rows,[6,74,16,14,12],[0,1,2,3,4,5,6,7,9]);
+ var fname="ДЗ_Производная_вариант"+d.variant+"_"+String(S.dz.cls).replace(/[^0-9a-zA-Zа-яА-ЯёЁ]+/g,"")+"кл_"+S.dz.name.replace(/[\\/:*?\"<>|]+/g," ").replace(/\s+/g,"_")+"_"+stamp.replace(/[: ]/g,"-")+".xlsx";
+ S.dzFile={name:fname,data:u8,correct:correct,pct:pct,mk:mk,stamp:stamp};
+}
+function dzBlob(){
+ return new Blob([S.dzFile.data],{type:"application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"});
+}
+function dzDownload(){
+ try{
+  var a=document.createElement("a");
+  a.href=URL.createObjectURL(dzBlob());a.download=S.dzFile.name;
+  document.body.appendChild(a);a.click();
+  setTimeout(function(){URL.revokeObjectURL(a.href);if(a.parentNode)a.parentNode.removeChild(a)},1500);
+ }catch(e){}
+}
+function dzUpload(cb){
+ var cfg=D.DZ_DISK||{};
+ if(!cfg.token){cb("notoken");return}
+ var path="disk:/"+String(cfg.folder||"").replace(/^\/+/,"")+"/"+S.dzFile.name;
+ fetch(cfg.api+"?overwrite=true&path="+encodeURIComponent(path),{headers:{Authorization:"OAuth "+cfg.token}})
+ .then(function(r){
+  if(!r.ok){return r.text().then(function(t){throw new Error("HTTP "+r.status+": "+String(t).slice(0,140))})}
+  return r.json();
+ })
+ .then(function(j){
+  if(!j||!j.href)throw new Error("Диск не вернул ссылку загрузки");
+  return fetch(j.href,{method:"PUT",body:dzBlob()}).then(function(r2){
+   if(r2.ok)return;
+   throw new Error("HTTP "+r2.status+" при загрузке файла");
+  });
+ })
+ .then(function(){cb("ok")})
+ .catch(function(e){cb(String(e&&e.message||e))});
+}
+function dzFileBlock(){
+ dzBuildFile();
+ var cfg=D.DZ_DISK||{};
+ var h="<h3 style='margin-top:22px'>Файл с результатами</h3><div class='dz-file' id='dzfile'><p>Готовим файл XLSX: задания, твои ответы, верные ответы и отметка…</p></div>";
+ setTimeout(function(){
+  var box=document.getElementById("dzfile");
+  if(!box)return;
+  if(cfg.token){
+   box.innerHTML="<p><span class='st' id='dzst'>Отправляем на Яндекс.Диск (папка «"+escA(cfg.folder||"")+"»)…</span></p><p>Файл: "+escA(S.dzFile.name)+"</p>";
+   dzUpload(function(res){
+    var st=document.getElementById("dzst");
+    if(!st)return;
+    if(res==="ok"){
+     st.textContent="✓ Отправлено на Яндекс.Диск (папка «"+(cfg.folder||"")+"»). Работа сдана!";
+     st.className="st ok";
+    }else{
+     st.className="st no";
+     st.textContent=res==="notoken"?"Не задан токен Яндекс.Диска — отправка не выполнена.":"Не удалось отправить: "+res;
+     var p=document.createElement("p");
+     p.textContent="Файл скачан на устройство — передай его учителю или загрузи на Диск вручную.";
+     st.parentNode.appendChild(p);
+     dzDownload();
+    }
+   });
+  }else{
+   box.innerHTML="<p><span class='st'>Файл готов: "+escA(S.dzFile.name)+"</span></p><p>Сейчас он скачается на устройство. Передай его учителю или загрузи в папку «"+escA(cfg.folder||"")+"» на Яндекс.Диске вручную.</p><div class='tz-nav'><button class='btn sm' type='button' id='dzdl'>Скачать XLSX ещё раз</button></div>";
+   dzDownload();
+   var b=document.getElementById("dzdl");
+   if(b)b.addEventListener("click",dzDownload);
+  }
+ },60);
+ return h;
+}
+
 /* ================= Результаты ================= */
 function finish(){
  saveCurrent();
@@ -228,7 +410,8 @@ function finish(){
   h+="<div class='tz-brow'><span class='nm'>"+pb.name+"</span><span class='vv'>"+pb.got+" из "+pb.of+"</span><div class='tz-mini'><i style='width:"+p+"%'></i></div></div>";
  });
  h+="<h3 style='margin-top:22px'>Разбор заданий</h3>"+review;
- h+="<div class='tz-nav'><button class='btn' type='button' id='again'>Пройти ещё раз · новый случайный вариант</button><button class='btn ghost' type='button' id='pick'>Сменить тему</button></div><p class='tz-warn' style='margin-top:12px'>Результат показан только здесь и нигде не сохраняется: при перезагрузке страницы он исчезнет. Если отметка нужна в журнале — запиши её.</p></div>";
+ if(S.dz)h+=dzFileBlock();
+ h+="<div class='tz-nav'><button class='btn' type='button' id='again'>"+(S.dz?"Пройти ещё раз · другой вариант":"Пройти ещё раз · новый случайный вариант")+"</button><button class='btn ghost' type='button' id='pick'>Сменить тему</button></div><p class='tz-warn' style='margin-top:12px'>"+(S.dz?"Не закрывай страницу, пока не увидишь статус отправки файла: работа без файла на Диске учителем не проверяется.":"Результат показан только здесь и нигде не сохраняется: при перезагрузке страницы он исчезнет. Если отметка нужна в журнале — запиши её.")+"</p></div>";
  app.innerHTML=h;
  document.getElementById("again").addEventListener("click",function(){startTopic(S.data.topicId)});
  document.getElementById("pick").addEventListener("click",function(){S=null;try{history.replaceState(null,"","#")}catch(e){};renderPick()});
