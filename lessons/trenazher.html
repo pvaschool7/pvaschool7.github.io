@@ -119,6 +119,14 @@
 .dz-resume{border:2px solid var(--green);background:linear-gradient(150deg,#eefaf0,#dcf5e3);border-radius:14px;padding:14px 18px;margin:16px auto;max-width:560px;text-align:left}
 .dz-resume p{margin:.2em 0}
 @media(prefers-color-scheme:dark){.dz-resume{background:linear-gradient(150deg,#122b1e,#173828)}}
+/* ===== Подтверждение отправки и подробные решения ===== */
+.dz-modal{position:fixed;inset:0;background:rgba(12,24,48,.55);display:flex;align-items:center;justify-content:center;z-index:99;padding:18px}
+.dz-modal-box{background:var(--card);border:2px solid var(--line);border-radius:16px;box-shadow:6px 7px 0 rgba(0,0,0,.22);max-width:480px;width:100%;padding:24px 26px 20px}
+.dz-modal-box h3{margin:0 0 8px;font-size:22px}
+.dz-modal-box p{margin:.25em 0;font-size:16px;color:var(--ink)}
+.dz-modal-box .tz-nav{margin-top:16px}
+.rev p.dz-det{margin-top:9px;border-top:1px dashed var(--line);padding-top:9px;font-size:15px;line-height:1.65}
+.rev p.dz-det sup{font-size:.65em}
 </style></head><body><div class="layout"><aside class="side"><a class="logo" href="../index.html"><img class="logo-ico" src="../icon-pva.svg" alt="" width="44" height="44"><span>Плотников В. А.</span></a><input type="checkbox" id="menu-toggle" aria-label="Открыть меню"><label for="menu-toggle" class="burger">Меню</label><nav class="menu" aria-label="Разделы сайта"><ul><li><a href="../index.html">Главная</a></li><li class="menu-search"><input type="search" id="site-search" class="site-search" placeholder="Поиск по сайту…" aria-label="Поиск по сайту" autocomplete="off" spellcheck="false"><div class="search-drop" id="search-drop" hidden></div></li><li><a href="../informatika.html">Информатика</a><ul><li><a href="../informatika-uchenikam.html">Ученикам</a></li><li><a href="../informatika-uchitelyam.html">Учителям</a></li><li><a href="../informatika-propushel-urok.html">Если ты пропустил урок</a></li></ul></li><li><a href="../matematika.html">Математика</a><ul><li><a href="../matematika-uchenikam.html">Ученикам</a></li><li><a href="../matematika-uchitelyam.html">Учителям</a></li><li><a href="../matematika-propushel-urok.html">Если ты пропустил урок</a></li></ul></li><li><a href="../kontakty.html">Контакты</a></li></ul></nav></aside><div class="col">
 <div class="lhero"><div class="lwrap">
 <div><a class="back" href="../informatika-uchenikam.html">← Информатика: ученикам</a><a class="back" href="../matematika-uchenikam.html">← Математика: ученикам</a></div>
@@ -205,7 +213,7 @@ function dzTopic(){var i,t=null;for(i=0;i<D.TOPICS.length;i++){if(D.TOPICS[i].id
 function dzLoad(){try{return JSON.parse(localStorage.getItem(DZKEY)||"null")}catch(e){return null}}
 function dzSave(){
  if(!S||!S.dz||!S.data)return;
- try{localStorage.setItem(DZKEY,JSON.stringify({name:S.dz.name,cls:S.dz.cls,variant:S.data.variant,items:S.dzItems,ts:Date.now()}))}catch(e){}
+ try{localStorage.setItem(DZKEY,JSON.stringify({name:S.dz.name,cls:S.dz.cls,variant:S.data.variant,items:S.dzItems,sent:!!S.sent,sentNote:S.sentNote||"",ts:Date.now()}))}catch(e){}
 }
 function dzClear(){try{localStorage.removeItem(DZKEY)}catch(e){}}
 function dzDone(st){return !!st&&(st.stt==="ok"||st.stt==="late"||st.stt==="reveal")}
@@ -224,12 +232,12 @@ function renderDzForm(err){
  if(!topic){renderPick();return}
  var folder=(D.DZ_DISK&&D.DZ_DISK.folder)?D.DZ_DISK.folder:"11 алгебра ДР";
  var nTasks=topic.blocks.length*D.TASKS_PER_BLOCK;
- var resumable=saved&&saved.name&&saved.items&&saved.items.length===nTasks&&!dzAllDone(saved.items);
+ var resumable=saved&&saved.name&&saved.items&&saved.items.length===nTasks;
  var h="<div class='slide start'><span class='tz-badge'>Домашнее задание · Математика · 11 класс</span><h2 class='tz-h2'>"+topic.title+"</h2>"
- +"<p class='tz-sub'>"+nTasks+" заданий по образцу № 4.30. Выбирать вариант не нужно — задания собираются случайно. Ответ на каждое задание — производная в виде выражения с <b>x</b>: пиши её в строчку, например <span class='dz-code'>3x^2-4x+5</span>, <span class='dz-code'>2x+7</span> или <span class='dz-code'>7/(x+3)^2</span>. В конце работы результат сохраняется в файл XLSX и отправляется учителю на Яндекс.Диск (папка «"+escA(folder)+"»).</p>";
+ +"<p class='tz-sub'>"+nTasks+" заданий по образцу № 4.30. Выбирать вариант не нужно — задания собираются случайно. Ответ на каждое задание — производная в виде выражения с <b>x</b>: пиши её в строчку, например <span class='dz-code'>3x^2-4x+5</span>, <span class='dz-code'>2x+7</span> или <span class='dz-code'>7/(x+3)^2</span>. В конце работы результат сохраняется в файл XLSX и отправляется учителю на Яндекс.Диск (папка «"+escA(folder)+"»). Перед отправкой работу можно перепроверить, после отправки откроется подробное решение всех заданий.</p>";
  if(resumable){
   var done=0;for(i=0;i<saved.items.length;i++){if(dzDone(saved.items[i]))done++}
-  h+="<div class='dz-resume'><p>Найдена незавершённая работа: <b>"+escA(saved.name)+"</b>, "+escA(saved.cls)+" класс · заполнено заданий: "+done+" из "+nTasks+".</p><div class='tz-nav'><button class='btn' type='button' id='dzresume'>Продолжить работу →</button><button class='btn ghost' type='button' id='dzfresh'>Начать заново</button></div></div>";
+  h+="<div class='dz-resume'><p>Найдена сохранённая работа: <b>"+escA(saved.name)+"</b>, "+escA(saved.cls)+" класс · заполнено заданий: "+done+" из "+nTasks+".</p><div class='tz-nav'><button class='btn' type='button' id='dzresume'>"+(saved.sent?"Открыть результат →":"Продолжить работу →")+"</button><button class='btn ghost' type='button' id='dzfresh'>Начать заново</button></div></div>";
  }
  h+="<div class='dz-form'>"
  +"<label for='dzname'>Фамилия и имя (например: Иванов Иван)</label><input class='tz-num' id='dzname' type='text' autocomplete='off' value='"+escA((saved&&saved.name)||"")+"'>"
@@ -260,13 +268,13 @@ function dzResume(){
  var saved=dzLoad(),topic=dzTopic();
  if(!saved||!saved.items||!topic){renderDzForm("");return}
  S={data:D.buildVariant(topic.id,saved.variant),dz:{name:saved.name,cls:saved.cls},
-    dzItems:saved.items,total:saved.items.length,finished:dzAllDone(saved.items),resumed:true};
+    dzItems:saved.items,total:saved.items.length,finished:dzAllDone(saved.items),sent:!!saved.sent,sentNote:saved.sentNote||"",resumed:true};
  dzRender({});
 }
 function dzStart(name,cls,variant){
  var topic=dzTopic();
  S={data:D.buildVariant(topic.id,variant),dz:{name:name,cls:cls},dzItems:[],total:0,finished:false,resumed:false};
- S.data.blocks.forEach(function(b){b.tasks.forEach(function(){S.dzItems.push({stt:"open",att:0,val:"",msg:""})})});
+ S.data.blocks.forEach(function(b){b.tasks.forEach(function(){S.dzItems.push({stt:"open",att:0,val:"",val1:"",msg:""})})});
  S.total=S.dzItems.length;
  dzSave();
  dzRender({});
@@ -279,7 +287,7 @@ function dzBlockDone(bi){
 }
 function dzBoard(){
  var score=dzScore(S.dzItems),done=0,i;
- for(i=0;i<S.dzItems.length;i++){if(dzDone(S.dzItems[i]))done++}
+ for(i=0;i<S.dzItems.length;i++){if(S.dzItems[i]&&S.dzItems[i].val)done++}
  return "<div class='dz-board'><span class='who'>"+escA(S.dz.name)+", "+escA(S.dz.cls)+" класс</span>"
  +"<span class='cnt'>Верно с первой попытки: <b>"+score+"</b> из "+S.total+" · заполнено: "+done+"</span>"
  +"<div class='tz-bar'><div class='tz-fill' style='width:"+Math.round(100*done/S.total)+"%'></div></div></div>";
@@ -301,7 +309,7 @@ function dzRender(opts){
  var y=window.scrollY||0,d=S.data,i;
  var h=dzBoard();
  h+="<div class='slide dz-live'><h2 class='tz-h2' style='text-align:left'>"+d.title+"</h2>"
- +"<p class='task-intro'>В каждом задании найди производную и впиши её в поле — выражением с <b>x</b> (можно без пробелов: <span class='dz-code'>3x^2-4x</span>), затем нажми «Проверить задание» под блоком. Верно с первой попытки — <b>+1 балл</b>; после одной ошибки верный ответ даёт решение без балла; после двух показывается верный ответ («разобрали»). Регистр, пробелы и знак умножения не важны.</p>";
+ +"<p class='task-intro'>В каждом задании найди производную и впиши её в поле — выражением с <b>x</b> (можно без пробелов: <span class='dz-code'>3x^2-4x</span>), затем нажми «Проверить задание» под блоком. Верно с первой попытки — <b>+1 балл</b>; после одной ошибки верный ответ даёт решение без балла; после двух показывается верный ответ («разобрали»). Регистр, пробелы и знак умножения не важны. В отчёт для учителя идёт первый ответ по каждому заданию. Перед отправкой можно вернуться к ответам и перепроверить их, после отправки откроется подробное решение.</p>";
  d.blocks.forEach(function(b,bi){
   h+="<section class='dz-block' data-b='"+bi+"'><h3 class='dz-btitle'>Блок "+(bi+1)+". "+b.name+"</h3>";
   if(bi===1)h+="<p class='task-intro'>Здесь работают правила: (u·v)′ = u′v + uv′ и (u/v)′ = (u′v − uv′)/v<sup>2</sup>.</p>";
@@ -310,8 +318,8 @@ function dzRender(opts){
   h+="<div class='task-foot'><button class='btn sm' type='button' data-check='"+bi+"'"+(dzBlockDone(bi)?" disabled":"")+">"+(dzBlockDone(bi)?"Блок проверен ✓":"Проверить задание")+"</button></div>";
   h+="</section>";
  });
- if(S.finished)h+=dzResultsHtml();
- h+="<div class='tz-nav' style='max-width:1160px;margin:0 auto 26px'>"+(S.finished?"<button class='btn' type='button' id='dzagain'>Пройти ещё раз · новый случайный вариант</button>":"")+"<span class='spacer'></span><button class='btn ghost' type='button' id='dzpick'>Сменить тему</button></div>";
+ if(S.finished)h+=S.sent?dzSentHtml():dzResultsHtml();
+ h+="<div class='tz-nav' style='max-width:1160px;margin:0 auto 26px'>"+(S.sent?"<button class='btn' type='button' id='dzagain'>Пройти ещё раз · новый случайный вариант</button>":"")+"<span class='spacer'></span><button class='btn ghost' type='button' id='dzpick'>Сменить тему</button></div>";
  app.innerHTML=h;
  var checks=app.querySelectorAll("[data-check]");
  for(i=0;i<checks.length;i++)checks[i].addEventListener("click",function(){dzCheckBlock(parseInt(this.getAttribute("data-check"),10))});
@@ -334,6 +342,23 @@ function dzRender(opts){
  if(ag)ag.addEventListener("click",function(){dzStart(S.dz.name,S.dz.cls,1+Math.floor(Math.random()*40))});
  var pk=document.getElementById("dzpick");
  if(pk)pk.addEventListener("click",function(){S=null;try{history.replaceState(null,"","#")}catch(e){};renderPick()});
+ var sd=document.getElementById("dzsend");
+ if(sd)sd.addEventListener("click",dzAskSend);
+ var rv=document.getElementById("dzrevise");
+ if(rv)rv.addEventListener("click",dzRevise);
+ var dl=document.getElementById("dzdl");
+ if(dl)dl.addEventListener("click",dzDownload);
+ var up=document.getElementById("dzup");
+ if(up)up.addEventListener("click",function(){
+  up.disabled=true;up.textContent="Отправляем…";
+  dzUpload(function(res){
+   up.disabled=false;
+   up.textContent=res==="ok"?"✓ Отправлено на Диск":"Отправить на Яндекс.Диск ещё раз";
+   var st=document.getElementById("dzst");
+   if(st){st.textContent=res==="ok"?"✓ Отправлено учителю на Яндекс.Диск.":"Не удалось отправить: "+res;st.className="st"+(res==="ok"?" ok":" no")}
+   if(res==="ok"){S.sentNote="";dzSave();var ms=document.getElementById("dzsentst");if(ms){ms.textContent="✓ Результат отправлен учителю на Яндекс.Диск (папка «"+((D.DZ_DISK&&D.DZ_DISK.folder)||"")+"»).";ms.className="st ok"}}
+  });
+ });
  if(opts.justFinished){var r=document.getElementById("dzres");if(r)r.scrollIntoView({behavior:"smooth",block:"start"})}
  else window.scrollTo(0,y);
 }
@@ -346,11 +371,16 @@ function dzCheckBlock(bi){
   var val=inp?inp.value.trim():"";
   st.val=val;st.msg="";
   if(!val){st.msg="впиши ответ";continue}
+  /* Первый ответ ученика запоминается отдельно (val1) и больше не меняется:
+     именно он попадает в файл для учителя — даже если потом ответ исправлен
+     или показан верный. Сам ответ ученика верным не подменяется. */
+  if(!st.val1)st.val1=val;
   if(D.checkExpr(val,t)){
    st.stt=(st.att===0)?"ok":"late";
   }else{
    st.att++;
-   if(st.att>=2){st.stt="reveal";st.val=t.sol}
+   /* Ответ ученика НЕ заменяем верным: верный ответ показывается рядом. */
+   if(st.att>=2)st.stt="reveal";
    else st.stt="wrong";
   }
  }
@@ -361,25 +391,16 @@ function dzCheckBlock(bi){
 }
 function dzResultsHtml(){
  var d=S.data,score=dzScore(S.dzItems),pct=Math.round(100*score/S.total),mk=markFor(pct),g=0;
- var h="<section class='dz-block' id='dzres'><h3 class='dz-btitle'>Итоги: результат и файл для учителя</h3>"
+ var h="<section class='dz-block' id='dzres'><h3 class='dz-btitle'>Итоги: все задания выполнены</h3>"
  +"<div class='tz-res'><div class='tz-mark'>"+mk+"</div><div class='tz-score'>"+score+" из "+S.total+"<small>верных с первой попытки · "+pct+"% · отметка «"+mk+"» · шкала: 90–100% «5», 70–89% «4», 50–69% «3»</small></div></div>";
  d.blocks.forEach(function(b,bi){
   var got=0,of=b.tasks.length,from=dzIndex(bi,0),i;
   for(i=0;i<of;i++){if(S.dzItems[from+i]&&S.dzItems[from+i].stt==="ok")got++}
   h+="<div class='tz-brow'><span class='nm'>Блок "+(bi+1)+". "+b.name+"</span><span class='vv'>"+got+" из "+of+"</span><div class='tz-mini'><i style='width:"+Math.round(100*got/of)+"%'></i></div></div>";
  });
- h+="<h3 style='margin-top:20px'>Разбор заданий</h3>";
- g=0;
- d.blocks.forEach(function(b){
-  b.tasks.forEach(function(t){
-   var st=S.dzItems[g];
-   var sth=st.stt==="ok"?"<span class='st ok'>✓ +1</span>":(st.stt==="late"?"<span class='st ok'>✓ без балла</span>":"<span class='st na'>разобрали</span>");
-   var my=st.stt==="reveal"?"":(st.val||"нет ответа");
-   h+="<div class='rev'><p>"+sth+"<b>Задание "+(g+1)+"</b></p><p>"+t.q+"</p><p class='ans'>"+(my?"Твой ответ: <b>"+escA(my)+"</b>":"Верный ответ: <b>"+t.atext+"</b>")+(st.stt==="late"?" · Верно: <b>"+t.atext+"</b>":"")+"</p>"+(t.hint?"<p class='ans'>"+t.hint+"</p>":"")+"</div>";
-   g++;
-  });
- });
- h+=dzFileBlock(!S.resumed);
+ h+="<p class='task-intro' style='margin-top:16px'>Учитель увидит файл с заданиями, твоими первыми ответами и отметкой. Верные ответы и подробное решение откроются после отправки — сейчас их не видно, можно спокойно перепроверить работу.</p>"
+ +"<div class='tz-nav'><button class='btn' type='button' id='dzsend'"+(S.sending?" disabled":"")+">"+(S.sending?"Отправляем на Яндекс.Диск…":"Отправить результат учителю →")+"</button>"
+ +"<button class='btn ghost' type='button' id='dzrevise'"+(S.sending?" disabled":"")+">← Вернуться к ответам</button></div>";
  h+="</section>";
  return h;
 }
@@ -491,16 +512,16 @@ function dzBuildFile(){
  rows.push(["Верно с первой попытки",score+" из "+S.total+" ("+pct+"%)"]);
  rows.push(["Отметка",mk]);
  rows.push([]);
- rows.push(["№","Блок","Задание","Ответ ученика","Верный ответ","Результат"]);
+ rows.push(["№","Блок","Задание","Ответ ученика (первая попытка)","Верный ответ","Результат"]);
  g=0;
  d.blocks.forEach(function(b,bi){b.tasks.forEach(function(t){
   var st=S.dzItems[g];
-  rows.push([g+1,"Блок "+(bi+1)+". "+b.name,dzPlain(t.q),st.val||"—",t.sol,dzStatusText(st.stt)]);
+  rows.push([g+1,"Блок "+(bi+1)+". "+b.name,dzPlain(t.q),st.val1||st.val||"—",t.sol,dzStatusText(st.stt)]);
   g++;
  })});
  var u8=XLSXLITE.build("Результат",rows,[6,24,64,26,22,30],[0,1,2,3,4,5,6,7,9]);
  var fname="ДЗ_Производная_"+String(S.dz.cls).replace(/[^0-9a-zA-Zа-яА-ЯёЁ]+/g,"")+"кл_"+S.dz.name.replace(/[\\/:*?\"<>|]+/g," ").replace(/\s+/g,"_")+"_"+stamp.replace(/[: ]/g,"-")+".xlsx";
- S.dzFile={name:fname,data:u8,correct:score,pct:pct,mk:mk,stamp:stamp};
+ S.dzFile={name:fname,data:u8,rows:rows,correct:score,pct:pct,mk:mk,stamp:stamp};
 }
 function dzBlob(){
  return new Blob([S.dzFile.data],{type:"application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"});
@@ -540,57 +561,87 @@ function dzUpload(cb){
  .then(function(){cb("ok")})
  .catch(function(e){cb(String(e&&e.message||e))});
 }
-function dzFileBlock(auto){
- dzBuildFile();
+/* Вопрос-подтверждение перед отправкой результата учителю */
+function dzAskSend(){
+ if(!S||!S.dz||S.sending)return;
+ var old=document.getElementById("dzmodal");if(old&&old.parentNode)old.parentNode.removeChild(old);
+ var m=document.createElement("div");
+ m.id="dzmodal";m.className="dz-modal";
+ m.innerHTML="<div class='dz-modal-box'><h3>Отправить результат учителю?</h3>"
+ +"<p>Вы точно уверены, может быть перепроверите результаты?</p>"
+ +"<div class='tz-nav'><button class='btn' type='button' id='dzmdyes'>Да, отправить</button><button class='btn ghost' type='button' id='dzmdno'>Нет, перепроверить</button></div></div>";
+ document.body.appendChild(m);
+ m.addEventListener("click",function(e){if(e.target===m&&m.parentNode)m.parentNode.removeChild(m)});
+ document.getElementById("dzmdyes").addEventListener("click",function(){if(m.parentNode)m.parentNode.removeChild(m);dzSend()});
+ document.getElementById("dzmdno").addEventListener("click",function(){if(m.parentNode)m.parentNode.removeChild(m);dzRevise()});
+}
+/* Да → отправка; сбой/нет токена → файл скачивается локально, работа считается сданной */
+function dzSend(){
+ if(!S||!S.dz||S.sending)return;
  var cfg=D.DZ_DISK||{};
- var h="<h3 style='margin-top:22px'>Файл с результатами</h3><div class='dz-file' id='dzfile'><p>Готовим файл XLSX: задания, твои ответы, верные ответы и отметка…</p></div>";
- setTimeout(function(){
-  var box=document.getElementById("dzfile");
-  if(!box)return;
-  var btns="<div class='tz-nav' style='margin-top:10px'><button class='btn sm' type='button' id='dzdl'>Скачать XLSX</button>"+(cfg.token?"<button class='btn ghost sm' type='button' id='dzup'>Отправить на Яндекс.Диск ещё раз</button>":"")+"</div>";
-  function wire(){
-   var b=document.getElementById("dzdl");
-   if(b)b.addEventListener("click",dzDownload);
-   var u=document.getElementById("dzup");
-   if(u)u.addEventListener("click",function(){
-    u.disabled=true;u.textContent="Отправляем…";
-    dzUpload(function(res){
-     u.disabled=false;
-     u.textContent=res==="ok"?"✓ Отправлено на Диск":"Отправить на Яндекс.Диск ещё раз";
-     var st=document.getElementById("dzst");
-     if(st){st.textContent=res==="ok"?"✓ Отправлено учителю на Яндекс.Диск.":"Не удалось отправить: "+res;st.className="st"+(res==="ok"?" ok":" no")}
-    });
-   });
-  }
-  if(!cfg.token){
-   box.innerHTML="<p><span class='st'>Файл готов: "+escA(S.dzFile.name)+"</span></p><p>Сейчас он скачается на устройство. Передай его учителю или загрузи в папку «"+escA(cfg.folder||"")+"» на Яндекс.Диске вручную.</p>"+btns;
-   wire();dzDownload();return;
-  }
-  if(auto){
-   box.innerHTML="<p><span class='st' id='dzst'>Отправляем на Яндекс.Диск (папка «"+escA(cfg.folder||"")+"»)…</span></p><p>Файл: "+escA(S.dzFile.name)+"</p>"+btns;
-   wire();
-   dzUpload(function(res){
-    var st=document.getElementById("dzst");
-    if(!st)return;
-    if(res==="ok"){
-     st.textContent="✓ Результат отправлен учителю на Яндекс.Диск (папка «"+(cfg.folder||"")+"»). Работа сдана!";
-     st.className="st ok";
-    }else{
-     st.className="st no";
-     st.textContent=res==="notoken"?"Не задан токен Яндекс.Диска — отправка не выполнена.":"Не удалось отправить: "+res;
-     var p=document.createElement("p");
-     p.textContent="Файл скачан на устройство — передай его учителю или загрузи на Диск вручную.";
-     st.parentNode.appendChild(p);
-     dzDownload();
-    }
-   });
-  }else{
-   box.innerHTML="<p><span class='st ok'>Файл готов: "+escA(S.dzFile.name)+"</span></p><p>Работа уже отправлялась учителю. Если нужно — скачай файл или отправь его ещё раз.</p><p class='st' id='dzst'></p>"+btns;
-   wire();
-  }
- },60);
+ dzBuildFile();
+ if(!cfg.token){
+  S.sent=true;
+  S.sentNote="Токен Яндекс.Диска не задан — файл скачан на устройство. Передай его учителю.";
+  dzSave();dzDownload();dzRender({justFinished:true});return;
+ }
+ S.sending=true;dzRender({});
+ dzUpload(function(res){
+  S.sending=false;
+  if(res==="ok"){S.sent=true;S.sentNote="";dzSave();dzRender({justFinished:true});return}
+  S.sent=true;
+  S.sentNote="Не удалось отправить на Яндекс.Диск: "+res+". Файл скачан на устройство — передай его учителю.";
+  dzSave();dzDownload();dzRender({justFinished:true});
+ });
+}
+/* Нет → возврат к ответам: они остаются в полях, работу можно исправить и проверить заново */
+function dzRevise(){
+ if(!S||!S.dz)return;
+ var i;
+ for(i=0;i<S.dzItems.length;i++){
+  var st=S.dzItems[i];
+  S.dzItems[i]={stt:"open",att:0,val:st.val||"",val1:"",msg:""};
+ }
+ S.finished=false;S.sent=false;S.sentNote="";
+ dzSave();
+ dzRender({});
+ window.scrollTo(0,0);
+}
+/* Экран после отправки: итоги, статус файла и подробное решение каждого задания.
+   Подробное решение показывается только ученику — в файл для учителя оно не попадает. */
+function dzSentHtml(){
+ var d=S.data,score=dzScore(S.dzItems),pct=Math.round(100*score/S.total),mk=markFor(pct),g=0;
+ var cfg=D.DZ_DISK||{},folder=cfg.folder||"";
+ if(!S.dzFile)dzBuildFile();
+ var h="<section class='dz-block' id='dzres'><h3 class='dz-btitle'>Итоги: работа сдана</h3>"
+ +"<div class='tz-res'><div class='tz-mark'>"+mk+"</div><div class='tz-score'>"+score+" из "+S.total+"<small>верных с первой попытки · "+pct+"% · отметка «"+mk+"» · шкала: 90–100% «5», 70–89% «4», 50–69% «3»</small></div></div>";
+ d.blocks.forEach(function(b,bi){
+  var got=0,of=b.tasks.length,from=dzIndex(bi,0),i;
+  for(i=0;i<of;i++){if(S.dzItems[from+i]&&S.dzItems[from+i].stt==="ok")got++}
+  h+="<div class='tz-brow'><span class='nm'>Блок "+(bi+1)+". "+b.name+"</span><span class='vv'>"+got+" из "+of+"</span><div class='tz-mini'><i style='width:"+Math.round(100*got/of)+"%'></i></div></div>";
+ });
+ h+="<div class='dz-file'><p class='st"+(S.sentNote?" no":" ok")+"' id='dzsentst'>"+(S.sentNote?escA(S.sentNote):"✓ Результат отправлен учителю на Яндекс.Диск (папка «"+escA(folder)+"»).")+"</p>"
+ +"<p>Файл: "+escA(S.dzFile.name)+"</p>"
+ +"<div class='tz-nav'><button class='btn sm' type='button' id='dzdl'>Скачать XLSX</button>"+(cfg.token?"<button class='btn ghost sm' type='button' id='dzup'>Отправить на Яндекс.Диск ещё раз</button>":"")+"</div>"
+ +"<p class='st' id='dzst'></p></div>";
+ h+="<h3 style='margin-top:22px'>Подробное решение заданий</h3>"
+ +"<p class='task-intro' style='margin-top:4px'>Разбор виден только тебе: учителю уходит файл с заданиями и твоими ответами — без решений.</p>";
+ g=0;
+ d.blocks.forEach(function(b,bi){b.tasks.forEach(function(t){
+  var st=S.dzItems[g];
+  var sth=st.stt==="ok"?"<span class='st ok'>✓ +1</span>":(st.stt==="late"?"<span class='st ok'>✓ без балла</span>":"<span class='st na'>разобрали</span>");
+  h+="<div class='rev'><p>"+sth+"<b>Задание "+(g+1)+"</b> · Блок "+(bi+1)+". "+escA(b.name)+"</p>"
+  +"<p>"+dzQClean(t.q)+"</p>"
+  +"<p class='ans'>Твой ответ (первая попытка): <b>"+escA(st.val1||st.val||"—")+"</b>"+(st.stt==="ok"?"":" · Верный ответ: <b>"+t.atext+"</b>")+"</p>"
+  +(t.detailed?"<p class='dz-det'>"+t.detailed+"</p>":"")
+  +"</div>";
+  g++;
+ })});
+ h+="</section>";
  return h;
 }
+/* Задание без скрытой ловушки (для разбора на экране) */
+function dzQClean(q){return String(q).replace(/<span class="ai-trap">[\s\S]*?<\/span>/gi,"").trim()}
 /* ================= Результаты ================= */
 function finish(){
  saveCurrent();
@@ -618,7 +669,6 @@ function finish(){
   h+="<div class='tz-brow'><span class='nm'>"+pb.name+"</span><span class='vv'>"+pb.got+" из "+pb.of+"</span><div class='tz-mini'><i style='width:"+p+"%'></i></div></div>";
  });
  h+="<h3 style='margin-top:22px'>Разбор заданий</h3>"+review;
- if(S.dz)h+=dzFileBlock();
  h+="<div class='tz-nav'><button class='btn' type='button' id='again'>"+(S.dz?"Пройти ещё раз · другой вариант":"Пройти ещё раз · новый случайный вариант")+"</button><button class='btn ghost' type='button' id='pick'>Сменить тему</button></div><p class='tz-warn' style='margin-top:12px'>"+(S.dz?"Не закрывай страницу, пока не увидишь статус отправки файла: работа без файла на Диске учителем не проверяется.":"Результат показан только здесь и нигде не сохраняется: при перезагрузке страницы он исчезнет. Если отметка нужна в журнале — запиши её.")+"</p></div>";
  app.innerHTML=h;
  document.getElementById("again").addEventListener("click",function(){startTopic(S.data.topicId)});
@@ -630,12 +680,17 @@ function finish(){
 document.addEventListener("keydown",function(e){
  if(S&&S.dz&&!S.finished&&(e.code==="F5"||((e.ctrlKey||e.metaKey)&&e.code==="KeyR")))e.preventDefault();
 });
+/* ---- Esc закрывает окно подтверждения отправки ---- */
+document.addEventListener("keydown",function(e){
+ if(e.key==="Escape"){var m=document.getElementById("dzmodal");if(m&&m.parentNode)m.parentNode.removeChild(m)}
+});
 window.addEventListener("beforeunload",function(e){
  if(S&&S.dz&&!S.finished){e.preventDefault();e.returnValue=" ";return e.returnValue}
 });
 /* ================= Инициализация (в т.ч. глубокая ссылка #t=…) ================= */
-/* ---- служебный доступ для проверки (только чтение состояния, без ответов) ---- */
-window.__pvaTest={dzState:function(){return S&&S.dz?{variant:S.data.variant,name:S.dz.name,cls:S.dz.cls,finished:!!S.finished,items:JSON.parse(JSON.stringify(S.dzItems))}:null}};
+/* ---- служебный доступ для проверки: состояние работы; строки файла — только после завершения ---- */
+window.__pvaTest={dzState:function(){return S&&S.dz?{variant:S.data.variant,name:S.dz.name,cls:S.dz.cls,finished:!!S.finished,sent:!!S.sent,items:JSON.parse(JSON.stringify(S.dzItems))}:null},
+ dzRows:function(){return S&&S.dzFile?S.dzFile.rows:null}};
 var m=(location.hash||"").match(/^#t=([a-zа-я-]+)/i);
 if(m){startTopic(m[1])}else{renderPick()}
 })();
