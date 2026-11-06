@@ -236,11 +236,10 @@ function dzStat(st){
 function renderDzForm(err){
  var topic=dzTopic(),i,saved=dzLoad();
  if(!topic){renderPick();return}
- var folder=(D.DZ_DISK&&D.DZ_DISK.folder)?D.DZ_DISK.folder:"11 алгебра ДР";
  var nTasks=topic.blocks.length*D.TASKS_PER_BLOCK;
  var resumable=saved&&saved.name&&saved.items&&saved.items.length===nTasks;
  var h="<div class='slide start'><span class='tz-badge'>Домашнее задание · Математика · 11 класс</span><h2 class='tz-h2'>"+topic.title+"</h2>"
- +"<p class='tz-sub'>"+nTasks+" заданий по образцу № 4.30. Выбирать вариант не нужно — задания собираются случайно. Ответ на каждое задание — производная в виде выражения с <b>x</b>: пиши её в строчку, например <span class='dz-code'>3x^2-4x+5</span>, <span class='dz-code'>2x+7</span> или <span class='dz-code'>7/(x+3)^2</span>. В конце работы результат сохраняется в файл XLSX и отправляется учителю на Яндекс.Диск (папка «"+escA(folder)+"»). Правильность ответов показывается только после отправки; до этого работу можно перепроверить, а после отправки откроется подробное решение всех заданий.</p>";
+ +"<p class='tz-sub'>"+nTasks+" заданий по образцу № 4.30.</p>";
  if(resumable){
   var done=0;for(i=0;i<saved.items.length;i++){if(dzDone(saved.items[i]))done++}
   h+="<div class='dz-resume'><p>Найдена сохранённая работа: <b>"+escA(saved.name)+"</b>, "+escA(saved.cls)+" класс · заполнено заданий: "+done+" из "+nTasks+".</p><div class='tz-nav'><button class='btn' type='button' id='dzresume'>"+(saved.sent?"Открыть результат →":"Продолжить работу →")+"</button><button class='btn ghost' type='button' id='dzfresh'>Начать заново</button></div></div>";
@@ -388,14 +387,12 @@ function dzRecordBlock(bi){
   var g=from+ti,st=S.dzItems[g];
   var inp=app.querySelector(".titem[data-g='"+g+"'] .tin");
   var val=inp?inp.value.trim():"";
-  if(val){
-   /* Первый записанный ответ (val1) больше не меняется: именно он уйдёт
-      учителю, даже если потом ответ исправить. */
-   if(!st.val1)st.val1=val;
-   st.val=val;st.stt="rec";st.msg="";st.att=0;
-  }else if(st.stt!=="rec"){
-   st.val="";st.msg="впиши ответ";st.stt="open";
-  }
+  /* Записываем ответ как есть — и заполненный, и пустой: ученик вправе
+     оставить задание без ответа, учитель увидит «нет ответа».
+     Первый непустой записанный ответ (val1) больше не меняется: именно
+     он уйдёт учителю, даже если потом ответ исправить. */
+  if(val&&!st.val1)st.val1=val;
+  st.val=val;st.stt="rec";st.msg="";st.att=0;
  }
  dzSave();
  var was=S.finished;
@@ -527,8 +524,10 @@ function dzBuildFile(){
   var st=S.dzItems[g];
   var first=st.val1||st.val||"";
   /* Правильность считаем по первому записанному ответу и показываем только
-     после отправки; подробные решения в файл для учителя не входят. */
-  st.stt=D.checkExpr(first,t)?"ok":"wrong";
+     после отправки; пустой ответ — это «нет ответа», а не «неверно».
+     Подробные решения в файл для учителя не входят. */
+  if(first)st.stt=D.checkExpr(first,t)?"ok":"wrong";
+  else st.stt="na";
   st.att=0;st.msg="";
   rows.push([g+1,"Блок "+(bi+1)+". "+b.name,dzPlain(t.q),first||"—",t.sol,dzStatusText(st.stt)]);
   g++;
@@ -674,7 +673,7 @@ function dzSentHtml(){
  g=0;
  d.blocks.forEach(function(b,bi){b.tasks.forEach(function(t){
   var st=S.dzItems[g];
-  var sth=st.stt==="ok"?"<span class='st ok'>✓ верно, +1</span>":"<span class='st no'>✗ неверно</span>";
+  var sth=st.stt==="ok"?"<span class='st ok'>✓ верно, +1</span>":(st.stt==="wrong"?"<span class='st no'>✗ неверно</span>":"<span class='st na'>нет ответа</span>");
   h+="<div class='rev'><p>"+sth+"<b>Задание "+(g+1)+"</b> · Блок "+(bi+1)+". "+escA(b.name)+"</p>"
   +"<p>"+dzQClean(t.q)+"</p>"
   +"<p class='ans'>Твой ответ (первая попытка): <b>"+escA(st.val1||st.val||"—")+"</b> · Верный ответ: <b>"+t.atext+"</b></p>"
