@@ -107,6 +107,8 @@
 .dz-live .task-intro{font-size:15.5px;color:var(--mute)}
 .dz-block{background:var(--card);border:1px solid var(--line);border-radius:16px;box-shadow:5px 6px 0 var(--line);padding:24px clamp(18px,2.4vw,30px);margin:0 auto 22px;max-width:1160px}
 .dz-btitle{font-size:26px;margin:0 0 .35em}
+.dz-tasks{display:grid;grid-template-columns:1fr}
+@media(min-width:861px){.dz-tasks{grid-template-columns:1fr 1fr;gap:8px 16px}.dz-tasks .titem{margin:0}}
 .titem{display:flex;align-items:flex-start;gap:12px;padding:13px 15px;border:1.5px dashed var(--line);border-radius:12px;margin:10px 0;background:var(--paper);flex-wrap:wrap}
 .titem .tz-n{width:34px;height:34px;font:19px/34px "Marck Script",cursive;flex:none;margin:0}
 .titem .tbody{flex:1;min-width:230px}
@@ -160,6 +162,7 @@
  .dz-btitle{font-size:21px;margin:0 0 .3em}
  .task-intro{font-size:14px}
  .titem{padding:9px 12px;margin:8px 0}
+ .dz-tasks{gap:6px 12px}
  .titem .tq{font-size:16px;line-height:1.45;margin:0 0 7px}
  .tin.dz-in{padding:7px 12px;font-size:16px;min-width:150px}
  .tz-num{padding:9px 12px;font-size:17px;width:170px}
@@ -367,6 +370,10 @@ function dzItemHtml(g,t,st){
 function dzRender(opts){
  opts=opts||{};
  var y=window.scrollY||0,d=S.data,i;
+ /* После перезагрузки dzFile не сохраняется: пересобираем файл (и вердикты
+    ✓/✗/нет ответа) до отрисовки заданий и итогов — иначе после «Открыть
+    результат» все задания показывались как неверные и «0 из 8». */
+ if(S.finished&&S.sent&&!S.dzFile)dzBuildFile();
  var h=dzBoard();
  h+="<div class='slide dz-live'><h2 class='tz-h2' style='text-align:left'>"+d.title+"</h2>"
  +"<p class='task-intro'>В каждом задании найди производную и впиши её в поле — выражением с <b>x</b> (можно без пробелов: <span class='dz-code'>3x^2-4x</span>), затем нажми «Записать ответ» под блоком. Правильность ответов не показывается: запиши все блоки, перепроверь ответы и только потом отправь результат учителю. Регистр, пробелы и знак умножения не важны. В отчёт для учителя уходит первый записанный ответ по каждому заданию, а после отправки откроется подробное решение.</p>";
@@ -374,7 +381,9 @@ function dzRender(opts){
   h+="<section class='dz-block' data-b='"+bi+"'><h3 class='dz-btitle'>Блок "+(bi+1)+". "+b.name+"</h3>";
   if(bi===1)h+="<p class='task-intro'>Здесь работают правила: (u·v)′ = u′v + uv′ и (u/v)′ = (u′v − uv′)/v<sup>2</sup>.</p>";
   var from=dzIndex(bi,0);
+  h+="<div class='dz-tasks'>";
   b.tasks.forEach(function(t,ti){h+=dzItemHtml(from+ti,t,S.dzItems[from+ti])});
+  h+="</div>";
   h+="<div class='task-foot'><button class='btn sm' type='button' data-rec='"+bi+"'"+(dzBlockDone(bi)?" disabled":"")+">"+(dzBlockDone(bi)?"Блок записан ✓":"Записать ответ")+"</button></div>";
   h+="</section>";
  });
