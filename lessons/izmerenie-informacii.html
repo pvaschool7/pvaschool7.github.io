@@ -31,11 +31,28 @@
 .lad{display:flex;flex-direction:column;gap:4px;margin:16px 0}
 .lad-r{display:flex;align-items:center;gap:10px;flex-wrap:nowrap;overflow-x:auto;padding-bottom:3px}
 .lad-u{flex:none;min-width:0;text-align:center;border:2px solid var(--green);border-radius:10px;padding:6px 14px;font-weight:600;background:var(--card);white-space:nowrap}
-/* Лестница единиц как в презентации: Гбайт сверху, бит снизу; вниз умножаем, вверх делим */
-.lad-v{display:flex;justify-content:center;margin:16px 0}
-.lad-vcol{display:flex;flex-direction:column;flex:1 1 240px;max-width:330px}
-.lad-v .lad-u{font-weight:700}
-.lad-step{display:flex;justify-content:space-between;gap:16px;padding:2px 6px;font-weight:700;font-size:13.5px}
+/* Лестница-ступеньки как в презентации: Гбайт слева вверху, бит справа внизу; ступень вниз (вправо) — умножаем, ступень вверх (влево) — делим */
+.lad-stair{display:flex;flex-direction:row;align-items:flex-end;gap:7px;margin:18px 0 8px;overflow-x:auto;padding:2px 4px 8px}
+.lcol{flex:none;display:flex;flex-direction:column;margin-bottom:calc(var(--o,0)*1px)}
+.lcol .lad-u{font-weight:700;min-width:86px;height:36px;box-sizing:border-box;display:flex;align-items:center;justify-content:center}
+.ltread{height:12px;margin-top:6px;border:2px solid var(--green);border-bottom-width:3px;border-radius:6px 9px 0 0;background:color-mix(in srgb,var(--green) 16%,var(--card))}
+.lriser{flex:none;display:flex;flex-direction:column;gap:3px;align-items:center;justify-content:flex-end;margin-bottom:calc(var(--o,0)*1px);font-weight:700;font-size:13px;line-height:1.25;white-space:nowrap;padding-bottom:10px}
+@media(max-width:720px){.lcol .lad-u{min-width:60px;padding:5px 9px;font-size:13.5px}.lriser{font-size:11.5px}}
+/* Журнал связиста: строки заполняются сами после вердиктов в детекторе */
+.jwrap{border:1.5px solid var(--line);border-radius:14px;background:var(--paper);margin:16px 0 4px;overflow:hidden}
+.jhead{padding:10px 14px;font-weight:700;font-size:13px;letter-spacing:.06em;text-transform:uppercase;color:var(--mute);border-bottom:1.5px dashed var(--line);background:color-mix(in srgb,var(--blue) 6%,var(--paper))}
+.jtable{width:100%;border-collapse:collapse;font-size:13.8px}
+.jtable th{text-align:left;font-size:11.5px;letter-spacing:.05em;text-transform:uppercase;color:var(--mute);padding:7px 10px;border-bottom:1.5px solid var(--line);font-weight:700}
+.jtable td{padding:7px 10px;border-bottom:1px dashed var(--line);vertical-align:top}
+.jtable tr:last-child td{border-bottom:none}
+.jrow .jr-s{white-space:nowrap;font-weight:700}
+.jrow .jr-v{white-space:nowrap;font-weight:700}
+.jrow .jr-e,.jrow .jr-r{color:var(--mute)}
+.jrow.jr-done{background:color-mix(in srgb,var(--green) 7%,var(--paper))}
+.jr-ok{color:var(--green)}
+.jr-no{color:var(--red)}
+.jr-note{padding:8px 14px;font-size:12.5px;color:var(--mute);border-top:1.5px dashed var(--line)}
+@media(max-width:760px){.jtable th.jr-hr,.jrow .jr-r{display:none}.jtable{font-size:12.6px}}
 .lad-dn{color:var(--green)}
 .lad-up{color:var(--blue)}
 .lad-x{flex:none;color:var(--mute);font-size:13.5px;white-space:nowrap}
@@ -256,7 +273,7 @@ select.tin{max-width:250px;font-weight:600}
 <section class="step"><div class="step-n">1</div><h2 class="step-title">Легенда: бортовой центр</h2>
 <p>Станция «Самара‑1» шлёт донесения, а бортовой ИИ Навигатор докладывает уверенно, но часто ошибается: путает единицы, ошибается в расчётах. Проверяйте его донесения теорией и счётом.</p>
 <div class="tgrid">
-<div class="tcard"><b>Вы — связисты</b><p>Работаем парами: докладчик и писарь, роли меняются. В задании 2 порядок особый: сначала Б отвечает на 1–3, потом А — на 4–5. Сеансы 1–6 отвечаете строго по очереди: А — нечётные, Б — чётные.</p></div>
+<div class="tcard"><b>Вы — связисты</b><p>Работаем парами: докладчик и писарь, роли меняются. В задании 2 порядок особый: сначала Б отвечает на 1–3, потом А — на 4–5. Сеансы 1–3 отвечает Ученик А, сеансы 4–6 — Ученик Б.</p></div>
 <div class="tcard"><b>Главный вопрос урока</b><p>Сколько «весит» информация? В конце урока — итоговый балл пары и предварительная отметка каждому.</p></div>
 </div>
 </section>
@@ -299,19 +316,17 @@ select.tin{max-width:250px;font-weight:600}
 </div>
 </section>
 <!-- 5. Теория 2 -->
-<section class="step"><div class="step-n">5</div><h2 class="step-title">Теория 2: единицы измерения</h2>
-<div class="lad lad-v">
-<div class="lad-vcol">
-<div class="lad-u">Гбайт</div>
-<div class="lad-step"><span class="lad-up">↑ :1024</span><span class="lad-dn">↓ ×1024</span></div>
-<div class="lad-u">Мбайт</div>
-<div class="lad-step"><span class="lad-up">↑ :1024</span><span class="lad-dn">↓ ×1024</span></div>
-<div class="lad-u">Кбайт</div>
-<div class="lad-step"><span class="lad-up">↑ :1024</span><span class="lad-dn">↓ ×1024</span></div>
-<div class="lad-u">байт</div>
-<div class="lad-step"><span class="lad-up">↑ :8</span><span class="lad-dn">↓ ×8</span></div>
-<div class="lad-u">бит</div>
-</div>
+<section class="step"><div class="step-n">5</div><h2 class="step-title">Теория 2: лестница единиц</h2>
+<div class="lad-stair" role="img" aria-label="Лестница единиц как в презентации: Гбайт слева вверху, ниже — Мбайт, Кбайт, байт, бит справа внизу; ступень вниз — умножаем, ступень вверх — делим">
+<div class="lcol" style="--o:216"><div class="lad-u">Гбайт</div><div class="ltread"></div></div>
+<div class="lriser" style="--o:189"><span class="lad-dn">↓ ×1024</span><span class="lad-up">↑ :1024</span></div>
+<div class="lcol" style="--o:162"><div class="lad-u">Мбайт</div><div class="ltread"></div></div>
+<div class="lriser" style="--o:135"><span class="lad-dn">↓ ×1024</span><span class="lad-up">↑ :1024</span></div>
+<div class="lcol" style="--o:108"><div class="lad-u">Кбайт</div><div class="ltread"></div></div>
+<div class="lriser" style="--o:81"><span class="lad-dn">↓ ×1024</span><span class="lad-up">↑ :1024</span></div>
+<div class="lcol" style="--o:54"><div class="lad-u">байт</div><div class="ltread"></div></div>
+<div class="lriser" style="--o:27"><span class="lad-dn">↓ ×8</span><span class="lad-up">↑ :8</span></div>
+<div class="lcol" style="--o:0"><div class="lad-u">бит</div><div class="ltread"></div></div>
 </div>
 <div class="tgrid">
 <div class="tcard"><b>Вниз — умножаем</b><p>Из крупной единицы в мелкую: 2 байта × 8 = 16 бит; 3 Кбайт × 1024 = 3072 байта.</p></div>
@@ -344,22 +359,14 @@ select.tin{max-width:250px;font-weight:600}
 </section>
 <!-- 8. Задание 3 -->
 <section class="step"><div class="step-n">8</div><h2 class="step-title">Задание 3: считаем донесение</h2>
-<p class="task-intro">Четыре донесения. План для каждого: по N найти i (2<sup>i</sup> = N) → объём I = K · i в битах → перевести в байты (: 8). Проверка: байты × 8.</p>
-<p class="ord-note"><b>Роли в паре:</b> <b>Ученик А</b> решает донесения №1–№2, <b>Ученик Б</b> — №3–№4. Потом проверяют друг друга.</p>
+<p class="task-intro">Два донесения у каждого — всего четыре. План для каждого: по N найти i (2<sup>i</sup> = N) → объём I = K · i в битах → перевести в байты (: 8). Проверка: байты × 8. В поле вносите итоговый объём в байтах, промежуточные шаги — в тетради.</p>
+<p class="ord-note"><b>Роли в паре:</b> <b>Ученик А</b> решает донесения №1–№2, <b>Ученик Б</b> — №3–№4: по 2 задания у каждого. Потом проверяют друг друга.</p>
 <div class="js-task" data-block="task3">
-<div class="titem js-item" data-owner="A" data-ok="5" data-sol="5"><span class="who">А</span><span class="tlabel">№1 (40 знаков, алфавит 32): вес знака i =</span><input class="tin" type="text" inputmode="numeric" autocomplete="off" aria-label="Ответ 1"><span class="tunit">бит</span><span class="tstat" aria-live="polite"></span></div>
-<div class="titem js-item" data-owner="A" data-ok="200" data-sol="200"><span class="who">А</span><span class="tlabel">№1: объём I =</span><input class="tin" type="text" inputmode="numeric" autocomplete="off" aria-label="Ответ 2"><span class="tunit">бит</span><span class="tstat" aria-live="polite"></span></div>
-<div class="titem js-item" data-owner="A" data-ok="25" data-sol="25"><span class="who">А</span><span class="tlabel">№1: объём I =</span><input class="tin" type="text" inputmode="numeric" autocomplete="off" aria-label="Ответ 3"><span class="tunit">байт</span><span class="tstat" aria-live="polite"></span></div>
-<div class="titem js-item" data-owner="A" data-ok="4" data-sol="4"><span class="who">А</span><span class="tlabel">№2 (36 знаков, алфавит 16): вес знака i =</span><input class="tin" type="text" inputmode="numeric" autocomplete="off" aria-label="Ответ 4"><span class="tunit">бит</span><span class="tstat" aria-live="polite"></span></div>
-<div class="titem js-item" data-owner="A" data-ok="144" data-sol="144"><span class="who">А</span><span class="tlabel">№2: объём I =</span><input class="tin" type="text" inputmode="numeric" autocomplete="off" aria-label="Ответ 5"><span class="tunit">бита</span><span class="tstat" aria-live="polite"></span></div>
-<div class="titem js-item" data-owner="A" data-ok="18" data-sol="18"><span class="who">А</span><span class="tlabel">№2: объём I =</span><input class="tin" type="text" inputmode="numeric" autocomplete="off" aria-label="Ответ 6"><span class="tunit">байт</span><span class="tstat" aria-live="polite"></span></div>
-<div class="titem js-item" data-owner="B" data-ok="6" data-sol="6"><span class="who">Б</span><span class="tlabel">№3 (24 знака, алфавит 64): вес знака i =</span><input class="tin" type="text" inputmode="numeric" autocomplete="off" aria-label="Ответ 7"><span class="tunit">бит</span><span class="tstat" aria-live="polite"></span></div>
-<div class="titem js-item" data-owner="B" data-ok="144" data-sol="144"><span class="who">Б</span><span class="tlabel">№3: объём I =</span><input class="tin" type="text" inputmode="numeric" autocomplete="off" aria-label="Ответ 8"><span class="tunit">бита</span><span class="tstat" aria-live="polite"></span></div>
-<div class="titem js-item" data-owner="B" data-ok="18" data-sol="18"><span class="who">Б</span><span class="tlabel">№3: объём I =</span><input class="tin" type="text" inputmode="numeric" autocomplete="off" aria-label="Ответ 9"><span class="tunit">байт</span><span class="tstat" aria-live="polite"></span></div>
-<div class="titem js-item" data-owner="B" data-ok="5" data-sol="5"><span class="who">Б</span><span class="tlabel">№4 (80 знаков, алфавит 32): вес знака i =</span><input class="tin" type="text" inputmode="numeric" autocomplete="off" aria-label="Ответ 10"><span class="tunit">бит</span><span class="tstat" aria-live="polite"></span></div>
-<div class="titem js-item" data-owner="B" data-ok="400" data-sol="400"><span class="who">Б</span><span class="tlabel">№4: объём I =</span><input class="tin" type="text" inputmode="numeric" autocomplete="off" aria-label="Ответ 11"><span class="tunit">бит</span><span class="tstat" aria-live="polite"></span></div>
-<div class="titem js-item" data-owner="B" data-ok="50" data-sol="50"><span class="who">Б</span><span class="tlabel">№4: объём I =</span><input class="tin" type="text" inputmode="numeric" autocomplete="off" aria-label="Ответ 12"><span class="tunit">байт</span><span class="tstat" aria-live="polite"></span></div>
-<div class="task-foot"><button class="btn sm js-check" type="button" data-chk="A">Проверить — Ученик А</button><button class="btn sm js-check" type="button" data-chk="B">Проверить — Ученик Б</button><div class="hint js-hint" hidden>План: сначала i из равенства 2<sup>i</sup> = N, потом I = K · i, потом биты в байты: делим на 8. Проверь ответ обратным действием: байты × 8.</div></div>
+<div class="titem js-item" data-owner="A" data-ok="25" data-sol="25"><span class="who">А</span><span class="tlabel">№1 (40 знаков, алфавит 32): объём I =</span><input class="tin" type="text" inputmode="numeric" autocomplete="off" aria-label="Ответ 1"><span class="tunit">байт</span><span class="tstat" aria-live="polite"></span></div>
+<div class="titem js-item" data-owner="A" data-ok="18" data-sol="18"><span class="who">А</span><span class="tlabel">№2 (36 знаков, алфавит 16): объём I =</span><input class="tin" type="text" inputmode="numeric" autocomplete="off" aria-label="Ответ 2"><span class="tunit">байт</span><span class="tstat" aria-live="polite"></span></div>
+<div class="titem js-item" data-owner="B" data-ok="18" data-sol="18"><span class="who">Б</span><span class="tlabel">№3 (24 знака, алфавит 64): объём I =</span><input class="tin" type="text" inputmode="numeric" autocomplete="off" aria-label="Ответ 3"><span class="tunit">байт</span><span class="tstat" aria-live="polite"></span></div>
+<div class="titem js-item" data-owner="B" data-ok="50" data-sol="50"><span class="who">Б</span><span class="tlabel">№4 (80 знаков, алфавит 32): объём I =</span><input class="tin" type="text" inputmode="numeric" autocomplete="off" aria-label="Ответ 4"><span class="tunit">байт</span><span class="tstat" aria-live="polite"></span></div>
+<div class="task-foot"><button class="btn sm js-check" type="button" data-chk="A">Проверить — Ученик А</button><button class="btn sm js-check" type="button" data-chk="B">Проверить — Ученик Б</button><div class="hint js-hint" hidden>План: сначала i из равенства 2<sup>i</sup> = N, потом I = K · i, потом биты в байты: делим на 8. Пример №1: i = 5, I = 40 · 5 = 200 бит, 200 : 8 = 25 байт. Проверь: 25 × 8 = 200.</div></div>
 </div>
 </section>
 <!-- 9. Инструменты связиста -->
@@ -374,56 +381,70 @@ select.tin{max-width:250px;font-weight:600}
 </section>
 <!-- 10. Сеансы 1–6 -->
 <section class="step"><div class="step-n">10</div><h2 class="step-title">Сеансы 1–6: ловим ошибки</h2>
-<p class="mute">За верный вердикт <b>+1</b>, за письменное доказательство <b>+2</b> — баллы «на проверке» утвердит учитель.<br>Порядок: сеансы <b>1, 3, 5</b> отвечает <b>Ученик А</b>, сеансы <b>2, 4, 6</b> — <b>Ученик Б</b>; переключение произойдёт само.</p>
+<p class="mute">За верный вердикт <b>+1</b>, за письменное доказательство <b>+2</b> — баллы «на проверке» утвердит учитель.<br>Порядок: сеансы <b>1–3</b> отвечает <b>Ученик А</b>, сеансы <b>4–6</b> — <b>Ученик Б</b>; переключение произойдёт само.</p>
 <div class="seans js-verdict" data-block="s1" data-ok="no" data-owner="A">
 <span class="seans-n">Сеанс 1</span><span class="own-chip">отвечает Ученик А</span>
 <div class="ai"><span class="ai-chip">Навигатор сообщает</span><p class="ai-say">«Чтобы закодировать 8 разных сигналов, нужно 8 бит на каждый сигнал».</p></div>
 <div class="vrow" role="group" aria-label="Вердикт"><button class="vbtn yes" data-v="yes" type="button">ВЕРЮ ИИ</button><button class="vbtn no" data-v="no" type="button">НЕ ВЕРЮ</button><button class="vbtn maybe" data-v="maybe" type="button">СОМНЕВАЮСЬ</button></div>
 <div class="vfeed" hidden></div>
-<div class="expl">8 разных сигналов различаются тремя битами: 2<sup>3</sup> = 8. Навигатор перепутал число сигналов (N) с числом бит (i).</div>
+<div class="expl">Сколько бит различают 8 вариантов? Вспомни N = 2<sup>i</sup>: восемь сигналов различаются тремя битами, 2<sup>3</sup> = 8. Навигатор перепутал число сигналов (N) с весом знака (i).</div>
 <div class="proof" hidden><label class="p-lab" for="pf1">Доказательство письменно (+2): где ошибка, почему Навигатор ошибся, как избежать?</label><textarea id="pf1" class="ta js-proof" rows="3" placeholder="Например: 8 сигналов различаются тремя битами, потому что 2 в кубе равно 8…"></textarea><div class="p-foot"><button class="btn sm ghost js-saveproof" type="button">Записать доказательство (+2)</button><span class="pmsg"></span></div></div>
 </div>
-<div class="seans js-verdict" data-block="s2" data-ok="no" data-owner="B">
-<span class="seans-n">Сеанс 2</span><span class="own-chip b">отвечает Ученик Б</span>
+<div class="seans js-verdict" data-block="s2" data-ok="no" data-owner="A">
+<span class="seans-n">Сеанс 2</span><span class="own-chip">отвечает Ученик А</span>
 <div class="ai"><span class="ai-chip">Навигатор сообщает</span><p class="ai-say">«В 1 Кбайте 1000 байт, поэтому 2 Кбайт — это 2000 байт».</p></div>
 <div class="vrow" role="group" aria-label="Вердикт"><button class="vbtn yes" data-v="yes" type="button">ВЕРЮ ИИ</button><button class="vbtn no" data-v="no" type="button">НЕ ВЕРЮ</button><button class="vbtn maybe" data-v="maybe" type="button">СОМНЕВАЮСЬ</button></div>
 <div class="vfeed" hidden></div>
-<div class="expl">1 Кбайт = 1024 байта = 2<sup>10</sup>. Компьютер считает степенями двойки, поэтому 2 Кбайт = 2048 байта.</div>
+<div class="expl">Сколько байт в 1 Кбайте? Посмотри на лестницу: 1 Кбайт = 1024 байта = 2<sup>10</sup>. Компьютер считает степенями двойки, поэтому 2 Кбайт = 2048 байта.</div>
 <div class="proof" hidden><label class="p-lab" for="pf2">Доказательство письменно (+2):</label><textarea id="pf2" class="ta js-proof" rows="3" placeholder="Запиши: сколько байт в 1 Кбайте и почему…"></textarea><div class="p-foot"><button class="btn sm ghost js-saveproof" type="button">Записать доказательство (+2)</button><span class="pmsg"></span></div></div>
 </div>
-<div class="seans js-verdict" data-block="s3" data-ok="no" data-owner="A">
+<div class="seans js-verdict" data-block="s3" data-ok="yes" data-owner="A">
 <span class="seans-n">Сеанс 3</span><span class="own-chip">отвечает Ученик А</span>
-<div class="ai"><span class="ai-chip">Навигатор сообщает</span><p class="ai-say">«Чтобы перевести байты в биты, число делят на 8: 5 байт — это меньше одного бита».</p></div>
+<div class="ai"><span class="ai-chip">Навигатор сообщает</span><p class="ai-say">«Байты в биты переводят умножением на 8: 5 байт — это 40 бит».</p></div>
 <div class="vrow" role="group" aria-label="Вердикт"><button class="vbtn yes" data-v="yes" type="button">ВЕРЮ ИИ</button><button class="vbtn no" data-v="no" type="button">НЕ ВЕРЮ</button><button class="vbtn maybe" data-v="maybe" type="button">СОМНЕВАЮСЬ</button></div>
 <div class="vfeed" hidden></div>
-<div class="expl">Байт крупнее бита. Байты → биты — это вниз по лестнице, значит умножаем: 5 × 8 = 40 бит.</div>
-<div class="proof" hidden><label class="p-lab" for="pf3">Доказательство письменно (+2):</label><textarea id="pf3" class="ta js-proof" rows="3" placeholder="Когда умножаем, а когда делим: вниз или вверх по лестнице единиц…"></textarea><div class="p-foot"><button class="btn sm ghost js-saveproof" type="button">Записать доказательство (+2)</button><span class="pmsg"></span></div></div>
+<div class="expl">Верно: байты → биты — это вниз по лестнице, значит умножаем: 5 · 8 = 40 бит. Байт крупнее бита. Ловушка не сработала.</div>
+<div class="proof" hidden><label class="p-lab" for="pf3">Обоснуй письменно (+2): почему это верно?</label><textarea id="pf3" class="ta js-proof" rows="3" placeholder="Запиши: как перевести 5 байт в биты и какая это ступень лестницы…"></textarea><div class="p-foot"><button class="btn sm ghost js-saveproof" type="button">Записать обоснование (+2)</button><span class="pmsg"></span></div></div>
 </div>
-<div class="seans js-verdict" data-block="s4" data-ok="no" data-owner="B">
+<div class="seans js-verdict" data-block="s4" data-ok="yes" data-owner="B">
 <span class="seans-n">Сеанс 4</span><span class="own-chip b">отвечает Ученик Б</span>
-<div class="ai"><span class="ai-chip">Навигатор сообщает</span><p class="ai-say">«Донесение из 20 знаков, алфавит из 16 знаков. Объём: 20 · 4 = 80 бит, то есть 8 байт».</p></div>
-<div class="vrow" role="group" aria-label="Вердикт"><button class="vbtn yes" data-v="yes" type="button">ВЕРЮ ИИ</button><button class="vbtn no" data-v="no" type="button">НЕ ВЕРЮ</button><button class="vbtn maybe" data-v="maybe" type="button">СОМНЕВАЮСЬ</button></div>
-<div class="vfeed" hidden></div>
-<div class="expl">Считаем вместе: 16 = 2<sup>4</sup>, значит i = 4 бита; I = 20 · 4 = 80 бит — здесь верно. Но 80 : 8 = 10 байт, а не 8. Ошибка в переводе единиц.</div>
-<div class="proof" hidden><label class="p-lab" for="pf4">Доказательство письменно (+2):</label><textarea id="pf4" class="ta js-proof" rows="3" placeholder="Посчитай на листе: 20 · 4, затем переведи в байты…"></textarea><div class="p-foot"><button class="btn sm ghost js-saveproof" type="button">Записать доказательство (+2)</button><span class="pmsg"></span></div></div>
-</div>
-<div class="seans js-verdict" data-block="s5" data-ok="yes" data-owner="A">
-<span class="seans-n">Сеанс 5</span><span class="own-chip">отвечает Ученик А</span>
 <div class="ai"><span class="ai-chip">Навигатор сообщает</span><p class="ai-say">«Если в алфавите 256 знаков, то один знак весит 8 бит, то есть 1 байт».</p></div>
 <div class="vrow" role="group" aria-label="Вердикт"><button class="vbtn yes" data-v="yes" type="button">ВЕРЮ ИИ</button><button class="vbtn no" data-v="no" type="button">НЕ ВЕРЮ</button><button class="vbtn maybe" data-v="maybe" type="button">СОМНЕВАЮСЬ</button></div>
 <div class="vfeed" hidden></div>
-<div class="expl">Верно: 256 = 2<sup>8</sup>, значит i = 8 бит = 1 байт. Это единственное верное донесение — ловушка не сработала.</div>
-<div class="proof" hidden><label class="p-lab" for="pf5">Обоснуй письменно (+2): почему это верно?</label><textarea id="pf5" class="ta js-proof" rows="3" placeholder="2 в восьмой степени равно 256, поэтому…"></textarea><div class="p-foot"><button class="btn sm ghost js-saveproof" type="button">Записать обоснование (+2)</button><span class="pmsg"></span></div></div>
+<div class="expl">Чему равно i при N = 256? Верно: 256 = 2<sup>8</sup>, значит i = 8 бит = 1 байт. Ловушка не сработала.</div>
+<div class="proof" hidden><label class="p-lab" for="pf4">Обоснуй письменно (+2): почему это верно?</label><textarea id="pf4" class="ta js-proof" rows="3" placeholder="2 в восьмой степени равно 256, поэтому…"></textarea><div class="p-foot"><button class="btn sm ghost js-saveproof" type="button">Записать обоснование (+2)</button><span class="pmsg"></span></div></div>
 </div>
-<div class="seans js-verdict" data-block="s6" data-ok="no" data-owner="B">
-<span class="seans-n">Сеанс 6</span><span class="own-chip b">отвечает Ученик Б</span>
+<div class="seans js-verdict" data-block="s5" data-ok="no" data-owner="B">
+<span class="seans-n">Сеанс 5</span><span class="own-chip b">отвечает Ученик Б</span>
 <div class="ai"><span class="ai-chip">Навигатор сообщает</span><p class="ai-say">«Согласно “Справочнику связиста Ларина” (1985), в одном байте 10 бит, поэтому станции считают по десяткам».</p></div>
 <div class="vrow" role="group" aria-label="Вердикт"><button class="vbtn yes" data-v="yes" type="button">ВЕРЮ ИИ</button><button class="vbtn no" data-v="no" type="button">НЕ ВЕРЮ</button><button class="vbtn maybe" data-v="maybe" type="button">СОМНЕВАЮСЬ</button></div>
 <div class="vfeed" hidden></div>
-<div class="expl">Фальшивый источник: такого справочника нет, а в байте всегда 8 бит. Проверяй источники по «Инструментам связиста».</div>
-<div class="proof" hidden><label class="p-lab" for="pf6">Доказательство письменно (+2):</label><textarea id="pf6" class="ta js-proof" rows="3" placeholder="Назови, почему источник фальшивый и что говорит теория о байте…"></textarea><div class="p-foot"><button class="btn sm ghost js-saveproof" type="button">Записать доказательство (+2)</button><span class="pmsg"></span></div></div>
+<div class="expl">Назови автора и издание: такого справочника нет, это фальшивый источник. А теория говорит: в байте всегда 8 бит. Проверяй источники по «Инструментам связиста».</div>
+<div class="proof" hidden><label class="p-lab" for="pf5">Доказательство письменно (+2):</label><textarea id="pf5" class="ta js-proof" rows="3" placeholder="Назови, почему источник фальшивый и что говорит теория о байте…"></textarea><div class="p-foot"><button class="btn sm ghost js-saveproof" type="button">Записать доказательство (+2)</button><span class="pmsg"></span></div></div>
 </div>
-</section>
+<div class="seans js-verdict" data-block="s6" data-ok="no" data-owner="B">
+<span class="seans-n">Сеанс 6</span><span class="own-chip b">отвечает Ученик Б</span>
+<div class="ai"><span class="ai-chip">Навигатор сообщает</span><p class="ai-say">«В алфавите станции 128 знаков, значит, вес знака — 6 бит».</p></div>
+<div class="vrow" role="group" aria-label="Вердикт"><button class="vbtn yes" data-v="yes" type="button">ВЕРЮ ИИ</button><button class="vbtn no" data-v="no" type="button">НЕ ВЕРЮ</button><button class="vbtn maybe" data-v="maybe" type="button">СОМНЕВАЮСЬ</button></div>
+<div class="vfeed" hidden></div>
+<div class="expl">128 — какая это степень двойки? 128 = 2<sup>7</sup>, значит i = 7 бит, а не 6. Навигатор снова перепутал N и i.</div>
+<div class="proof" hidden><label class="p-lab" for="pf6">Доказательство письменно (+2):</label><textarea id="pf6" class="ta js-proof" rows="3" placeholder="Запиши: 128 — это какая степень двойки…"></textarea><div class="p-foot"><button class="btn sm ghost js-saveproof" type="button">Записать доказательство (+2)</button><span class="pmsg"></span></div></div>
+</div>
+
+<div class="jwrap"><div class="jhead">Журнал связиста · итоги проверки</div>
+<table class="jtable">
+<thead><tr><th>Сеанс</th><th>Заявление Навигатора</th><th>Вердикт</th><th>Ошибка</th><th class="jr-hr">Ответ (разбор)</th></tr></thead>
+<tbody id="jrBody">
+<tr class="jrow" data-jr="s1"><td class="jr-s">1·А</td><td class="jr-t">8 сигналов — 8 бит на сигнал</td><td class="jr-v">—</td><td class="jr-e">—</td><td class="jr-r">—</td></tr>
+<tr class="jrow" data-jr="s2"><td class="jr-s">2·А</td><td class="jr-t">1 Кбайт = 1000 байт</td><td class="jr-v">—</td><td class="jr-e">—</td><td class="jr-r">—</td></tr>
+<tr class="jrow" data-jr="s3"><td class="jr-s">3·А</td><td class="jr-t">5 байт — это 40 бит</td><td class="jr-v">—</td><td class="jr-e">—</td><td class="jr-r">—</td></tr>
+<tr class="jrow" data-jr="s4"><td class="jr-s">4·Б</td><td class="jr-t">256 знаков — 8 бит = 1 байт</td><td class="jr-v">—</td><td class="jr-e">—</td><td class="jr-r">—</td></tr>
+<tr class="jrow" data-jr="s5"><td class="jr-s">5·Б</td><td class="jr-t">«Справочник Ларина»: в байте 10 бит</td><td class="jr-v">—</td><td class="jr-e">—</td><td class="jr-r">—</td></tr>
+<tr class="jrow" data-jr="s6"><td class="jr-s">6·Б</td><td class="jr-t">128 знаков — 6 бит на знак</td><td class="jr-v">—</td><td class="jr-e">—</td><td class="jr-r">—</td></tr>
+</tbody>
+</table>
+<div class="jr-note">Строка журнала заполняется сама, когда пара даёт вердикт в сеансе. Ведёт запись писарь, баллы утверждает учитель.</div>
+</div></section>
 <!-- 11. Лаборатория ловушек -->
 <section class="step"><div class="step-n">11</div><h2 class="step-title">Лаборатория ловушек: сочиняем сами</h2>
 <p class="task-intro">1. Выберите блок теории. 2. Придумайте заявление Навигатора с одной ошибкой (если расчёт — дайте исходные числа и неверный ответ). 3. На обороте листа напишите ключ: где ошибка и почему. 4. Обменяйтесь с соседней парой и найдите ошибку по «Инструментам связиста».</p>
@@ -496,7 +517,7 @@ select.tin{max-width:250px;font-weight:600}
 <div class="expl">У индикатора два состояния — выбор из двух вариантов несёт <b>1 бит</b>, а не 1 байт. Навигатор снова перепутал единицы.</div>
 </div>
 <div class="finw-duo">
-<p class="ord-note">Письменный финал пишет каждый: сначала <b>Ученик А</b>, затем <b>Ученик Б</b>. До +8 за форму — проверит учитель.</p>
+<p class="ord-note">Письменный финал пишет каждый: сначала <b>Ученик А</b>, затем <b>Ученик Б</b>. До +8 — 4 критерия по 2 балла (точность, причина, доказательство, профилактика) — проверит учитель.</p>
 <div class="duo">
 <div class="duo-form ownA" data-block="finwA" data-kind="finw" data-owner="A">
 <span class="who-tag">Форма Ученика А</span>
@@ -523,6 +544,7 @@ select.tin{max-width:250px;font-weight:600}
 </section>
 <!-- 14. Итоги -->
 <section class="step"><div class="step-n">14</div><h2 class="step-title">Итоги: покажите учителю</h2>
+<div class="note"><b>Система баллов — как в презентации</b><br>Баллы пары (ведёт писарь): +1 — вердикт · +2 — доказательство · −1 — неверный ответ · +2 — своя ловушка · +2 — нашли ошибку. Итого пары — на «Бортовом журнале» и в карточке результата.<br>Показатель 1: ловушка на входе и на выходе — N из M. Показатель 2: финал — 4 критерия по 2 балла (0–8).<br>Отметки: 14–16 — «5» · 11–13 — «4» · 8–10 — «3».</div>
 <div class="rcard" id="resultCard"></div>
 <div class="res-actions">
 <button class="btn" id="showBtn" type="button">Показать результат учителю</button>
@@ -553,7 +575,7 @@ select.tin{max-width:250px;font-weight:600}
 <div class="b-sub" id="sPairSub">из них на проверке: 0</div>
 <div class="b-bar"><div class="b-barfill" id="barFill"></div></div>
 <div class="b-sub"><span id="barPct">0%</span> от максимума урока · блоков пройдено: <b id="sBlocks">0 из 17</b></div>
-<div class="b-rules"><b>Как копятся баллы</b><br>+1 — верный вердикт или ответ (с первой попытки)<br>+2 — доказательство к донесению (проверит учитель)<br>+2 — своя ловушка в лаборатории (форма у каждого)<br>до +4 — исправленный запрос к ИИ (форма у каждого)<br>до +8 — письменный финал (форма у каждого)<br><b>Баллы «на проверке» получает пара</b> — учитель утвердит их в конце урока.</div>
+<div class="b-rules"><b>Баллы пары (ведёт писарь) — как в презентации</b><br>+1 — вердикт · +2 — доказательство · −1 — неверный ответ<br>+2 — своя ловушка · +2 — нашли ошибку<br>+1 — верный ответ в заданиях (с первой попытки) · до +4 — исправленный запрос к ИИ · до +8 — письменный финал<br><b>Баллы «на проверке» утвердит учитель.</b></div>
 <button class="b-min" type="button" aria-expanded="false" aria-label="Свернуть или развернуть бортовой журнал"><span class="min-lab">Развернуть</span><span class="min-arr" aria-hidden="true"></span></button><button class="b-save" id="xlsBtn" type="button">Сохранить отчёт (XLSX)</button>
 <button class="b-reset" id="resetBtn" type="button">Сбросить урок</button>
 </aside>
@@ -589,22 +611,27 @@ try{var x=JSON.parse(localStorage.getItem(KEY)||"null");if(x&&x.items)S=x}catch(
 S.ts=S.ts||stamp();
 function save(){try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}}
 function sname(k){return (S.names[k]||"").trim()||("Ученик "+(k==="A"?"А":"Б"))}
-function mark(p){return p>=90?"5":p>=75?"4":p>=55?"3":"2"}
+function mark(p){return p>=87.5?"5":p>=68.75?"4":p>=50?"3":"2"}
+function finPts(id){var r=S.items[id];return r&&r.ok?Math.min(8,r.pts||0):0}
+function trapCaught(bid){var el=document.querySelector('[data-block="'+bid+'"]'),r=S.items[bid];return el&&r&&r.v===el.getAttribute("data-ok")?1:0}
 function renderResults(){
  var box=$("#resultCard");if(!box)return;
  var half=PAIR_MAX/2;
+ var fwA=finPts("finwA"),fwB=finPts("finwB");
+ var restA=Math.max(0,S.pend/2-fwA),restB=Math.max(0,S.pend/2-fwB);
  var tA=S.auto.A+S.pend/2,tB=S.auto.B+S.pend/2;
  var pA=Math.min(100,Math.round(tA/half*100)),pB=Math.min(100,Math.round(tB/half*100));
- var tot=S.auto.A+S.auto.B+S.pend;
+ var tot=S.auto.A+S.auto.B+S.pend,traps=trapCaught("vhod")+trapCaught("finv");
  box.innerHTML='<h3 class="rc-t">'+LESSON_TITLE+'</h3>'
  +'<div class="rscroll"><table class="rt"><tr><th>Показатель</th><th>'+esc(sname("A"))+'</th><th>'+esc(sname("B"))+'</th></tr>'
- +'<tr><td>Баллы за ответы</td><td>'+fmt(S.auto.A)+'</td><td>'+fmt(S.auto.B)+'</td></tr>'
- +'<tr><td>Половина баллов пары «на проверке»</td><td>+'+fmt(S.pend/2)+'</td><td>+'+fmt(S.pend/2)+'</td></tr>'
+ +'<tr><td>Вердикты и ответы (+1 верно, −1 неверный ответ)</td><td>'+fmt(S.auto.A)+'</td><td>'+fmt(S.auto.B)+'</td></tr>'
+ +'<tr><td>Показатель 2 — финал: 4 критерия по 2 балла (0–8, на проверке)</td><td>'+fmt(fwA)+'</td><td>'+fmt(fwB)+'</td></tr>'
+ +'<tr><td>Доказательства, своя ловушка, исправленный запрос — «на проверке»</td><td>+'+fmt(restA)+'</td><td>+'+fmt(restB)+'</td></tr>'
  +'<tr><td><b>Итоговый балл</b></td><td><b>'+fmt(tA)+'</b></td><td><b>'+fmt(tB)+'</b></td></tr>'
  +'<tr><td><b>Предварительная отметка</b></td><td><b class="mk">«'+mark(pA)+'»</b></td><td><b class="mk">«'+mark(pB)+'»</b></td></tr>'
  +'</table></div>'
- +'<p class="rline">Балл пары: <b>'+fmt(tot)+'</b> из '+PAIR_MAX+' · из них на проверке: '+fmt(S.pend)+' · пройдено блоков: '+S.blocks+' из '+TOTAL_BLOCKS+'</p>'
- +'<p class="rnote">Отметки предварительные: учитель проверит доказательства к донесениям, лабораторию ловушек, исправленный запрос и письменный финал — и утвердит результат.</p>'
+ +'<p class="rline">Показатель 1 — ловушки на входе и на выходе: пара поймала <b>'+traps+' из 2</b> · Балл пары: <b>'+fmt(tot)+'</b> из '+PAIR_MAX+' · из них на проверке: '+fmt(S.pend)+' · пройдено блоков: '+S.blocks+' из '+TOTAL_BLOCKS+'</p>'
+ +'<p class="rnote">Баллы пары (ведёт писарь): <b>+1</b> — вердикт · <b>+2</b> — доказательство · <b>−1</b> — неверный ответ · <b>+2</b> — своя ловушка · <b>+2</b> — нашли ошибку. Отметки — как в презентации: <b>14–16 — «5»</b> · <b>11–13 — «4»</b> · <b>8–10 — «3»</b> (16-балльная шкала применена к максимуму урока пропорционально). Отметки предварительные: учитель проверит финал по критериям (точность, причина, доказательство, профилактика), доказательства, ловушку и запрос — и утвердит результат.</p>'
  +'<p class="rdate">'+new Date().toLocaleDateString("ru-RU",{day:"numeric",month:"long",year:"numeric"})+'</p>';
 }
 function renderBoard(){
@@ -702,7 +729,8 @@ $$(".js-task").forEach(function(task){
     }
    }else{
     var att=(st.att||0)+1;
-    cl.add("wrong");$(".tstat",it).textContent="✗";
+    cl.add("wrong");$(".tstat",it).textContent="✗ −1";
+    var wOwn=it.getAttribute("data-owner")||S.v;S.auto[wOwn]=Math.max(0,S.auto[wOwn]-1);bump(wOwn,"−1");
     if(att>=2){
      S.items[key]={stt:"reveal",att:att,val:val};
      lock(it,it.getAttribute("data-sol"),"reveal","");
@@ -731,7 +759,7 @@ $$(".js-verdict").forEach(function(v){
   var good=st.v===ok,nop=v.hasAttribute("data-nopoints");
   feed.hidden=false;
   feed.className="vfeed "+(good?"good":(st.v==="maybe"?"meh":"bad"));
-  feed.innerHTML="<b>"+(good?(nop?"Ловушка распознана! ":"Верно! +1 балл. "):(st.v==="maybe"?"Сомнение — это честно, но балла нет. ":"Мимо ловушки! "))+"</b>"+(expl?expl.innerHTML:"");
+  feed.innerHTML="<b>"+(good?(nop?"Ловушка распознана! ":"Верно! +1 балл. "):(st.v==="maybe"?"Сомнение — это честно, но балла нет. ":(nop?"Мимо ловушки! ":"Мимо ловушки! −1 балл. ")))+"</b>"+(expl?expl.innerHTML:"");
   if(proof)proof.hidden=false;
   if(st.proof&&ta&&sp){ta.value=st.txt||"";ta.disabled=true;sp.disabled=true;if(msg){msg.textContent="✓ записано: +2 на проверке";msg.className="pmsg good"}}
  }
@@ -747,6 +775,7 @@ $$(".js-verdict").forEach(function(v){
   var rec={v:b.getAttribute("data-v"),proof:0,own:act};
   S.items[bid]=rec;
   if(rec.v===ok&&!v.hasAttribute("data-nopoints")){S.auto[act]++;bump(act,"+1")}
+  else if(rec.v!==ok&&rec.v!=="maybe"&&!v.hasAttribute("data-nopoints")){S.auto[act]=Math.max(0,S.auto[act]-1);bump(act,"−1")}
   S.v=(act==="A"?"B":"A");
   apply(rec);
   if(!S.done[bid]){S.done[bid]=1;S.blocks++}
@@ -815,7 +844,7 @@ function resetAll(){
    var inp=$(".tin",it);if(inp){inp.value="";inp.disabled=false}
    var st=$(".tstat",it);if(st)st.textContent="";
   });
-  var b=$(".js-check",task);if(b){b.disabled=false;b.textContent="Проверить задание"}
+  $$(".js-check",task).forEach(function(b){b.disabled=false;b.textContent=b.getAttribute("data-chk")==="B"?"Проверить — Ученик Б":"Проверить — Ученик А"})
   var h=$(".js-hint",task);if(h)h.hidden=true;
  });
  $$(".js-verdict").forEach(function(v){
@@ -922,7 +951,7 @@ function blockTitle(bid){var el=document.querySelector('[data-block="'+bid+'"]')
 function reportRows(){
  var half=PAIR_MAX/2,tA=S.auto.A+S.pend/2,tB=S.auto.B+S.pend/2;
  var pA=Math.min(100,Math.round(tA/half*100)),pB=Math.min(100,Math.round(tB/half*100));
- var tot=S.auto.A+S.auto.B+S.pend,R=[];
+ var tot=S.auto.A+S.auto.B+S.pend,fwA=finPts("finwA"),fwB=finPts("finwB"),restA=Math.max(0,S.pend/2-fwA),restB=Math.max(0,S.pend/2-fwB),traps=trapCaught("vhod")+trapCaught("finv"),R=[];
  R.push([{v:LESSON_TITLE,s:1}]);
  R.push(["МБОУ «Школа №7» г.о. Самара · учитель Плотников В. А. · pvaschool7.github.io"]);
  R.push(["Дата и время прохождения: "+new Date().toLocaleString("ru-RU",{day:"numeric",month:"long",year:"numeric",hour:"numeric",minute:"2-digit"})]);
@@ -930,11 +959,14 @@ function reportRows(){
  R.push([{v:"Ученик А",s:2},{v:sname("A"),s:1},{v:"Ученик Б",s:2},{v:sname("B"),s:1}]);
  R.push([]);
  R.push([{v:"Показатель",s:2},{v:"Ученик А",s:2},{v:"Ученик Б",s:2}]);
- R.push(["Баллы за ответы",fmt(S.auto.A),fmt(S.auto.B)]);
- R.push(["Половина баллов пары «на проверке»","+"+fmt(S.pend/2),"+"+fmt(S.pend/2)]);
+ R.push(["Вердикты и ответы (+1 верно, −1 неверный ответ)",fmt(S.auto.A),fmt(S.auto.B)]);
+ R.push(["Показатель 2 — финал: 4 критерия по 2 балла (0–8)","+"+fmt(fwA),"+"+fmt(fwB)]);
+ R.push(["Доказательства, своя ловушка, запрос — «на проверке»","+"+fmt(restA),"+"+fmt(restB)]);
  R.push([{v:"Итоговый балл",s:1},{v:fmt(tA),s:1},{v:fmt(tB),s:1}]);
  R.push([{v:"Предварительная отметка",s:2},{v:"«"+mark(pA)+"»",s:2},{v:"«"+mark(pB)+"»",s:2}]);
+ R.push(["Показатель 1 — ловушки на входе и выходе: пара поймала "+traps+" из 2"]);
  R.push(["Балл пары: "+fmt(tot)+" из "+PAIR_MAX+" · блоков пройдено: "+S.blocks+" из "+TOTAL_BLOCKS]);
+ R.push(["Баллы пары (ведёт писарь): +1 вердикт · +2 доказательство · −1 неверный ответ · +2 своя ловушка · +2 нашли ошибку · отметки: 14–16 «5», 11–13 «4», 8–10 «3»"]);
  R.push([]);
  R.push([{v:"Детализация по блокам",s:1}]);
  R.push([{v:"Блок",s:2},{v:"Баллы",s:2},{v:"Пояснение",s:2}]);
@@ -1091,4 +1123,37 @@ renderBoard();
 })();
 </script>
 </div></div>
-<script src="../search-index.js" defer></script><script src="../search.js" defer></script></body></html>
+<script src="../search-index.js" defer></script><script src="../search.js" defer></script><script>
+/* Журнал связиста: заполняет строку, когда пара даёт вердикт в сеансе */
+(function(){
+var JR={
+ s1:{v:"НЕ ВЕРЮ",e:"N и i перепутаны",r:"8 = 2<sup>3</sup> → i = 3 бита на сигнал"},
+ s2:{v:"НЕ ВЕРЮ",e:"1000 вместо 1024",r:"1 Кбайт = 1024 байта; 2 Кбайт = 2048 байта"},
+ s3:{v:"ВЕРЮ",e:"Ошибки нет: умножение ×8",r:"5 · 8 = 40 бит"},
+ s4:{v:"ВЕРЮ",e:"Ошибки нет: 2<sup>8</sup> = 256",r:"i = 8 бит = 1 байт"},
+ s5:{v:"НЕ ВЕРЮ",e:"Фальшивый источник",r:"В байте 8 бит; такого справочника нет"},
+ s6:{v:"НЕ ВЕРЮ",e:"N и i: 128 = 2<sup>7</sup>",r:"128 = 2<sup>7</sup> → i = 7 бит, а не 6"}
+};
+function fill(se,b){
+ var id=se.getAttribute("data-block"),d=JR[id];if(!d)return;
+ var tr=document.querySelector('#jrBody tr[data-jr="'+id+'"]');if(!tr)return;
+ var ok=se.getAttribute("data-ok"),v=b.getAttribute("data-v");
+ var lab={yes:"ВЕРЮ ИИ",no:"НЕ ВЕРЮ",maybe:"СОМНЕВАЮСЬ"}[v]||v;
+ var good=v===ok;
+ tr.querySelector(".jr-v").innerHTML=lab+(good?' <span class="jr-ok">✓</span>':' <span class="jr-no">✗ → верно: '+d.v+"</span>");
+ tr.querySelector(".jr-e").innerHTML=d.e;
+ tr.querySelector(".jr-r").innerHTML=d.r;
+ tr.classList.add("jr-done");
+}
+if(!document.getElementById("jrBody"))return;
+document.addEventListener("click",function(e){
+ var b=e.target&&e.target.closest?e.target.closest(".vbtn"):null;if(!b)return;
+ var se=b.closest?b.closest(".seans"):null;if(se)fill(se,b);
+});
+/* восстановление после перезагрузки: главный скрипт помечает выбранный вердикт классом .picked */
+Array.prototype.forEach.call(document.querySelectorAll(".seans.js-verdict"),function(se){
+ var p=se.querySelector(".vbtn.picked");if(p)fill(se,p);
+});
+})();
+</script>
+</body></html>

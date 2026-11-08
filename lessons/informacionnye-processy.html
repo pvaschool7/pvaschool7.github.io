@@ -31,6 +31,21 @@
 .sch .node.dst{border-color:var(--red)}
 .sch .arr{color:var(--blue);font-weight:700}
 .sch .warn{border-color:var(--red);color:var(--red);font-size:14px}
+/* Журнал связиста: строки заполняются сами после вердиктов в детекторе */
+.jwrap{border:1.5px solid var(--line);border-radius:14px;background:var(--paper);margin:16px 0 4px;overflow:hidden}
+.jhead{padding:10px 14px;font-weight:700;font-size:13px;letter-spacing:.06em;text-transform:uppercase;color:var(--mute);border-bottom:1.5px dashed var(--line);background:color-mix(in srgb,var(--blue) 6%,var(--paper))}
+.jtable{width:100%;border-collapse:collapse;font-size:13.8px}
+.jtable th{text-align:left;font-size:11.5px;letter-spacing:.05em;text-transform:uppercase;color:var(--mute);padding:7px 10px;border-bottom:1.5px solid var(--line);font-weight:700}
+.jtable td{padding:7px 10px;border-bottom:1px dashed var(--line);vertical-align:top}
+.jtable tr:last-child td{border-bottom:none}
+.jrow .jr-s{white-space:nowrap;font-weight:700}
+.jrow .jr-v{white-space:nowrap;font-weight:700}
+.jrow .jr-e,.jrow .jr-r{color:var(--mute)}
+.jrow.jr-done{background:color-mix(in srgb,var(--green) 7%,var(--paper))}
+.jr-ok{color:var(--green)}
+.jr-no{color:var(--red)}
+.jr-note{padding:8px 14px;font-size:12.5px;color:var(--mute);border-top:1.5px dashed var(--line)}
+@media(max-width:760px){.jtable th.jr-hr,.jrow .jr-r{display:none}.jtable{font-size:12.6px}}
 /* ===== Табло пары ===== */
 .board{order:-1;position:sticky;top:8px;z-index:20;display:flex;flex-wrap:wrap;align-items:center;gap:12px 18px;background:var(--card);border:2px solid var(--blue);border-radius:16px;box-shadow:4px 5px 0 rgba(47,111,208,.22);padding:16px 20px;margin:0 0 24px}
 .board-sentinel{order:-2;height:0;margin:0;padding:0;border:0;visibility:hidden;pointer-events:none}
@@ -386,7 +401,22 @@ select.tin{max-width:250px;font-weight:600}
 <div class="expl">Фальшивый источник: такого устава нет, а помехи есть — ионосфера, тропосфера, шум приёмника. Поэтому данные проверяют и повторяют.</div>
 <div class="proof" hidden><label class="p-lab" for="pf6">Доказательство письменно (+2):</label><textarea id="pf6" class="ta js-proof" rows="3" placeholder="Назови, почему источник фальшивый и что говорит теория о помехах…"></textarea><div class="p-foot"><button class="btn sm ghost js-saveproof" type="button">Записать доказательство (+2)</button><span class="pmsg"></span></div></div>
 </div>
-</section>
+
+<div class="jwrap"><div class="jhead">Журнал · итоги проверки</div>
+<table class="jtable">
+<thead><tr><th>Сеанс</th><th>Заявление Навигатора</th><th>Вердикт</th><th>Ошибка</th><th class="jr-hr">Ответ (разбор)</th></tr></thead>
+<tbody id="jrBody">
+<tr class="jrow" data-jr="vhod"><td class="jr-s">0·разминка</td><td class="jr-t">Измерение — обработка</td><td class="jr-v">—</td><td class="jr-e">—</td><td class="jr-r">—</td></tr>
+<tr class="jrow" data-jr="s1"><td class="jr-s">1·А</td><td class="jr-t">Запись в журнал — обработка</td><td class="jr-v">—</td><td class="jr-e">—</td><td class="jr-r">—</td></tr>
+<tr class="jrow" data-jr="s2"><td class="jr-s">2·Б</td><td class="jr-t">Земля — источник</td><td class="jr-v">—</td><td class="jr-e">—</td><td class="jr-r">—</td></tr>
+<tr class="jrow" data-jr="s3"><td class="jr-s">3·А</td><td class="jr-t">Вычисление — не обработка</td><td class="jr-v">—</td><td class="jr-e">—</td><td class="jr-r">—</td></tr>
+<tr class="jrow" data-jr="s4"><td class="jr-s">4·Б</td><td class="jr-t">Разница 70, 40, 90 — 40</td><td class="jr-v">—</td><td class="jr-e">—</td><td class="jr-r">—</td></tr>
+<tr class="jrow" data-jr="s5"><td class="jr-s">5·А</td><td class="jr-t">Копия на другом носителе</td><td class="jr-v">—</td><td class="jr-e">—</td><td class="jr-r">—</td></tr>
+<tr class="jrow" data-jr="s6"><td class="jr-s">6·Б</td><td class="jr-t">«Устав Ларина»</td><td class="jr-v">—</td><td class="jr-e">—</td><td class="jr-r">—</td></tr>
+</tbody>
+</table>
+<div class="jr-note">Строка журнала заполняется сама, когда пара даёт вердикт в сеансе. Ведёт запись писарь, баллы утверждает учитель.</div>
+</div></section>
 <!-- 11. Лаборатория ловушек -->
 <section class="step"><div class="step-n">11</div><h2 class="step-title">Лаборатория ловушек: сочиняем сами</h2>
 <p class="task-intro">1. Выберите блок теории. 2. Придумайте заявление Навигатора с одной ошибкой. 3. На обороте листа напишите ключ: где ошибка и почему. 4. Обменяйтесь с соседней парой и найдите ошибку по «Инструментам связиста».</p>
@@ -459,7 +489,7 @@ select.tin{max-width:250px;font-weight:600}
 <div class="expl">Отправка по каналу связи — это <b>передача</b>: источник → канал → приёмник. Хранение — запись на носитель, она осталась в бортовом журнале.</div>
 </div>
 <div class="finw-duo">
-<p class="ord-note">Письменный финал пишет каждый: сначала <b>Ученик А</b>, затем <b>Ученик Б</b>. До +8 за форму — проверит учитель.</p>
+<p class="ord-note">Письменный финал пишет каждый: сначала <b>Ученик А</b>, затем <b>Ученик Б</b>. До +8 — 4 критерия по 2 балла (точность, причина, доказательство, профилактика) — проверит учитель.</p>
 <div class="duo">
 <div class="duo-form ownA" data-block="finwA" data-kind="finw" data-owner="A">
 <span class="who-tag">Форма Ученика А</span>
@@ -486,6 +516,7 @@ select.tin{max-width:250px;font-weight:600}
 </section>
 <!-- 14. Итоги -->
 <section class="step"><div class="step-n">14</div><h2 class="step-title">Итоги: покажите учителю</h2>
+<div class="note"><b>Система баллов — как в презентации</b><br>Баллы пары (ведёт писарь): +1 — вердикт · +2 — доказательство · −1 — неверный ответ · +2 — своя ловушка · +2 — нашли ошибку. Итого пары — на «Бортовом журнале» и в карточке результата.<br>Показатель 1: ловушка на входе и на выходе — N из M. Показатель 2: финал — 4 критерия по 2 балла (0–8).<br>Отметки: 14–16 — «5» · 11–13 — «4» · 8–10 — «3».</div>
 <div class="rcard" id="resultCard"></div>
 <div class="res-actions">
 <button class="btn" id="showBtn" type="button">Показать результат учителю</button>
@@ -516,7 +547,7 @@ select.tin{max-width:250px;font-weight:600}
 <div class="b-sub" id="sPairSub">из них на проверке: 0</div>
 <div class="b-bar"><div class="b-barfill" id="barFill"></div></div>
 <div class="b-sub"><span id="barPct">0%</span> от максимума урока · блоков пройдено: <b id="sBlocks">0 из 17</b></div>
-<div class="b-rules"><b>Как копятся баллы</b><br>+1 — верный вердикт или ответ (с первой попытки)<br>+2 — доказательство к донесению (проверит учитель)<br>+2 — своя ловушка в лаборатории (форма у каждого)<br>до +4 — исправленный запрос к ИИ (форма у каждого)<br>до +8 — письменный финал (форма у каждого)<br><b>Баллы «на проверке» получает пара</b> — учитель утвердит их в конце урока.</div>
+<div class="b-rules"><b>Баллы пары (ведёт писарь) — как в презентации</b><br>+1 — вердикт · +2 — доказательство · −1 — неверный ответ<br>+2 — своя ловушка · +2 — нашли ошибку<br>+1 — верный ответ в заданиях (с первой попытки) · до +4 — исправленный запрос к ИИ · до +8 — письменный финал<br><b>Баллы «на проверке» утвердит учитель.</b></div>
 <button class="b-min" type="button" aria-expanded="false" aria-label="Свернуть или развернуть бортовой журнал"><span class="min-lab">Развернуть</span><span class="min-arr" aria-hidden="true"></span></button><button class="b-save" id="xlsBtn" type="button">Сохранить отчёт (XLSX)</button>
 <button class="b-reset" id="resetBtn" type="button">Сбросить урок</button>
 </aside>
@@ -552,22 +583,27 @@ try{var x=JSON.parse(localStorage.getItem(KEY)||"null");if(x&&x.items)S=x}catch(
 S.ts=S.ts||stamp();
 function save(){try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}}
 function sname(k){return (S.names[k]||"").trim()||("Ученик "+(k==="A"?"А":"Б"))}
-function mark(p){return p>=90?"5":p>=75?"4":p>=55?"3":"2"}
+function mark(p){return p>=87.5?"5":p>=68.75?"4":p>=50?"3":"2"}
+function finPts(id){var r=S.items[id];return r&&r.ok?Math.min(8,r.pts||0):0}
+function trapCaught(bid){var el=document.querySelector('[data-block="'+bid+'"]'),r=S.items[bid];return el&&r&&r.v===el.getAttribute("data-ok")?1:0}
 function renderResults(){
  var box=$("#resultCard");if(!box)return;
  var half=PAIR_MAX/2;
+ var fwA=finPts("finwA"),fwB=finPts("finwB");
+ var restA=Math.max(0,S.pend/2-fwA),restB=Math.max(0,S.pend/2-fwB);
  var tA=S.auto.A+S.pend/2,tB=S.auto.B+S.pend/2;
  var pA=Math.min(100,Math.round(tA/half*100)),pB=Math.min(100,Math.round(tB/half*100));
- var tot=S.auto.A+S.auto.B+S.pend;
+ var tot=S.auto.A+S.auto.B+S.pend,traps=trapCaught("vhod")+trapCaught("finv");
  box.innerHTML='<h3 class="rc-t">'+LESSON_TITLE+'</h3>'
  +'<div class="rscroll"><table class="rt"><tr><th>Показатель</th><th>'+esc(sname("A"))+'</th><th>'+esc(sname("B"))+'</th></tr>'
- +'<tr><td>Баллы за ответы</td><td>'+fmt(S.auto.A)+'</td><td>'+fmt(S.auto.B)+'</td></tr>'
- +'<tr><td>Половина баллов пары «на проверке»</td><td>+'+fmt(S.pend/2)+'</td><td>+'+fmt(S.pend/2)+'</td></tr>'
+ +'<tr><td>Вердикты и ответы (+1 верно, −1 неверный ответ)</td><td>'+fmt(S.auto.A)+'</td><td>'+fmt(S.auto.B)+'</td></tr>'
+ +'<tr><td>Показатель 2 — финал: 4 критерия по 2 балла (0–8, на проверке)</td><td>'+fmt(fwA)+'</td><td>'+fmt(fwB)+'</td></tr>'
+ +'<tr><td>Доказательства, своя ловушка, исправленный запрос — «на проверке»</td><td>+'+fmt(restA)+'</td><td>+'+fmt(restB)+'</td></tr>'
  +'<tr><td><b>Итоговый балл</b></td><td><b>'+fmt(tA)+'</b></td><td><b>'+fmt(tB)+'</b></td></tr>'
  +'<tr><td><b>Предварительная отметка</b></td><td><b class="mk">«'+mark(pA)+'»</b></td><td><b class="mk">«'+mark(pB)+'»</b></td></tr>'
  +'</table></div>'
- +'<p class="rline">Балл пары: <b>'+fmt(tot)+'</b> из '+PAIR_MAX+' · из них на проверке: '+fmt(S.pend)+' · пройдено блоков: '+S.blocks+' из '+TOTAL_BLOCKS+'</p>'
- +'<p class="rnote">Отметки предварительные: учитель проверит доказательства к донесениям, лабораторию ловушек, исправленный запрос и письменный финал — и утвердит результат.</p>'
+ +'<p class="rline">Показатель 1 — ловушки на входе и на выходе: пара поймала <b>'+traps+' из 2</b> · Балл пары: <b>'+fmt(tot)+'</b> из '+PAIR_MAX+' · из них на проверке: '+fmt(S.pend)+' · пройдено блоков: '+S.blocks+' из '+TOTAL_BLOCKS+'</p>'
+ +'<p class="rnote">Баллы пары (ведёт писарь): <b>+1</b> — вердикт · <b>+2</b> — доказательство · <b>−1</b> — неверный ответ · <b>+2</b> — своя ловушка · <b>+2</b> — нашли ошибку. Отметки — как в презентации: <b>14–16 — «5»</b> · <b>11–13 — «4»</b> · <b>8–10 — «3»</b> (16-балльная шкала применена к максимуму урока пропорционально). Отметки предварительные: учитель проверит финал по критериям (точность, причина, доказательство, профилактика), доказательства, ловушку и запрос — и утвердит результат.</p>'
  +'<p class="rdate">'+new Date().toLocaleDateString("ru-RU",{day:"numeric",month:"long",year:"numeric"})+'</p>';
 }
 function renderBoard(){
@@ -659,7 +695,8 @@ $$(".js-task").forEach(function(task){
     }
    }else{
     var att=(st.att||0)+1;
-    cl.add("wrong");$(".tstat",it).textContent="✗";
+    cl.add("wrong");$(".tstat",it).textContent="✗ −1";
+    var wOwn=it.getAttribute("data-owner")||S.v;S.auto[wOwn]=Math.max(0,S.auto[wOwn]-1);bump(wOwn,"−1");
     if(att>=2){
      S.items[key]={stt:"reveal",att:att,val:val};
      lock(it,it.getAttribute("data-sol"),"reveal","");
@@ -688,7 +725,7 @@ $$(".js-verdict").forEach(function(v){
   var good=st.v===ok,nop=v.hasAttribute("data-nopoints");
   feed.hidden=false;
   feed.className="vfeed "+(good?"good":(st.v==="maybe"?"meh":"bad"));
-  feed.innerHTML="<b>"+(good?(nop?"Ловушка распознана! ":"Верно! +1 балл. "):(st.v==="maybe"?"Сомнение — это честно, но балла нет. ":"Мимо ловушки! "))+"</b>"+(expl?expl.innerHTML:"");
+  feed.innerHTML="<b>"+(good?(nop?"Ловушка распознана! ":"Верно! +1 балл. "):(st.v==="maybe"?"Сомнение — это честно, но балла нет. ":(nop?"Мимо ловушки! ":"Мимо ловушки! −1 балл. ")))+"</b>"+(expl?expl.innerHTML:"");
   if(proof)proof.hidden=false;
   if(st.proof&&ta&&sp){ta.value=st.txt||"";ta.disabled=true;sp.disabled=true;if(msg){msg.textContent="✓ записано: +2 на проверке";msg.className="pmsg good"}}
  }
@@ -704,6 +741,7 @@ $$(".js-verdict").forEach(function(v){
   var rec={v:b.getAttribute("data-v"),proof:0,own:act};
   S.items[bid]=rec;
   if(rec.v===ok&&!v.hasAttribute("data-nopoints")){S.auto[act]++;bump(act,"+1")}
+  else if(rec.v!==ok&&rec.v!=="maybe"&&!v.hasAttribute("data-nopoints")){S.auto[act]=Math.max(0,S.auto[act]-1);bump(act,"−1")}
   S.v=(act==="A"?"B":"A");
   apply(rec);
   if(!S.done[bid]){S.done[bid]=1;S.blocks++}
@@ -771,7 +809,7 @@ function resetAll(){
    var inp=$(".tin",it);if(inp){inp.value="";inp.disabled=false}
    var st=$(".tstat",it);if(st)st.textContent="";
   });
-  var b=$(".js-check",task);if(b){b.disabled=false;b.textContent="Проверить задание"}
+  $$(".js-check",task).forEach(function(b){b.disabled=false;b.textContent=b.getAttribute("data-chk")==="B"?"Проверить — Ученик Б":"Проверить — Ученик А"})
   var h=$(".js-hint",task);if(h)h.hidden=true;
  });
  $$(".js-verdict").forEach(function(v){
@@ -878,7 +916,7 @@ function blockTitle(bid){var el=document.querySelector('[data-block="'+bid+'"]')
 function reportRows(){
  var half=PAIR_MAX/2,tA=S.auto.A+S.pend/2,tB=S.auto.B+S.pend/2;
  var pA=Math.min(100,Math.round(tA/half*100)),pB=Math.min(100,Math.round(tB/half*100));
- var tot=S.auto.A+S.auto.B+S.pend,R=[];
+ var tot=S.auto.A+S.auto.B+S.pend,fwA=finPts("finwA"),fwB=finPts("finwB"),restA=Math.max(0,S.pend/2-fwA),restB=Math.max(0,S.pend/2-fwB),traps=trapCaught("vhod")+trapCaught("finv"),R=[];
  R.push([{v:LESSON_TITLE,s:1}]);
  R.push(["МБОУ «Школа №7» г.о. Самара · учитель Плотников В. А. · pvaschool7.github.io"]);
  R.push(["Дата и время прохождения: "+new Date().toLocaleString("ru-RU",{day:"numeric",month:"long",year:"numeric",hour:"numeric",minute:"2-digit"})]);
@@ -886,11 +924,14 @@ function reportRows(){
  R.push([{v:"Ученик А",s:2},{v:sname("A"),s:1},{v:"Ученик Б",s:2},{v:sname("B"),s:1}]);
  R.push([]);
  R.push([{v:"Показатель",s:2},{v:"Ученик А",s:2},{v:"Ученик Б",s:2}]);
- R.push(["Баллы за ответы",fmt(S.auto.A),fmt(S.auto.B)]);
- R.push(["Половина баллов пары «на проверке»","+"+fmt(S.pend/2),"+"+fmt(S.pend/2)]);
+ R.push(["Вердикты и ответы (+1 верно, −1 неверный ответ)",fmt(S.auto.A),fmt(S.auto.B)]);
+ R.push(["Показатель 2 — финал: 4 критерия по 2 балла (0–8)","+"+fmt(fwA),"+"+fmt(fwB)]);
+ R.push(["Доказательства, своя ловушка, запрос — «на проверке»","+"+fmt(restA),"+"+fmt(restB)]);
  R.push([{v:"Итоговый балл",s:1},{v:fmt(tA),s:1},{v:fmt(tB),s:1}]);
  R.push([{v:"Предварительная отметка",s:2},{v:"«"+mark(pA)+"»",s:2},{v:"«"+mark(pB)+"»",s:2}]);
+ R.push(["Показатель 1 — ловушки на входе и выходе: пара поймала "+traps+" из 2"]);
  R.push(["Балл пары: "+fmt(tot)+" из "+PAIR_MAX+" · блоков пройдено: "+S.blocks+" из "+TOTAL_BLOCKS]);
+ R.push(["Баллы пары (ведёт писарь): +1 вердикт · +2 доказательство · −1 неверный ответ · +2 своя ловушка · +2 нашли ошибку · отметки: 14–16 «5», 11–13 «4», 8–10 «3»"]);
  R.push([]);
  R.push([{v:"Детализация по блокам",s:1}]);
  R.push([{v:"Блок",s:2},{v:"Баллы",s:2},{v:"Пояснение",s:2}]);
@@ -1047,4 +1088,38 @@ renderBoard();
 })();
 </script>
 </div></div>
-<script src="../search-index.js" defer></script><script src="../search.js" defer></script></body></html>
+<script src="../search-index.js" defer></script><script src="../search.js" defer></script><script>
+/* Журнал связиста: заполняет строку, когда пара даёт вердикт в сеансе */
+(function(){
+var JR={
+ vhod:{v:"НЕ ВЕРЮ",e:"Это сбор информации",r:"Датчик получает сведения — сбор (разминка, без балла)"},
+ s1:{v:"НЕ ВЕРЮ",e:"Это хранение информации",r:"Запись на носитель — хранение, не обработка"},
+ s2:{v:"НЕ ВЕРЮ",e:"Источник и приёмник перепутаны",r:"Станция — источник, Земля — приёмник"},
+ s3:{v:"НЕ ВЕРЮ",e:"Вычисление — это обработка",r:"Разница значений — новая информация"},
+ s4:{v:"НЕ ВЕРЮ",e:"Ошибка в подсчёте",r:"90 − 40 = 50, а не 40"},
+ s5:{v:"ВЕРЮ",e:"Ошибки нет: защита от потери",r:"Копия на другом носителе спасает при сбое памяти"},
+ s6:{v:"НЕ ВЕРЮ",e:"Фальшивый источник",r:"Такого устава нет; помехи бывают — данные проверяют"}
+};
+function fill(se,b){
+ var id=se.getAttribute("data-block"),d=JR[id];if(!d)return;
+ var tr=document.querySelector('#jrBody tr[data-jr="'+id+'"]');if(!tr)return;
+ var ok=se.getAttribute("data-ok"),v=b.getAttribute("data-v");
+ var lab={yes:"ВЕРЮ ИИ",no:"НЕ ВЕРЮ",maybe:"СОМНЕВАЮСЬ"}[v]||v;
+ var good=v===ok;
+ tr.querySelector(".jr-v").innerHTML=lab+(good?' <span class="jr-ok">✓</span>':' <span class="jr-no">✗ → верно: '+d.v+"</span>");
+ tr.querySelector(".jr-e").innerHTML=d.e;
+ tr.querySelector(".jr-r").innerHTML=d.r;
+ tr.classList.add("jr-done");
+}
+if(!document.getElementById("jrBody"))return;
+document.addEventListener("click",function(e){
+ var b=e.target&&e.target.closest?e.target.closest(".vbtn"):null;if(!b)return;
+ var se=b.closest?b.closest(".seans"):null;if(se)fill(se,b);
+});
+/* восстановление после перезагрузки: главный скрипт помечает выбранный вердикт классом .picked */
+Array.prototype.forEach.call(document.querySelectorAll(".seans.js-verdict"),function(se){
+ var p=se.querySelector(".vbtn.picked");if(p)fill(se,p);
+});
+})();
+</script>
+</body></html>
