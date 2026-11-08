@@ -68,6 +68,10 @@
 .tz-mini{flex-basis:100%;height:8px;border-radius:99px;background:var(--paper);border:1px solid var(--line);overflow:hidden}
 .tz-mini i{display:block;height:100%;background:linear-gradient(90deg,var(--green),var(--blue))}
 .rev{border:1.5px dashed var(--line);border-radius:12px;padding:11px 15px;margin:10px 0;background:var(--paper)}
+/* Экран разбора: карточки ответов в 2 колонки (1 колонка на узких экранах) */
+.revgrid{display:grid;grid-template-columns:1fr;gap:12px;margin:10px 0 4px;align-items:start}
+.revgrid .rev{margin:0}
+@media(min-width:861px){.revgrid{grid-template-columns:1fr 1fr;gap:16px}}
 .rev .st{font-weight:800;margin-right:8px}
 .rev .ok{color:var(--green)}.rev .no{color:var(--red)}.rev .na{color:var(--mute)}
 .rev p{margin:.15em 0;font-size:15px}
@@ -709,6 +713,7 @@ function dzSentHtml(){
  +"<p class='st' id='dzst'></p></div>";
  h+="<h3 style='margin-top:22px'>Подробное решение заданий</h3>"
  +"<p class='task-intro' style='margin-top:4px'>Разбор виден только тебе: учителю уходит файл с заданиями и твоими ответами — без решений.</p>";
+ h+="<div class='revgrid'>";
  g=0;
  d.blocks.forEach(function(b,bi){b.tasks.forEach(function(t){
   var st=S.dzItems[g];
@@ -720,7 +725,7 @@ function dzSentHtml(){
   +"</div>";
   g++;
  })});
- h+="</section>";
+ h+="</div></section>";
  return h;
 }
 /* Задание без скрытой ловушки (для разбора на экране) */
@@ -751,7 +756,7 @@ function finish(){
   var p=Math.round(100*pb.got/pb.of);
   h+="<div class='tz-brow'><span class='nm'>"+pb.name+"</span><span class='vv'>"+pb.got+" из "+pb.of+"</span><div class='tz-mini'><i style='width:"+p+"%'></i></div></div>";
  });
- h+="<h3 style='margin-top:22px'>Разбор заданий</h3>"+review;
+ h+="<h3 style='margin-top:22px'>Разбор заданий</h3><div class='revgrid'>"+review+"</div>";
  h+="<div class='tz-nav'><button class='btn' type='button' id='again'>"+(S.dz?"Пройти ещё раз · другой вариант":"Пройти ещё раз · новый случайный вариант")+"</button><button class='btn ghost' type='button' id='pick'>Сменить тему</button></div><p class='tz-warn' style='margin-top:12px'>"+(S.dz?"Не закрывай страницу, пока не увидишь статус отправки файла: работа без файла на Диске учителем не проверяется.":"Результат показан только здесь и нигде не сохраняется: при перезагрузке страницы он исчезнет. Если отметка нужна в журнале — запиши её.")+"</p></div>";
  app.innerHTML=h;
  document.getElementById("again").addEventListener("click",function(){startTopic(S.data.topicId)});

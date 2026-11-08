@@ -64,10 +64,24 @@
 .b-save:hover{filter:brightness(1.08)}
 .b-reset{order:10;flex:none;margin:0;width:auto;padding:8px 14px;border:2px dashed var(--red);background:none;color:var(--red);border-radius:10px;font-weight:600;cursor:pointer;font-size:14px}
 .b-reset:hover{background:var(--red);color:var(--on-accent)}
+.b-min{order:11;display:none;flex:none;margin:0;padding:7px 12px;border:1.5px solid var(--line);background:var(--paper);color:var(--ink);border-radius:9px;font:600 12.5px "Golos Text",sans-serif;cursor:pointer;align-items:center;gap:7px}
+.b-min .min-arr{width:7px;height:7px;border-right:2px solid currentColor;border-bottom:2px solid currentColor;transform:rotate(45deg);margin-top:-2px;transition:transform .2s}
+.board{transition:box-shadow .2s}
+body{overflow-anchor:none}
+.board.mini{padding:8px 14px;gap:6px 14px;box-shadow:0 10px 22px rgba(0,0,0,.18)}
+.board.mini::before{display:none}
+.board.mini:not(.open){cursor:pointer}
+.board.mini:not(.open) .b-names,.board.mini:not(.open) .b-switch,.board.mini:not(.open) .b-sub,.board.mini:not(.open) .b-bar,.board.mini:not(.open) .b-rules,.board.mini:not(.open) .b-save,.board.mini:not(.open) .b-reset{display:none}
+.board.mini:not(.open) .b-head{font-size:11.5px}
+.board.mini:not(.open) .b-row{border:none;background:none;padding:2px 4px}
+.board.mini:not(.open) .b-who{max-width:110px;font-size:13.5px}
+.board.mini:not(.open) .b-val b{font-size:17px}
+.board.mini .b-min{display:inline-flex}
+.board.mini.open .b-min .min-arr{transform:rotate(-135deg);margin-top:2px}
 @media(max-width:900px){
   .board{position:sticky;top:73px;padding:14px 16px;gap:10px 14px;margin-bottom:20px}
   .board.mini{padding:9px 12px;gap:7px;box-shadow:0 10px 22px rgba(0,0,0,.22)}
-  .board.mini .b-head,.board.mini .b-names,.board.mini .b-switch,.board.mini .b-sub,.board.mini .b-bar,.board.mini .b-reset{display:none}
+  .board.mini:not(.open) .b-head,.board.mini:not(.open) .b-names,.board.mini:not(.open) .b-switch,.board.mini:not(.open) .b-sub,.board.mini:not(.open) .b-bar,.board.mini:not(.open) .b-reset{display:none}
   .board.mini .b-row{flex:1 1 42%}
   .board.mini .b-save{flex:1 1 100%;padding:8px 14px;font-size:13.5px}
   .board::before{display:none}
@@ -498,10 +512,10 @@ select.tin{max-width:250px;font-weight:600}
 <div class="b-bar"><div class="b-barfill" id="barFill"></div></div>
 <div class="b-sub"><span id="barPct">0%</span> от максимума урока · блоков пройдено: <b id="sBlocks">0 из 17</b></div>
 <div class="b-rules"><b>Как копятся баллы</b><br>+1 — верный вердикт или ответ (с первой попытки)<br>+2 — доказательство к донесению (проверит учитель)<br>+2 — своя ловушка в лаборатории (форма у каждого)<br>до +4 — исправленный запрос к ИИ (форма у каждого)<br>до +8 — письменный финал (форма у каждого)<br><b>Баллы «на проверке» получает пара</b> — учитель утвердит их в конце урока.</div>
-<button class="b-save" id="xlsBtn" type="button">Сохранить отчёт (XLSX)</button>
+<button class="b-min" type="button" aria-expanded="false" aria-label="Свернуть или развернуть бортовой журнал"><span class="min-lab">Развернуть</span><span class="min-arr" aria-hidden="true"></span></button><button class="b-save" id="xlsBtn" type="button">Сохранить отчёт (XLSX)</button>
 <button class="b-reset" id="resetBtn" type="button">Сбросить урок</button>
 </aside>
-<script>(function(){var b=document.querySelector(".board"),s=document.querySelector(".board-sentinel");if(!b||!s||!("IntersectionObserver" in window))return;function fit(){if(window.matchMedia&&matchMedia("(max-width:900px)").matches){var t=8,bar=document.querySelector(".side");if(bar){var r=bar.getBoundingClientRect();if(r.bottom>0&&getComputedStyle(bar).position==="sticky")t=Math.ceil(r.bottom)}b.style.top=t+"px"}else{b.style.top=""}}fit();if(window.addEventListener)window.addEventListener("resize",fit);new IntersectionObserver(function(en){for(var i=0;i<en.length;i++)b.classList.toggle("mini",!en[i].isIntersecting)},{rootMargin:"-70px 0px 0px 0px",threshold:0}).observe(s)})();</script>
+<script>(function(){var b=document.querySelector(".board"),s=document.querySelector(".board-sentinel");if(!b||!s||!("IntersectionObserver" in window))return;function fit(){if(window.matchMedia&&matchMedia("(max-width:900px)").matches){var t=8,bar=document.querySelector(".side");if(bar){var r=bar.getBoundingClientRect();if(r.bottom>0&&getComputedStyle(bar).position==="sticky")t=Math.ceil(r.bottom)}b.style.top=t+"px"}else{b.style.top=""}}fit();if(window.addEventListener)window.addEventListener("resize",fit);var btn=b.querySelector(".b-min");function setOpen(v){b.classList.toggle("open",v);if(btn){btn.setAttribute("aria-expanded",v?"true":"false");var l=btn.querySelector(".min-lab");if(l)l.textContent=v?"Свернуть":"Развернуть"}}function toggleOpen(){var st=b.getBoundingClientRect().top<=(parseFloat(getComputedStyle(b).top)||0)+2,h1=b.offsetHeight;setOpen(!b.classList.contains("open"));var d=b.offsetHeight-h1;if(st&&d){var rs=document.documentElement.style,sv=rs.scrollBehavior;rs.scrollBehavior="auto";window.scrollBy(0,d);rs.scrollBehavior=sv}}b.addEventListener("click",function(e){if(!b.classList.contains("mini")||b.classList.contains("open"))return;var t=e.target;while(t&&t!==b){var n=(t.tagName||"").toUpperCase();if(n==="BUTTON"||n==="INPUT"||n==="SELECT"||n==="TEXTAREA"||n==="A"||n==="LABEL")return;t=t.parentNode}toggleOpen()});if(btn)btn.addEventListener("click",function(e){e.stopPropagation();if(b.classList.contains("mini"))toggleOpen()});new IntersectionObserver(function(en){for(var i=0;i<en.length;i++){var vis=en[i].isIntersecting;b.classList.toggle("mini",!vis);if(vis)setOpen(false)}},{rootMargin:"-70px 0px 0px 0px",threshold:0}).observe(s)})();</script>
 </div>
 <footer class="lfoot"><div class="lwrap">Интерактивный урок к презентации «Измерение информации: бортовой центр» · <a href="../informatika-uchenikam.html">Информатика · 7 класс</a> · Плотников В. А. · МБОУ «Школа №7» г.о. Самара · <a href="../index.html">pvaschool7.github.io</a> · <a href="../materials.html">Материалы</a></div></footer>
 <div class="modal" id="modal" hidden><div class="modal-box"><div class="modal-bar"><b>Результат пары — для учителя</b><span style="display:flex;gap:8px;align-items:center"><button class="btn ghost" id="mXls" type="button">XLSX</button><button class="btn ghost" id="mClose" type="button">Закрыть</button></span></div><div class="rcard" id="mCard" style="border:none"></div></div></div>
