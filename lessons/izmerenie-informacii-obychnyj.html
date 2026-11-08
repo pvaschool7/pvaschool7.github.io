@@ -31,6 +31,13 @@
 .lad{display:flex;flex-direction:column;gap:4px;margin:16px 0}
 .lad-r{display:flex;align-items:center;gap:10px;flex-wrap:nowrap;overflow-x:auto;padding-bottom:3px}
 .lad-u{flex:none;min-width:0;text-align:center;border:2px solid var(--green);border-radius:10px;padding:6px 14px;font-weight:600;background:var(--card);white-space:nowrap}
+/* Лестница единиц как в презентации: Гбайт сверху, бит снизу; вниз умножаем, вверх делим */
+.lad-v{display:flex;justify-content:center;margin:16px 0}
+.lad-vcol{display:flex;flex-direction:column;flex:1 1 240px;max-width:330px}
+.lad-v .lad-u{font-weight:700}
+.lad-step{display:flex;justify-content:space-between;gap:16px;padding:2px 6px;font-weight:700;font-size:13.5px}
+.lad-dn{color:var(--green)}
+.lad-up{color:var(--blue)}
 .lad-x{flex:none;color:var(--mute);font-size:13.5px;white-space:nowrap}
 .lad-x{color:var(--mute);font-size:13.5px}
 .sch{display:flex;flex-wrap:wrap;gap:7px;align-items:center;margin:14px 0}
@@ -117,6 +124,8 @@ select.tin{max-width:250px;font-weight:600}
 .titem.wrong{border:2px solid var(--red)}
 .titem.wrong .tstat{color:var(--red)}
 .task-foot{margin-top:12px;display:flex;flex-wrap:wrap;align-items:center;gap:12px}
+.task-foot .js-check{flex:1 1 200px;text-align:center}
+.res-tgl{margin:0 0 10px}
 .hint{width:100%;font-size:14px;color:var(--mute);background:var(--paper);border-left:4px solid var(--yellow);border-radius:0 10px 10px 0;padding:8px 12px}
 /* ===== Донесения ИИ и вердикты ===== */
 .seans{border:1.5px solid var(--line);border-radius:12px;padding:14px 16px;margin:14px 0;background:var(--paper)}
@@ -293,13 +302,23 @@ select.tin{max-width:250px;font-weight:600}
 <div class="titem js-item" data-owner="A" data-ok="7" data-sol="7"><span class="who">А</span><span class="tlabel">2) 128 знаков — i =</span><input class="tin" type="text" inputmode="numeric" autocomplete="off" aria-label="Ответ 2"><span class="tunit">бит</span><span class="tstat" aria-live="polite"></span></div>
 <div class="titem js-item" data-owner="B" data-ok="8" data-sol="8"><span class="who">Б</span><span class="tlabel">3) 256 знаков — i =</span><input class="tin" type="text" inputmode="numeric" autocomplete="off" aria-label="Ответ 3"><span class="tunit">бит</span><span class="tstat" aria-live="polite"></span></div>
 <div class="titem js-item" data-owner="B" data-ok="9" data-sol="9"><span class="who">Б</span><span class="tlabel">4) 512 знаков — i =</span><input class="tin" type="text" inputmode="numeric" autocomplete="off" aria-label="Ответ 4"><span class="tunit">бит</span><span class="tstat" aria-live="polite"></span></div>
-<div class="task-foot"><button class="btn sm js-check" type="button">Проверить задание</button><div class="hint js-hint" hidden>Подбирай степень двойки: 2, 4, 8, 16, 32, 64, 128, 256, 512… Балл начисляется только с первой попытки.</div></div>
+<div class="task-foot"><button class="btn sm js-check" type="button" data-chk="A">Проверить — Ученик А</button><button class="btn sm js-check" type="button" data-chk="B">Проверить — Ученик Б</button><div class="hint js-hint" hidden>Подбирай степень двойки: 2, 4, 8, 16, 32, 64, 128, 256, 512… Балл начисляется только с первой попытки.</div></div>
 </div>
 </section>
 <!-- 5. Теория 2 -->
 <section class="step"><div class="step-n">5</div><h2 class="step-title">Теория 2: лестница единиц</h2>
-<div class="lad">
-<div class="lad-r"><span class="lad-u">бит</span><span class="lad-x">×8 →</span><span class="lad-u">байт</span><span class="lad-x">×1024 →</span><span class="lad-u">Кбайт</span><span class="lad-x">×1024 →</span><span class="lad-u">Мбайт</span><span class="lad-x">×1024 →</span><span class="lad-u">Гбайт</span></div>
+<div class="lad lad-v">
+<div class="lad-vcol">
+<div class="lad-u">Гбайт</div>
+<div class="lad-step"><span class="lad-up">↑ :1024</span><span class="lad-dn">↓ ×1024</span></div>
+<div class="lad-u">Мбайт</div>
+<div class="lad-step"><span class="lad-up">↑ :1024</span><span class="lad-dn">↓ ×1024</span></div>
+<div class="lad-u">Кбайт</div>
+<div class="lad-step"><span class="lad-up">↑ :1024</span><span class="lad-dn">↓ ×1024</span></div>
+<div class="lad-u">байт</div>
+<div class="lad-step"><span class="lad-up">↑ :8</span><span class="lad-dn">↓ ×8</span></div>
+<div class="lad-u">бит</div>
+</div>
 </div>
 <div class="tgrid">
 <div class="tcard"><b>Вниз — умножаем</b><p>Из крупной единицы в мелкую: 2 байта × 8 = 16 бит; 3 Кбайт × 1024 = 3072 байта.</p></div>
@@ -316,7 +335,7 @@ select.tin{max-width:250px;font-weight:600}
 <div class="titem js-item" data-owner="B" data-ok="4" data-sol="4"><span class="who">Б</span><span class="tlabel">2) 4096 байт =</span><input class="tin" type="text" inputmode="numeric" autocomplete="off" aria-label="Ответ 2"><span class="tunit">Кбайт</span><span class="tstat" aria-live="polite"></span></div>
 <div class="titem js-item" data-owner="A" data-ok="2048" data-sol="2048"><span class="who">А</span><span class="tlabel">3) 2 Кбайт =</span><input class="tin" type="text" inputmode="numeric" autocomplete="off" aria-label="Ответ 3"><span class="tunit">байта</span><span class="tstat" aria-live="polite"></span></div>
 <div class="titem js-item" data-owner="A" data-ok="40" data-sol="40"><span class="who">А</span><span class="tlabel">4) 5 байт =</span><input class="tin" type="text" inputmode="numeric" autocomplete="off" aria-label="Ответ 4"><span class="tunit">бит</span><span class="tstat" aria-live="polite"></span></div>
-<div class="task-foot"><button class="btn sm js-check" type="button">Проверить задание</button><div class="hint js-hint" hidden>Вниз по лестнице — умножаем (×8, ×1024), вверх — делим (:8, :1024). Не забудь: 1 Кбайт = 1024 байта.</div></div>
+<div class="task-foot"><button class="btn sm js-check" type="button" data-chk="A">Проверить — Ученик А</button><button class="btn sm js-check" type="button" data-chk="B">Проверить — Ученик Б</button><div class="hint js-hint" hidden>Вниз по лестнице — умножаем (×8, ×1024), вверх — делим (:8, :1024). Не забудь: 1 Кбайт = 1024 байта.</div></div>
 </div>
 </section>
 <!-- 7. Теория 3 -->
@@ -331,14 +350,22 @@ select.tin{max-width:250px;font-weight:600}
 </section>
 <!-- 8. Задание 3 -->
 <section class="step"><div class="step-n">8</div><h2 class="step-title">Задание 3: считаем донесение</h2>
-<p class="task-intro">Донесение: 40 знаков. Алфавит: 32 знака. 1) Найдите вес знака i. 2) Найдите объём I в битах. 3) Переведите в байты. 4) Проверка: байты × 8.</p>
-<p class="ord-note"><b>Роли в паре:</b> А решает шаги 1–2, Б — шаги 3–4. Потом проверяют друг друга. Проверка: 25 · 8 = 200.</p>
+<p class="task-intro">Четыре донесения. План для каждого: по N найти i (2<sup>i</sup> = N) → объём I = K · i в битах → перевести в байты (: 8). Проверка: байты × 8.</p>
+<p class="ord-note"><b>Роли в паре:</b> <b>Ученик А</b> решает донесения №1–№2, <b>Ученик Б</b> — №3–№4. Потом проверяют друг друга.</p>
 <div class="js-task" data-block="task3">
-<div class="titem js-item" data-owner="A" data-ok="5" data-sol="5"><span class="who">А</span><span class="tlabel">1) Вес знака i =</span><input class="tin" type="text" inputmode="numeric" autocomplete="off" aria-label="Ответ 1"><span class="tunit">бит</span><span class="tstat" aria-live="polite"></span></div>
-<div class="titem js-item" data-owner="A" data-ok="200" data-sol="200"><span class="who">А</span><span class="tlabel">2) Объём I =</span><input class="tin" type="text" inputmode="numeric" autocomplete="off" aria-label="Ответ 2"><span class="tunit">бит</span><span class="tstat" aria-live="polite"></span></div>
-<div class="titem js-item" data-owner="B" data-ok="25" data-sol="25"><span class="who">Б</span><span class="tlabel">3) Объём I =</span><input class="tin" type="text" inputmode="numeric" autocomplete="off" aria-label="Ответ 3"><span class="tunit">байт</span><span class="tstat" aria-live="polite"></span></div>
-<div class="titem js-item" data-owner="B" data-ok="200" data-sol="200"><span class="who">Б</span><span class="tlabel">4) Проверка: 25 байт × 8 =</span><input class="tin" type="text" inputmode="numeric" autocomplete="off" aria-label="Ответ 4"><span class="tunit">бит</span><span class="tstat" aria-live="polite"></span></div>
-<div class="task-foot"><button class="btn sm js-check" type="button">Проверить задание</button><div class="hint js-hint" hidden>Сначала i из равенства 2<sup>i</sup> = 32, потом I = K · i, потом биты в байты: делим на 8. Проверь ответ обратным действием.</div></div>
+<div class="titem js-item" data-owner="A" data-ok="5" data-sol="5"><span class="who">А</span><span class="tlabel">№1 (40 знаков, алфавит 32): вес знака i =</span><input class="tin" type="text" inputmode="numeric" autocomplete="off" aria-label="Ответ 1"><span class="tunit">бит</span><span class="tstat" aria-live="polite"></span></div>
+<div class="titem js-item" data-owner="A" data-ok="200" data-sol="200"><span class="who">А</span><span class="tlabel">№1: объём I =</span><input class="tin" type="text" inputmode="numeric" autocomplete="off" aria-label="Ответ 2"><span class="tunit">бит</span><span class="tstat" aria-live="polite"></span></div>
+<div class="titem js-item" data-owner="A" data-ok="25" data-sol="25"><span class="who">А</span><span class="tlabel">№1: объём I =</span><input class="tin" type="text" inputmode="numeric" autocomplete="off" aria-label="Ответ 3"><span class="tunit">байт</span><span class="tstat" aria-live="polite"></span></div>
+<div class="titem js-item" data-owner="A" data-ok="4" data-sol="4"><span class="who">А</span><span class="tlabel">№2 (36 знаков, алфавит 16): вес знака i =</span><input class="tin" type="text" inputmode="numeric" autocomplete="off" aria-label="Ответ 4"><span class="tunit">бит</span><span class="tstat" aria-live="polite"></span></div>
+<div class="titem js-item" data-owner="A" data-ok="144" data-sol="144"><span class="who">А</span><span class="tlabel">№2: объём I =</span><input class="tin" type="text" inputmode="numeric" autocomplete="off" aria-label="Ответ 5"><span class="tunit">бита</span><span class="tstat" aria-live="polite"></span></div>
+<div class="titem js-item" data-owner="A" data-ok="18" data-sol="18"><span class="who">А</span><span class="tlabel">№2: объём I =</span><input class="tin" type="text" inputmode="numeric" autocomplete="off" aria-label="Ответ 6"><span class="tunit">байт</span><span class="tstat" aria-live="polite"></span></div>
+<div class="titem js-item" data-owner="B" data-ok="6" data-sol="6"><span class="who">Б</span><span class="tlabel">№3 (24 знака, алфавит 64): вес знака i =</span><input class="tin" type="text" inputmode="numeric" autocomplete="off" aria-label="Ответ 7"><span class="tunit">бит</span><span class="tstat" aria-live="polite"></span></div>
+<div class="titem js-item" data-owner="B" data-ok="144" data-sol="144"><span class="who">Б</span><span class="tlabel">№3: объём I =</span><input class="tin" type="text" inputmode="numeric" autocomplete="off" aria-label="Ответ 8"><span class="tunit">бита</span><span class="tstat" aria-live="polite"></span></div>
+<div class="titem js-item" data-owner="B" data-ok="18" data-sol="18"><span class="who">Б</span><span class="tlabel">№3: объём I =</span><input class="tin" type="text" inputmode="numeric" autocomplete="off" aria-label="Ответ 9"><span class="tunit">байт</span><span class="tstat" aria-live="polite"></span></div>
+<div class="titem js-item" data-owner="B" data-ok="5" data-sol="5"><span class="who">Б</span><span class="tlabel">№4 (80 знаков, алфавит 32): вес знака i =</span><input class="tin" type="text" inputmode="numeric" autocomplete="off" aria-label="Ответ 10"><span class="tunit">бит</span><span class="tstat" aria-live="polite"></span></div>
+<div class="titem js-item" data-owner="B" data-ok="400" data-sol="400"><span class="who">Б</span><span class="tlabel">№4: объём I =</span><input class="tin" type="text" inputmode="numeric" autocomplete="off" aria-label="Ответ 11"><span class="tunit">бит</span><span class="tstat" aria-live="polite"></span></div>
+<div class="titem js-item" data-owner="B" data-ok="50" data-sol="50"><span class="who">Б</span><span class="tlabel">№4: объём I =</span><input class="tin" type="text" inputmode="numeric" autocomplete="off" aria-label="Ответ 12"><span class="tunit">байт</span><span class="tstat" aria-live="polite"></span></div>
+<div class="task-foot"><button class="btn sm js-check" type="button" data-chk="A">Проверить — Ученик А</button><button class="btn sm js-check" type="button" data-chk="B">Проверить — Ученик Б</button><div class="hint js-hint" hidden>План: сначала i из равенства 2<sup>i</sup> = N, потом I = K · i, потом биты в байты: делим на 8. Проверь ответ обратным действием: байты × 8.</div></div>
 </div>
 </section>
 <!-- 9. Инструменты связиста -->
@@ -459,7 +486,9 @@ select.tin{max-width:250px;font-weight:600}
 </div>
 </section>
 <!-- 13. Резерв 1 -->
-<section class="step"><div class="step-n">13</div><h2 class="step-title">Резерв 1: считаем донесение побольше</h2>
+<section class="step res-step"><div class="step-n">13</div><h2 class="step-title">Резерв 1: считаем донесение побольше</h2>
+<button class="btn sm ghost res-tgl" type="button">Показать резерв</button>
+<div class="res-body" hidden>
 <p class="mute">Резерв — для пар, которые справились раньше. Каждый верный ответ <b>+1</b>, верное доказательство <b>+2</b>, исправленный запрос — до <b>+4</b>. Резервные баллы идут сверх максимума урока.</p>
 <p class="task-intro">Донесение: 120 знаков. Алфавит: 64 знака. 1) Найдите вес знака i. 2) Найдите объём I в битах. 3) Переведите в байты. 4) Проверка: байты × 8.</p>
 <p class="ord-note"><b>Роли в паре:</b> А решает шаги 1–2, Б — шаги 3–4, затем проверяют друг друга.</p>
@@ -468,11 +497,14 @@ select.tin{max-width:250px;font-weight:600}
 <div class="titem js-item" data-owner="A" data-ok="720" data-sol="720"><span class="who">А</span><span class="tlabel">2) Объём I =</span><input class="tin" type="text" inputmode="numeric" autocomplete="off" aria-label="Ответ 2"><span class="tunit">бит</span><span class="tstat" aria-live="polite"></span></div>
 <div class="titem js-item" data-owner="B" data-ok="90" data-sol="90"><span class="who">Б</span><span class="tlabel">3) Объём I =</span><input class="tin" type="text" inputmode="numeric" autocomplete="off" aria-label="Ответ 3"><span class="tunit">байт</span><span class="tstat" aria-live="polite"></span></div>
 <div class="titem js-item" data-owner="B" data-ok="720" data-sol="720"><span class="who">Б</span><span class="tlabel">4) Проверка: 90 байт × 8 =</span><input class="tin" type="text" inputmode="numeric" autocomplete="off" aria-label="Ответ 4"><span class="tunit">бит</span><span class="tstat" aria-live="polite"></span></div>
-<div class="task-foot"><button class="btn sm js-check" type="button">Проверить задание</button><div class="hint js-hint" hidden>i найди по степеням двойки: 2<sup>i</sup> = 64. Дальше I = K · i, потом биты в байты: делим на 8. Проверь ответ обратным действием.</div></div>
+<div class="task-foot"><button class="btn sm js-check" type="button" data-chk="A">Проверить — Ученик А</button><button class="btn sm js-check" type="button" data-chk="B">Проверить — Ученик Б</button><div class="hint js-hint" hidden>i найди по степеням двойки: 2<sup>i</sup> = 64. Дальше I = K · i, потом биты в байты: делим на 8. Проверь ответ обратным действием.</div></div>
 </div>
-</section>
+
+</div></section>
 <!-- 14. Резерв 2 -->
-<section class="step"><div class="step-n">14</div><h2 class="step-title">Резерв 2: ступеньки вверх и вниз</h2>
+<section class="step res-step"><div class="step-n">14</div><h2 class="step-title">Резерв 2: ступеньки вверх и вниз</h2>
+<button class="btn sm ghost res-tgl" type="button">Показать резерв</button>
+<div class="res-body" hidden>
 <p class="task-intro">Переведите по ступенькам: 1) 2 Кбайт в биты; 2) 5120 Кбайт в Мбайт; 3) 16384 бита в Кбайт; 4) 3 Мбайт в Кбайт.</p>
 <p class="ord-note"><b>Роли в паре:</b> А решает 1 и 3, Б решает 2 и 4, затем проверяют друг друга.</p>
 <div class="js-task" data-block="r2">
@@ -480,11 +512,14 @@ select.tin{max-width:250px;font-weight:600}
 <div class="titem js-item" data-owner="B" data-ok="5" data-sol="5"><span class="who">Б</span><span class="tlabel">2) 5120 Кбайт =</span><input class="tin" type="text" inputmode="numeric" autocomplete="off" aria-label="Ответ 2"><span class="tunit">Мбайт</span><span class="tstat" aria-live="polite"></span></div>
 <div class="titem js-item" data-owner="A" data-ok="2" data-sol="2"><span class="who">А</span><span class="tlabel">3) 16384 бита =</span><input class="tin" type="text" inputmode="numeric" autocomplete="off" aria-label="Ответ 3"><span class="tunit">Кбайт</span><span class="tstat" aria-live="polite"></span></div>
 <div class="titem js-item" data-owner="B" data-ok="3072" data-sol="3072"><span class="who">Б</span><span class="tlabel">4) 3 Мбайт =</span><input class="tin" type="text" inputmode="numeric" autocomplete="off" aria-label="Ответ 4"><span class="tunit">Кбайт</span><span class="tstat" aria-live="polite"></span></div>
-<div class="task-foot"><button class="btn sm js-check" type="button">Проверить задание</button><div class="hint js-hint" hidden>Идём ступень за ступенью: вниз умножаем (×8, ×1024), вверх делим (:8, :1024).</div></div>
+<div class="task-foot"><button class="btn sm js-check" type="button" data-chk="A">Проверить — Ученик А</button><button class="btn sm js-check" type="button" data-chk="B">Проверить — Ученик Б</button><div class="hint js-hint" hidden>Идём ступень за ступенью: вниз умножаем (×8, ×1024), вверх делим (:8, :1024).</div></div>
 </div>
-</section>
+
+</div></section>
 <!-- 15. Резерв 3 -->
-<section class="step"><div class="step-n">15</div><h2 class="step-title">Резерв 3: блиц и задача со звёздочкой</h2>
+<section class="step res-step"><div class="step-n">15</div><h2 class="step-title">Резерв 3: блиц и задача со звёздочкой</h2>
+<button class="btn sm ghost res-tgl" type="button">Показать резерв</button>
+<div class="res-body" hidden>
 <p class="task-intro"><b>Блиц (20 секунд на ответ):</b> 1) 16 знаков: бит на знак? 2) 3 Кбайт: сколько байт? 3) 2 байта: сколько бит? 4) 24 бита: сколько байт?</p>
 <p class="task-intro"><b>Со звёздочкой:</b> алфавит из 20 знаков. Сколько бит на знак? Подсказка: 2<sup>4</sup> = 16 — мало, 2<sup>5</sup> = 32 — хватает.</p>
 <p class="ord-note"><b>Как играем:</b> А отвечает на 1–2, Б — на 3–4, звёздочка решаем вместе. Отмечайте ☐ в чек-листе.</p>
@@ -494,11 +529,14 @@ select.tin{max-width:250px;font-weight:600}
 <div class="titem js-item" data-owner="B" data-ok="16" data-sol="16"><span class="who">Б</span><span class="tlabel">3) 2 байта =</span><input class="tin" type="text" inputmode="numeric" autocomplete="off" aria-label="Ответ 3"><span class="tunit">бит</span><span class="tstat" aria-live="polite"></span></div>
 <div class="titem js-item" data-owner="B" data-ok="3" data-sol="3"><span class="who">Б</span><span class="tlabel">4) 24 бита =</span><input class="tin" type="text" inputmode="numeric" autocomplete="off" aria-label="Ответ 4"><span class="tunit">байта</span><span class="tstat" aria-live="polite"></span></div>
 <div class="titem js-item" data-ok="5" data-sol="5"><span class="who">★</span><span class="tlabel">5) Алфавит 20 знаков — i =</span><input class="tin" type="text" inputmode="numeric" autocomplete="off" aria-label="Ответ 5"><span class="tunit">бит</span><span class="tstat" aria-live="polite"></span></div>
-<div class="task-foot"><button class="btn sm js-check" type="button">Проверить задание</button><div class="hint js-hint" hidden>Степени двойки: 2, 4, 8, 16, 32… Для звёздочки: 16 знаков — это 4 бита, но 20 знаков уже не помещаются — берём 5 бит.</div></div>
+<div class="task-foot"><button class="btn sm js-check" type="button" data-chk="A">Проверить — Ученик А</button><button class="btn sm js-check" type="button" data-chk="B">Проверить — Ученик Б</button><div class="hint js-hint" hidden>Степени двойки: 2, 4, 8, 16, 32… Для звёздочки: 16 знаков — это 4 бита, но 20 знаков уже не помещаются — берём 5 бит.</div></div>
 </div>
-</section>
+
+</div></section>
 <!-- 16. Резерв 4 -->
-<section class="step"><div class="step-n">16</div><h2 class="step-title">Резерв 4: ловушка про скорость интернета</h2>
+<section class="step res-step"><div class="step-n">16</div><h2 class="step-title">Резерв 4: ловушка про скорость интернета</h2>
+<button class="btn sm ghost res-tgl" type="button">Показать резерв</button>
+<div class="res-body" hidden>
 <div class="seans js-verdict" data-block="r4" data-ok="no">
 <span class="seans-n">Резервное донесение</span>
 <div class="ai"><span class="ai-chip">Навигатор сообщает</span><p class="ai-say">«80 Мбит/с — значит, файл в 80 Мбайт придёт за 1 секунду».</p></div>
@@ -507,9 +545,12 @@ select.tin{max-width:250px;font-weight:600}
 <div class="expl">Мбит — мегабиты, Мбайт — мегабайты: мегабиты делим на 8. 80 Мбит/с = 10 Мбайт/с, поэтому 80 : 10 = 8 секунд. Роли: докладчик называет ошибку, писарь записывает ключ.</div>
 <div class="proof" hidden><label class="p-lab" for="pf6">Доказательство письменно (+2): где ошибка и за сколько секунд файл придёт на самом деле?</label><textarea id="pf6" class="ta js-proof" rows="3" placeholder="80 Мбит/с — это… мегабайт в секунду, поэтому…"></textarea><div class="p-foot"><button class="btn sm ghost js-saveproof" type="button">Записать доказательство (+2)</button><span class="pmsg"></span></div></div>
 </div>
-</section>
+
+</div></section>
 <!-- 17. Резерв 5 -->
-<section class="step"><div class="step-n">17</div><h2 class="step-title">Резерв 5: исправь запрос к ИИ</h2>
+<section class="step res-step"><div class="step-n">17</div><h2 class="step-title">Резерв 5: исправь запрос к ИИ</h2>
+<button class="btn sm ghost res-tgl" type="button">Показать резерв</button>
+<div class="res-body" hidden>
 <div class="q-was"><b>Было: слабый запрос</b><br>«Сколько весит донесение?» — ответ ИИ: «Много, зависит от длины» — неполно.</div>
 <div class="q-now"><b>Стало: сильный запрос</b><br>«Донесение: 40 знаков, алфавит 32 знака. Найди вес знака по формуле N = 2<sup>i</sup>, объём в битах и в байтах. Покажи каждое действие. Если данных не хватает, напиши “не знаю”».</div>
 <div class="prax-duo">
@@ -541,7 +582,8 @@ select.tin{max-width:250px;font-weight:600}
 </div>
 </div>
 </div>
-</section>
+
+</div></section>
 <!-- 18. Итоги -->
 <section class="step"><div class="step-n">18</div><h2 class="step-title">Итоги: покажите учителю</h2>
 <p class="mute" style="font-size:13.5px">Результаты урока: сколько связистов распознало ловушку на входе и на выходе; письменный финал — 4 критерия по 2 балла: 7–8 — «5», 5–6 — «4», 3–4 — «3».</p>
@@ -594,7 +636,7 @@ select.tin{max-width:250px;font-weight:600}
 (function(){
 "use strict";
 var LESSON_ID="izmerenie-obychnyj";
-var PAIR_MAX=48;
+var PAIR_MAX=56;
 var LESSON_TITLE="Интерактивный урок «Измерение информации: бортовой центр» — обычный класс, информатика, 7 класс";
 var KEY="pva-lesson-"+LESSON_ID;
 var d=document;
@@ -607,7 +649,9 @@ function fmt(n){n=Math.round(n*10)/10;return n%1?n.toFixed(1).replace(".",","):S
 function esc(s){return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;")}
 function stamp(){var t=new Date(),p=function(n){return (n<10?"0":"")+n};return p(t.getDate())+"."+p(t.getMonth()+1)+"."+t.getFullYear()+" "+p(t.getHours())+"-"+p(t.getMinutes())+"-"+p(t.getSeconds())}
 var S={v:"A",names:{A:"",B:""},auto:{A:0,B:0},pend:0,blocks:0,items:{},done:{},ts:stamp()};
-var TOTAL_BLOCKS=$$("[data-block]").length;
+/* Резервные разделы скрыты и дают бонусные баллы сверх максимума —
+   в обязательный счёт блоков не входят */
+var TOTAL_BLOCKS=$$("[data-block]").filter(function(x){return !(x.closest&&x.closest(".res-step"))}).length;
 try{var x=JSON.parse(localStorage.getItem(KEY)||"null");if(x&&x.items)S=x}catch(e){}
 S.ts=S.ts||stamp();
 function save(){try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}}
@@ -668,7 +712,7 @@ function applyGate(task,items,silent){
 $$(".js-task").forEach(function(task){
  var bid=task.getAttribute("data-block");
  var items=$$(".js-item",task);
- var btn=$(".js-check",task),hint=$(".js-hint",task);
+ var btns=$$(".js-check",task),hint=$(".js-hint",task);
  function lock(it,val,cls,msg){
   var inp=$(".tin",it);
   if(inp){inp.value=val;inp.disabled=true}
@@ -690,14 +734,24 @@ $$(".js-task").forEach(function(task){
  if(task.hasAttribute("data-gate"))task.addEventListener("input",function(e){
   if(e.target&&e.target.classList&&e.target.classList.contains("tin"))applyGate(task,items);
  });
+ /* после перезагрузки: если задание уже решено, обе кнопки гасим */
+ var allDone=items.length>0&&items.every(function(it){var c=it.classList;return c.contains("ok")||c.contains("late")||c.contains("reveal")});
+ if(allDone){btns.forEach(function(b){b.textContent="Задание проверено ✓";b.disabled=true});if(hint)hint.hidden=true}
  task.addEventListener("keydown",function(e){
-  if(e.key==="Enter"&&e.target.classList&&e.target.classList.contains("tin")){e.preventDefault();if(btn&&!btn.disabled)btn.click()}
+  if(e.key==="Enter"&&e.target.classList&&e.target.classList.contains("tin")){e.preventDefault();
+   var eIt=e.target.closest(".js-item"),eOwn=eIt?(eIt.getAttribute("data-owner")||"A"):null;
+   var eBtn=eOwn?$('.js-check[data-chk="'+eOwn+'"]',task):null;
+   if(!eBtn)eBtn=btns[0]||null;
+   if(eBtn&&!eBtn.disabled)eBtn.click()}
  });
  task.addEventListener("click",function(e){
-  if(!e.target.closest||!e.target.closest(".js-check"))return;
+  var bEl=e.target.closest?e.target.closest(".js-check"):null;
+  if(!bEl)return;
+  var chk=bEl.getAttribute("data-chk")||"";
   task._submitted=true;S.gate=S.gate||{};S.gate[bid]=1;
   var anyOpen=false;
   items.forEach(function(it,idx){
+   if(chk&&(it.getAttribute("data-owner")||"A")!==chk)return;
    var key=bid+"#"+idx,st=S.items[key]||{};
    var cl=it.classList;
    if(cl.contains("ok")||cl.contains("late")||cl.contains("reveal"))return;
@@ -725,10 +779,13 @@ $$(".js-task").forEach(function(task){
    }
   });
   var solved=items.every(function(it){var c=it.classList;return c.contains("ok")||c.contains("late")||c.contains("reveal")});
+  var sideDone=!chk||items.filter(function(x){return (x.getAttribute("data-owner")||"A")===chk}).every(function(it){var c=it.classList;return c.contains("ok")||c.contains("late")||c.contains("reveal")});
   applyGate(task,items);
   if(hint)hint.hidden=solved;
-  if(solved&&!S.done[bid]){S.done[bid]=1;S.blocks++;btn.textContent="Задание проверено ✓";btn.disabled=true}
-  if(!solved)btn.textContent="Проверить ещё раз";
+  if(solved){btns.forEach(function(b){b.textContent="Задание проверено ✓";b.disabled=true})}
+  else if(sideDone){bEl.textContent="Задание проверено ✓";bEl.disabled=true}
+  else{bEl.textContent="Проверить ещё раз"}
+  if(solved&&!S.done[bid]){S.done[bid]=1;if(!(task.closest&&task.closest(".res-step")))S.blocks++}
   renderBoard();save();
  });
 });
@@ -759,7 +816,7 @@ $$(".js-verdict").forEach(function(v){
   if(rec.v===ok&&!v.hasAttribute("data-nopoints")){S.auto[act]++;bump(act,"+1")}
   S.v=(act==="A"?"B":"A");
   apply(rec);
-  if(!S.done[bid]){S.done[bid]=1;S.blocks++}
+  if(!S.done[bid]){S.done[bid]=1;if(!(v.closest&&v.closest(".res-step")))S.blocks++}
   renderBoard();save();
  })});
  if(sp)sp.addEventListener("click",function(){
@@ -807,7 +864,7 @@ $$("[data-kind]").forEach(function(box){
   S.items[bid]={ok:1,pts:pts,vals:vals,cbs:cbs.map(function(c){return c.checked})};
   S.pend+=pts;lock();
   msg.textContent="✓ сдано: +"+pts+" на проверке";msg.className="pmsg good";
-  if(!S.done[bid]){S.done[bid]=1;S.blocks++}
+  if(!S.done[bid]){S.done[bid]=1;if(!(box.closest&&box.closest(".res-step")))S.blocks++}
   renderBoard();save();
  });
 });
@@ -880,6 +937,16 @@ $$(".js-item[data-owner]").forEach(function(it){
  }
  it.addEventListener("focusin",autoSw);
  it.addEventListener("mousedown",autoSw);
+});
+/* ---- резервные блоки: скрыты по умолчанию, раскрываются по одному ---- */
+$$(".res-step").forEach(function(sec){
+ var tgl=$(".res-tgl",sec),body=$(".res-body",sec);
+ if(!tgl||!body)return;
+ tgl.addEventListener("click",function(){
+  var willOpen=body.hidden;
+  body.hidden=!willOpen;
+  tgl.textContent=willOpen?"Скрыть резерв":"Показать резерв";
+ });
 });
 /* ---- экспорт отчёта в XLSX ---- */
 var FILE_TAG="Измерение информации (обычный класс)";

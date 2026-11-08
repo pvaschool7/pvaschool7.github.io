@@ -110,6 +110,7 @@ select.tin{max-width:250px;font-weight:600}
 .titem.wrong{border:2px solid var(--red)}
 .titem.wrong .tstat{color:var(--red)}
 .task-foot{margin-top:12px;display:flex;flex-wrap:wrap;align-items:center;gap:12px}
+.task-foot .js-check{flex:1 1 200px;text-align:center}
 .hint{width:100%;font-size:14px;color:var(--mute);background:var(--paper);border-left:4px solid var(--yellow);border-radius:0 10px 10px 0;padding:8px 12px}
 /* ===== Донесения ИИ и вердикты ===== */
 .seans{border:1.5px solid var(--line);border-radius:12px;padding:14px 16px;margin:14px 0;background:var(--paper)}
@@ -281,7 +282,7 @@ select.tin{max-width:250px;font-weight:600}
 <div class="titem js-item" data-owner="A" data-ok="передача" data-sol="передача"><span class="who">А</span><span class="tlabel">3) Отправил данные на Землю</span><select class="tin field" aria-label="Ответ 3"><option value="">— выбери процесс —</option><option>сбор</option><option>хранение</option><option>передача</option><option>обработка</option><option>защита</option></select><span class="tstat" aria-live="polite"></span></div>
 <div class="titem js-item" data-owner="B" data-ok="обработка" data-sol="обработка"><span class="who">Б</span><span class="tlabel">4) Вычислил разницу двух измерений</span><select class="tin field" aria-label="Ответ 4"><option value="">— выбери процесс —</option><option>сбор</option><option>хранение</option><option>передача</option><option>обработка</option><option>защита</option></select><span class="tstat" aria-live="polite"></span></div>
 <div class="titem js-item" data-owner="B" data-ok="защита" data-sol="защита"><span class="who">Б</span><span class="tlabel">5) Закрыл бортовой компьютер паролем</span><select class="tin field" aria-label="Ответ 5"><option value="">— выбери процесс —</option><option>сбор</option><option>хранение</option><option>передача</option><option>обработка</option><option>защита</option></select><span class="tstat" aria-live="polite"></span></div>
-<div class="task-foot"><button class="btn sm js-check" type="button">Проверить задание</button><div class="hint js-hint" hidden>Спроси себя: что именно делает станция — получает сведения, записывает на носитель, отправляет по каналу, вычисляет новое или закрывает доступ?</div></div>
+<div class="task-foot"><button class="btn sm js-check" type="button" data-chk="A">Проверить — Ученик А</button><button class="btn sm js-check" type="button" data-chk="B">Проверить — Ученик Б</button><div class="hint js-hint" hidden>Спроси себя: что именно делает станция — получает сведения, записывает на носитель, отправляет по каналу, вычисляет новое или закрывает доступ?</div></div>
 </div>
 </section>
 <!-- 5. Теория 2 -->
@@ -301,7 +302,7 @@ select.tin{max-width:250px;font-weight:600}
 <div class="titem js-item" data-owner="A" data-ok="95 80 60 45" data-sol="95, 80, 60, 45"><span class="who">А</span><span class="tlabel">1) По убыванию:</span><input class="tin wide" type="text" autocomplete="off" aria-label="Ответ 1" placeholder="через запятую"><span class="tstat" aria-live="polite"></span></div>
 <div class="titem js-item" data-owner="B" data-ok="45" data-sol="45"><span class="who">Б</span><span class="tlabel">2) Наименьшее значение:</span><input class="tin" type="text" inputmode="numeric" autocomplete="off" aria-label="Ответ 2"><span class="tunit">%</span><span class="tstat" aria-live="polite"></span></div>
 <div class="titem js-item" data-owner="B" data-ok="50" data-sol="50"><span class="who">Б</span><span class="tlabel">3) Разница наибольшего и наименьшего:</span><input class="tin" type="text" inputmode="numeric" autocomplete="off" aria-label="Ответ 3"><span class="tunit">%</span><span class="tstat" aria-live="polite"></span></div>
-<div class="task-foot"><button class="btn sm js-check" type="button">Проверить задание</button><div class="hint js-hint" hidden>Самое большое — 95. Разница записывается действием: наибольшее − наименьшее. Новая информация — порядок и число.</div></div>
+<div class="task-foot"><button class="btn sm js-check" type="button" data-chk="A">Проверить — Ученик А</button><button class="btn sm js-check" type="button" data-chk="B">Проверить — Ученик Б</button><div class="hint js-hint" hidden>Самое большое — 95. Разница записывается действием: наибольшее − наименьшее. Новая информация — порядок и число.</div></div>
 </div>
 </section>
 <!-- 7. Теория 3 -->
@@ -321,7 +322,7 @@ select.tin{max-width:250px;font-weight:600}
 <div class="titem js-item" data-owner="A" data-ok="копия на другом носителе" data-sol="копия на другом носителе"><span class="who">А</span><span class="tlabel">1) Сбой памяти бортового журнала</span><select class="tin field" aria-label="Ответ 1"><option value="">— выбери меру —</option><option>пароль и права доступа</option><option>копия на другом носителе</option><option>повторить передачу</option></select><span class="tstat" aria-live="polite"></span></div>
 <div class="titem js-item" data-owner="A" data-ok="пароль и права доступа" data-sol="пароль и права доступа"><span class="who">А</span><span class="tlabel">2) Посторонний подключился к бортовому компьютеру</span><select class="tin field" aria-label="Ответ 2"><option value="">— выбери меру —</option><option>пароль и права доступа</option><option>копия на другом носителе</option><option>повторить передачу</option></select><span class="tstat" aria-live="polite"></span></div>
 <div class="titem js-item" data-owner="B" data-ok="повторить передачу" data-sol="повторить передачу"><span class="who">Б</span><span class="tlabel">3) Помехи исказили радиосигнал</span><select class="tin field" aria-label="Ответ 3"><option value="">— выбери меру —</option><option>пароль и права доступа</option><option>копия на другом носителе</option><option>повторить передачу</option></select><span class="tstat" aria-live="polite"></span></div>
-<div class="task-foot"><button class="btn sm js-check" type="button">Проверить задание</button><div class="hint js-hint" hidden>Копия в той же памяти не спасёт от сбоя; от постороннего защищает пароль; помехи — повод повторить передачу.</div></div>
+<div class="task-foot"><button class="btn sm js-check" type="button" data-chk="A">Проверить — Ученик А</button><button class="btn sm js-check" type="button" data-chk="B">Проверить — Ученик Б</button><div class="hint js-hint" hidden>Копия в той же памяти не спасёт от сбоя; от постороннего защищает пароль; помехи — повод повторить передачу.</div></div>
 </div>
 </section>
 <!-- 9. Инструменты связиста -->
@@ -606,7 +607,7 @@ function applyGate(task,items,silent){
 $$(".js-task").forEach(function(task){
  var bid=task.getAttribute("data-block");
  var items=$$(".js-item",task);
- var btn=$(".js-check",task),hint=$(".js-hint",task);
+ var btns=$$(".js-check",task),hint=$(".js-hint",task);
  function lock(it,val,cls,msg){
   var inp=$(".tin",it);
   if(inp){inp.value=val;inp.disabled=true}
@@ -624,13 +625,23 @@ $$(".js-task").forEach(function(task){
   else if(st.stt==="wrong"){it.classList.add("wrong");$(".tstat",it).textContent="✗"}
  });
  applyGate(task,items,true);
+ /* после перезагрузки: если задание уже решено, обе кнопки гасим */
+ var allDone=items.length>0&&items.every(function(it){var c=it.classList;return c.contains("ok")||c.contains("late")||c.contains("reveal")});
+ if(allDone){btns.forEach(function(b){b.textContent="Задание проверено ✓";b.disabled=true});if(hint)hint.hidden=true}
  task.addEventListener("keydown",function(e){
-  if(e.key==="Enter"&&e.target.classList&&e.target.classList.contains("tin")){e.preventDefault();if(btn&&!btn.disabled)btn.click()}
+  if(e.key==="Enter"&&e.target.classList&&e.target.classList.contains("tin")){e.preventDefault();
+   var eIt=e.target.closest(".js-item"),eOwn=eIt?(eIt.getAttribute("data-owner")||"A"):null;
+   var eBtn=eOwn?$('.js-check[data-chk="'+eOwn+'"]',task):null;
+   if(!eBtn)eBtn=btns[0]||null;
+   if(eBtn&&!eBtn.disabled)eBtn.click()}
  });
  task.addEventListener("click",function(e){
-  if(!e.target.closest||!e.target.closest(".js-check"))return;
+  var bEl=e.target.closest?e.target.closest(".js-check"):null;
+  if(!bEl)return;
+  var chk=bEl.getAttribute("data-chk")||"";
   var anyOpen=false;
   items.forEach(function(it,idx){
+   if(chk&&(it.getAttribute("data-owner")||"A")!==chk)return;
    var key=bid+"#"+idx,st=S.items[key]||{};
    var cl=it.classList;
    if(cl.contains("ok")||cl.contains("late")||cl.contains("reveal"))return;
@@ -658,10 +669,13 @@ $$(".js-task").forEach(function(task){
    }
   });
   var solved=items.every(function(it){var c=it.classList;return c.contains("ok")||c.contains("late")||c.contains("reveal")});
+  var sideDone=!chk||items.filter(function(x){return (x.getAttribute("data-owner")||"A")===chk}).every(function(it){var c=it.classList;return c.contains("ok")||c.contains("late")||c.contains("reveal")});
   applyGate(task,items);
   if(hint)hint.hidden=solved;
-  if(solved&&!S.done[bid]){S.done[bid]=1;S.blocks++;btn.textContent="Задание проверено ✓";btn.disabled=true}
-  if(!solved)btn.textContent="Проверить ещё раз";
+  if(solved){btns.forEach(function(b){b.textContent="Задание проверено ✓";b.disabled=true})}
+  else if(sideDone){bEl.textContent="Задание проверено ✓";bEl.disabled=true}
+  else{bEl.textContent="Проверить ещё раз"}
+  if(solved&&!S.done[bid]){S.done[bid]=1;if(!(task.closest&&task.closest(".res-step")))S.blocks++}
   renderBoard();save();
  });
 });
