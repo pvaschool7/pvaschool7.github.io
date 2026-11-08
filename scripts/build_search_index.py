@@ -42,6 +42,7 @@ PAGES = [
     "obo-mne.html",
     "kontakty.html",
     "lessons/izmerenie-informacii.html",
+    "lessons/izmerenie-informacii-obychnyj.html",
     "lessons/informacionnye-processy.html",
     "lessons/konspekt-izmerenie.html",
     "lessons/konspekt-processy.html",
