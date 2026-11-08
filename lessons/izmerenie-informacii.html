@@ -214,12 +214,9 @@ select.tin{max-width:250px;font-weight:600}
 .js-task::before{content:'Ученик А';grid-column:1;grid-row:1;align-self:end;font-weight:700;font-size:13.5px;color:var(--mute);padding:0 2px}
 .js-task::after{content:'Ученик Б';grid-column:2;grid-row:1;align-self:end;font-weight:700;font-size:13.5px;color:var(--mute);padding:0 2px}
 }
-/* Кто сейчас отвечает: строка активного ученика подсвечена (и в свёрнутой полоске) */
+/* Кто сейчас отвечает: активная строка выделена прямоугольником (и в свёрнутой полоске) */
 .board .b-row.turn{border:1.5px solid var(--blue);background:color-mix(in srgb,var(--blue) 9%,var(--paper))}
-.board .b-row.turn .b-who{color:var(--blue);font-weight:800}
-.board.mini:not(.open) .b-row.turn{border-radius:9px;padding:2px 8px}
-.board.mini:not(.open) .b-row.turn .b-who::before{content:'●';color:var(--blue);margin-right:5px;font-size:10px;vertical-align:1px;animation:pva-turn 1.3s ease-in-out infinite}
-@keyframes pva-turn{0%,100%{opacity:1}50%{opacity:.3}}
+.board.mini:not(.open) .b-row.turn{border:1.5px solid var(--blue);background:color-mix(in srgb,var(--blue) 9%,var(--paper));border-radius:9px;padding:2px 8px}
 @media(min-width:701px) and (max-height:920px){
  .lhero{padding:14px 0 18px;margin-bottom:14px}
  .lhero h1{font-size:clamp(26px,3.2vw,36px);margin:.2em 0 .1em}
