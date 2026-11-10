@@ -33,6 +33,7 @@ PAGES = [
     "informatika.html",
     "informatika-uchenikam.html",
     "informatika-uchitelyam.html",
+    "informatika-hakaton.html",
     "informatika-propushel-urok.html",
     "matematika.html",
     "matematika-uchenikam.html",
