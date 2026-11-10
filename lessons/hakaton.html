@@ -93,13 +93,30 @@
 .hk-no{color:var(--red);font-weight:700}
 .hk-status{min-height:24px;font-weight:600;font-size:14.5px;margin-top:8px}
 .hk-status.ok{color:var(--green)}.hk-status.err{color:var(--red)}
+
+/* --- хакатон v2: вкладки, состав, синхронизация --- */
+.hk-tabs{display:flex;gap:10px;flex-wrap:wrap;margin:0 0 16px}
+.hk-tab{border:1.5px solid var(--line,var(--blue));background:var(--card);color:var(--ink,var(--text));border-radius:22px;padding:9px 18px;font:inherit;font-weight:600;cursor:pointer;font-size:14.5px}
+.hk-tab.on{background:var(--blue);color:#fff;border-color:var(--blue)}
+.hk-roster{display:flex;flex-direction:column;gap:8px;margin:10px 0}
+.hk-rost-row{display:flex;align-items:center;gap:12px;flex-wrap:wrap;border:1.5px solid var(--line,var(--blue));border-radius:12px;padding:9px 12px;background:var(--card)}
+.hk-rost-name{font-weight:600;min-width:150px}
+.hk-rost-role{color:var(--mute);font-size:14px}
+.hk-rost-join{color:var(--mute);font-size:13px;margin-left:auto}
+.hk-rost-add{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-top:4px}
+.hk-rost-add .hk-in{max-width:230px}
+.hk-joincard{border:1.5px solid var(--blue);border-radius:14px;padding:14px 16px;margin-top:12px;background:var(--card)}
+.hk-joinhead{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.hk-sync-ok{color:var(--green)!important;background:color-mix(in srgb,var(--green) 12%,var(--card))!important}
+.hk-sync-off{color:#a05a00!important;background:color-mix(in srgb,#a05a00 10%,var(--card))!important}
+.btn.ghost.sm{padding:5px 12px;font-size:13.5px}
 </style>
 </head><body><div class="layout"><aside class="side"><a class="logo" href="../index.html"><img class="logo-ico" src="../icon-pva.svg" alt="" width="44" height="44"><span>Плотников В. А.</span></a><input type="checkbox" id="menu-toggle" aria-label="Открыть меню"><label for="menu-toggle" class="burger">Меню</label><nav class="menu" aria-label="Разделы сайта"><ul><li><a href="../index.html">Главная</a></li><li class="menu-search"><input type="search" id="site-search" class="site-search" placeholder="Поиск по сайту…" aria-label="Поиск по сайту" autocomplete="off" spellcheck="false"><div class="search-drop" id="search-drop" hidden></div></li><li><a href="../informatika.html">Информатика</a><ul><li><a href="../informatika-uchenikam.html">Ученикам</a></li><li><a href="../informatika-uchitelyam.html">Учителям</a></li><li><a href="../informatika-propushel-urok.html">Если ты пропустил урок</a></li></ul></li><li><a href="../matematika.html">Математика</a><ul><li><a href="../matematika-uchenikam.html">Ученикам</a></li><li><a href="../matematika-uchitelyam.html">Учителям</a></li><li><a href="../matematika-propushel-urok.html">Если ты пропустил урок</a></li></ul></li><li><a href="../kontakty.html">Контакты</a></li></ul></nav></aside><div class="col">
 <div class="lhero"><div class="lwrap">
 <a class="back" href="../informatika-uchenikam.html">← Информатика · Ученикам</a><a class="back" href="../informatika-uchitelyam.html">← Учителям</a><br>
 <span class="tag">Информатика · 7–11 классы · командное соревнование</span>
 <h1>Хакатон «TASKILLS»</h1>
-<p class="lead">«Решаем реальные задачи — прокачиваем навыки». Команда из 3–5 человек за 48 часов проходит путь настоящего ИТ-проекта: от идеи и макета до работающего решения и защиты перед жюри. Выберите трек и свой уровень — уровень Базовый по силам 7–8 классам, Средний — 9 классу, Продвинутый — 10–11 классам. Протокол работы команды отправляется учителю на Яндекс.Диск (папка «Хакатон»), после отправки открывается полный разбор задания.</p>
+<p class="lead">«Решаем реальные задачи — прокачиваем навыки». Команда из 3–5 человек за 48 часов проходит путь настоящего ИТ-проекта: от идеи и макета до работающего решения и защиты перед жюри. Капитан создаёт команду, участники присоединяются к ней по названию — с любого компьютера и в любое время. Уровни по силам: Базовый — 7–8 классам, Средний — 9 классу, Продвинутый — 10–11 классам. Общий протокол работы уходит учителю на Яндекс.Диск (папка «Хакатон»), после отправки открывается полный разбор задания.</p>
 </div></div>
 <div class="lwrap lgrid">
 <main id="app" aria-live="polite">Загрузка…</main>
@@ -341,9 +358,19 @@ commonChecklist:["Работает ли ключевая функция вжив
  "Если делаем бонусный трек — решает ли ИИ-функция реальную задачу пользователя и соблюдена ли этика данных?"]
 };
 /* =====================================================================
-   Движок страницы «Хакатон»: регистрация команды → работа над заданием →
-   итог и отправка протокола на Яндекс.Диск (папка «Хакатон») → полный разбор.
-   Состояние сохраняется в localStorage (ключ pva-hakaton).
+   Движок страницы «Хакатон», версия 2 — командная работа с разных
+   компьютеров:
+     • капитан создаёт команду (название, классы, трек, уровень, состав);
+     • команда сохраняется на Яндекс.Диске: папка «Хакатон/команды»
+       (<название>.json) — общее хранилище для всех устройств;
+     • ученик, знающий название команды, присоединяется под своим именем
+       и ролью, которую назначил капитан, — с любого компьютера и в любое
+       время;
+     • капитан в любой момент добавляет и удаляет участников, меняет роли;
+     • прогресс (MVP, этапы, самооценка) общий: правки с любого компьютера
+       публикуются на Диске, остальные компьютеры подтягивают их сами;
+     • без интернета страница продолжает работать локально (оффлайн-режим).
+   Личное состояние браузера — localStorage (ключ pva-hakaton).
    ===================================================================== */
 window.HK_DATA = HK_DATA;
 var KEY = "pva-hakaton";
@@ -358,114 +385,359 @@ function load(){try{var r=localStorage.getItem(KEY);return r?JSON.parse(r):null}
 function freshProg(){return{mvp:[],stages:HK_DATA.stages.map(function(){return{done:false,note:""}}),rub:[0,0,0,0,0],bonus:0}}
 function trackById(id){for(var i=0;i<HK_DATA.tracks.length;i++)if(HK_DATA.tracks[i].id===id)return HK_DATA.tracks[i];return null}
 function curTrack(){return trackById(S&&S.team?S.team.track:null)}
-function curLevel(){var t=curTrack();if(!t)return null;for(var i=0;i<t.levels.length;i++)if(t.levels[i].id===S.team.level)return t.levels[i];return null}
+function curLevel(){var t=curTrack();if(!t||!S)return null;for(var i=0;i<t.levels.length;i++)if(t.levels[i].id===S.team.level)return t.levels[i];return null}
 function rubSum(){var s=0;if(S&&S.prog)for(var i=0;i<5;i++)s+=(+S.prog.rub[i]||0);return s}
 function mvpDone(){var n=0;if(S&&S.prog)for(var i=0;i<S.prog.mvp.length;i++)if(S.prog.mvp[i])n++;return n}
 function stagesDone(){var n=0;if(S&&S.prog)for(var i=0;i<S.prog.stages.length;i++)if(S.prog.stages[i]&&S.prog.stages[i].done)n++;return n}
 function totalScore(){return rubSum()+(+((S&&S.prog&&S.prog.bonus)||0))}
+function pad2(n){return (n<10?"0":"")+n}
+function nowStamp(){var d=new Date();return pad2(d.getDate())+"."+pad2(d.getMonth()+1)+" "+pad2(d.getHours())+":"+pad2(d.getMinutes())}
+function findMember(name){ /* участник по имени (без учёта регистра) */
+  if(!S||!S.team)return null;
+  var want=String(name||"").toLowerCase().trim();
+  for(var i=0;i<S.team.members.length;i++){
+    var mm=S.team.members[i];
+    if(String(mm.name||"").toLowerCase().trim()===want)return mm;
+  }
+  return null;
+}
+function isCaptain(){return !!(S&&S.me&&S.me.captain)}
 
+/* ---- состояние ---- */
 var S = load();
 if (S && (!S.team || !S.prog)) S = null;
+var SCREEN = "start"; /* start | work | final | razbor — для перерисовки после синхронизации */
 
-/* ================= ЭКРАН 1: регистрация команды ================= */
+/* =====================================================================
+   Синхронизация с Яндекс.Диском: файл команды в папке «Хакатон/команды»
+   ===================================================================== */
+var SYNC = {timer:null, busy:false, lastOk:null, retry:false, cbs:[]};
+function setSyncChip(state, msg){
+  var el=document.getElementById("hkSync");if(!el)return;
+  el.classList.remove("hk-sync-ok","hk-sync-off");
+  if(state==="ok"){el.classList.add("hk-sync-ok");el.textContent="Диск: синхронизировано"+(SYNC.lastOk?" · "+SYNC.lastOk:"");}
+  else if(state==="sync"){el.textContent="Синхронизация с Диском…";}
+  else if(state==="off"){el.classList.add("hk-sync-off");el.textContent="Нет связи с Диском — работаем локально"+(msg?" · "+msg:"");}
+  else el.textContent="";
+}
+function touch(immediate){ /* локальная правка → сохранить и опубликовать */
+  save();
+  if(!S||!S.team||!S.team.code)return;
+  clearTimeout(SYNC.timer);
+  SYNC.timer=setTimeout(function(){publishNow()}, immediate?0:1200);
+}
+function publishNow(cb){
+  if(!S||!S.team||!S.team.code){if(cb)cb(false,"нет команды");return;}
+  if(SYNC.busy){ /* идёт публикация — пометим: сразу после неё отправим свежее состояние */
+    SYNC.retry=true;
+    if(cb){SYNC.cbs=(SYNC.cbs||[]).concat(cb)}
+    return;
+  }
+  SYNC.busy=true;setSyncChip("sync");
+  S.team.rev=(+S.team.rev||0)+1;
+  S.team.updatedAt=new Date().toISOString();
+  save();
+  HAKPROTO.hkSaveTeam(S.team,S.prog,function(ok,msg){
+    SYNC.busy=false;
+    if(ok){SYNC.lastOk=nowStamp();S.team.offline=false;setSyncChip("ok");}
+    else{S.team.offline=true;setSyncChip("off",msg||"");}
+    save();
+    if(cb)cb(ok,msg);
+    var more=(SYNC.cbs||[]).slice();SYNC.cbs=[];
+    for(var i=0;i<more.length;i++){try{more[i](ok,msg)}catch(e){}}
+    if(SYNC.retry){SYNC.retry=false;publishNow();}
+  });
+}
+function refreshFromDisk(cb){ /* тихо проверить: нет ли на Диске более свежей версии */
+  if(!S||!S.team||!S.team.code||SYNC.busy){if(cb)cb(false);return;}
+  if(document.hidden){if(cb)cb(false);return;}
+  HAKPROTO.hkLoadTeam(S.team.name,function(team,prog,err){
+    if(err||!team){if(cb)cb(false);return;}
+    if((+team.rev||0)>(+S.team.rev||0)){
+      var me=S.me, el=document.activeElement;
+      S.team=team;S.prog=prog||freshProg();
+      if(me)S.me=me;
+      save();SYNC.lastOk=nowStamp();setSyncChip("ok");
+      var typing=el&&(el.tagName==="INPUT"||el.tagName==="TEXTAREA");
+      if(!typing){
+        if(SCREEN==="work")renderWork();
+        else if(SCREEN==="final")renderFinal();
+        else if(SCREEN==="start")renderStart();
+      }
+      if(cb)cb(true);return;
+    }
+    if(cb)cb(false);
+  });
+}
+
+/* =====================================================================
+   ЭКРАН 1: старт — капитан создаёт команду, ученик присоединяется
+   ===================================================================== */
 function renderStart(){
+ SCREEN="start";
  var t=S?S.team:null;
  var h='<div class="hk-sec"><h2>Что такое хакатон «TASKILLS»</h2>'
  +'<p>Хакатон — соревнование по информационным технологиям для школьников: <b>task</b> — «задача», <b>skills</b> — «навыки». За 48 часов команда из <b>3–5 человек</b> проходит полный путь ИТ-проекта: от идеи и прототипа до работающего решения и защиты перед жюри (питч до 5 минут + ответы на вопросы).</p>'
  +'<p>В пакете <b>четыре основных задания</b> — команда выбирает ровно одно, то, которое ближе её составу и навыкам, и одно <b>бонусное</b> — «Добавь нейросеть!» (до +10 баллов, только вместе с основным). В каждом задании три уровня сложности. Выбирайте честно: лучше уверенно закрытый средний уровень, чем сырой продвинутый.</p>'
+ +'<p><b>Как работаем:</b> капитан создаёт команду и публикует её — файл команды хранится на Яндекс.Диске, в папке «Хакатон». Каждый участник, знающий <b>название команды</b>, присоединяется под своим именем и ролью, которую назначил капитан, — с любого компьютера и в любое время. Капитан может в любой момент добавить или удалить участника. Прогресс общий: все видят отметки и заметки всей команды.</p>'
  +'<p class="mute">Планируйте время: примерно <b>60%</b> — разработка, <b>20%</b> — презентация, <b>20%</b> — репетиция защиты.</p></div>';
- if(S&&S.sent){
+ if(S&&S.team){
+  var meTxt=S.me?("Вы на этом компьютере: <b>"+esc(S.me.name)+"</b>"+(S.me.role?" — "+esc(S.me.role):"")+(S.me.captain?" (капитан)":"")):"";
   h+='<div class="hk-sec" style="border-color:var(--green)"><h2>Команда «'+esc(S.team.name)+'» — работа сохранена</h2>'
-  +'<p>Протокол'+(S.sent.way==="disk"?" отправлен учителю на Яндекс.Диск (папка «Хакатон»)":" сохранён (файлы скачаны)")+' · '+esc(S.sent.stamp||"")+' · итог самооценки: <b>'+totalScore()+' из 110</b>.</p>'
-  +'<div class="hk-actions"><button class="btn" type="button" id="hkGoRaz">Полный разбор задания →</button><button class="btn ghost" type="button" id="hkGoWork">Вернуться к работе</button><button class="btn ghost" type="button" id="hkReset">Начать новую команду</button></div></div>';
+  +'<p>'+(S.team.sent?("Протокол"+(S.team.sent.way==="disk"?" отправлен учителю на Яндекс.Диск (папка «Хакатон»)":" сохранён (файлы скачаны)")+" · "+esc(S.team.sent.stamp||"")+" · "):"")+'итог самооценки: <b>'+totalScore()+' из '+(S.team.bonus?110:100)+'</b>. '+(S.team.offline?'<span class="hk-sync-off">Нет связи с Диском — изменения хранятся локально.</span>':'')+'</p>'
+  +(meTxt?'<p class="mute">'+meTxt+'</p>':'')
+  +'<div class="hk-actions"><button class="btn" type="button" id="hkGoWork">Продолжить работу</button><button class="btn ghost" type="button" id="hkGoRaz">Полный разбор задания →</button><button class="btn ghost" type="button" id="hkReset">Выйти и начать заново</button></div></div>';
  }
- /* выбор трека */
- h+='<div class="hk-sec"><h2>Шаг 1. Выберите задание (трек)</h2><div class="hk-cards">';
+ /* переключатель: капитан / участник */
+ h+='<div class="hk-tabs" id="hkTabs"><button class="hk-tab on" type="button" id="tabCap">Я капитан — создать команду</button><button class="hk-tab" type="button" id="tabStu">Я ученик — присоединиться к команде</button></div>';
+ /* ---------- форма капитана ---------- */
+ h+='<div id="hkFormCap"><div class="hk-sec"><h2>Шаг 1. Выберите задание (трек)</h2><div class="hk-cards">';
  for(var i=0;i<HK_DATA.tracks.length;i++){var tr=HK_DATA.tracks[i];
   var on=t&&t.track===tr.id?"checked":"";
   h+='<label class="card hk-opt"><input type="radio" name="hktrack" value="'+tr.id+'"'+(on?" checked":"")+'><span class="pick"></span>'
   +'<span class="tag">Трек '+tr.n+' · '+esc(tr.track)+'</span><h3>'+esc(tr.name)+'</h3><p>'+esc(tr.who)+'.</p><p class="mute">Обязательных функций MVP: '+tr.mvp.length+' · уровней: 3</p></label>';
  }
  h+='</div></div>';
- /* данные команды */
  h+='<div class="hk-sec"><h2>Шаг 2. Команда</h2><div class="hk-form">'
  +'<div class="hk-row"><label for="hkName">Название команды:</label><input class="hk-in" id="hkName" type="text" maxlength="40" placeholder="Например: «Байты»" value="'+esc(t?t.name:"")+'"></div>'
  +'<div class="hk-row"><label>Классы участников:</label><span class="hk-cls" id="hkCls">';
  for(var c=7;c<=11;c++){var on2=t&&t.cls&&t.cls.indexOf(c)>=0?"on":"";var ch=on2?" checked":"";
   h+='<label class="'+on2+'"><input type="checkbox" value="'+c+'"'+ch+'>'+c+' класс</label>';}
  h+='</span></div>'
- +'<div><label style="font-weight:600;font-size:14.5px">Состав: впишите от 3 до 5 участников и их роли</label><div class="hk-mem" id="hkMem" style="margin-top:8px">';
+ +'<div><label style="font-weight:600;font-size:14.5px">Состав на старте: вы — капитан (участник 1). Остальных можно вписать сейчас или добавить позже — прямо во время хакатона; участники также присоединяются сами по названию команды.</label><div class="hk-mem" id="hkMem" style="margin-top:8px">';
  var opts=function(sel){var o="";for(var r=0;r<ROLES.length;r++)o+='<option value="'+ROLES[r]+'"'+(sel===ROLES[r]?" selected":"")+'>'+ROLES[r]+'</option>';return o};
- for(var m=0;m<5;m++){var mm=t&&t.members&&t.members[m]?t.members[m]:{name:"",role:m===0?"Капитан":(m===1?"Разработчик":(m===2?"Дизайнер":""))};
-  h+='<input class="hk-in" type="text" maxlength="40" placeholder="Участник '+(m+1)+'" data-mem="'+m+'" value="'+esc(mm.name)+'">'
-  +'<select class="hk-in" data-role="'+m+'"><option value="">— роль —</option>'+opts(mm.role)+'</select>';}
+ for(var mi=0;mi<5;mi++){
+  var mm=(t&&t.members&&t.members[mi])?t.members[mi]:{name:"",role:mi===0?"Капитан":(mi===1?"Разработчик":(mi===2?"Дизайнер":""))};
+  if(mi===0){
+   h+='<input class="hk-in" type="text" maxlength="40" placeholder="Ваше имя — капитан команды" data-mem="0" value="'+esc(mm.name)+'">'
+   +'<select class="hk-in" data-role="0" disabled><option>Капитан</option></select>';
+  }else{
+   h+='<input class="hk-in" type="text" maxlength="40" placeholder="Участник '+(mi+1)+' — имя (можно оставить пустым)" data-mem="'+mi+'" value="'+esc(mm.name)+'">'
+   +'<select class="hk-in" data-role="'+mi+'"><option value="">— роль —</option>'+opts(mm.role)+'</select>';
+  }
+ }
  h+='</div></div>'
  +'<div class="hk-row"><label class="hk-row" style="gap:8px"><input type="checkbox" id="hkBonus"'+(t&&t.bonus?" checked":"")+'> <span>Делаем бонусный трек <b>«Добавь нейросеть!»</b> (до +10 баллов к основной оценке)</span></label></div>'
  +'<div class="hk-err" id="hkErr"></div>'
- +'<div class="hk-actions"><button class="btn" type="button" id="hkStart">Начать работу →</button>'
+ +'<div class="hk-actions"><button class="btn" type="button" id="hkStart">Создать команду →</button>'
  +(S?'<button class="btn ghost" type="button" id="hkResume">Продолжить сохранённую работу</button>':'')+'</div>'
- +'<p class="mute" style="font-size:13.5px">Работа команды сохраняется в этом браузере: можно закрыть страницу и вернуться позже.</p>'
- +'</div></div>';
+ +'<p class="mute" style="font-size:13.5px">Команда публикуется на Яндекс.Диске (папка «Хакатон»): участники присоединяются по названию с любого устройства, а работа сохраняется и в этом браузере — можно закрыть страницу и вернуться позже.</p>'
+ +'</div></div></div>';
+ /* ---------- форма участника ---------- */
+ h+='<div id="hkFormStu" hidden><div class="hk-sec"><h2>Присоединиться к команде</h2>'
+ +'<p class="mute">Введите название команды, которое сказал капитан. Сайт покажет состав и роли — найдите своё имя (его заранее вписал капитан) и войдите в команду. Работать можно с любого компьютера, прогресс общий.</p>'
+ +'<div class="hk-row" style="max-width:520px"><label for="hkJoinName">Название команды:</label><div style="display:flex;gap:10px;flex-wrap:wrap"><input class="hk-in" id="hkJoinName" type="text" maxlength="40" placeholder="Например: «Байты»" style="flex:1;min-width:200px"><button class="btn" type="button" id="hkJoinFind">Найти команду</button></div></div>'
+ +'<div class="hk-err" id="hkJoinErr"></div><div id="hkJoinRes"></div></div></div>';
  app.innerHTML=h;
- /* события */
+ /* события: вкладки */
+ var cap=$("#tabCap"),stu=$("#tabStu");
+ function showTab(which){
+  var onCap=which==="cap";
+  cap.classList.toggle("on",onCap);stu.classList.toggle("on",!onCap);
+  $("#hkFormCap").hidden=!onCap;$("#hkFormStu").hidden=onCap;
+ }
+ cap.addEventListener("click",function(){showTab("cap")});
+ stu.addEventListener("click",function(){showTab("stu")});
+ if(S&&S.me&&!S.me.captain)showTab("stu");
+ /* события: треки */
  $all('input[name="hktrack"]').forEach(function(r){r.addEventListener("change",function(){
   $all(".hk-opt").forEach(function(el){el.style.outline="";});
   $all('input[name="hktrack"]:checked').forEach(function(x){x.closest(".card").style.outline="2px solid var(--blue)"});
  });});
  $all("#hkCls input").forEach(function(cb){cb.addEventListener("change",function(){cb.parentNode.classList.toggle("on",cb.checked)})});
  if(t&&t.track){var rr=$('input[name="hktrack"][value="'+t.track+'"]');if(rr)rr.closest(".card").style.outline="2px solid var(--blue)";}
- var start=$("#hkStart");if(start)start.addEventListener("click",doStart);
+ $("#hkStart").addEventListener("click",doStart);
  var res=$("#hkResume");if(res)res.addEventListener("click",function(){renderWork()});
+ $("#hkJoinFind").addEventListener("click",joinFind);
+ $("#hkJoinName").addEventListener("keydown",function(e){if(e.key==="Enter")joinFind()});
  var rz=$("#hkGoRaz");if(rz)rz.addEventListener("click",function(){renderRazbor()});
  var gw=$("#hkGoWork");if(gw)gw.addEventListener("click",function(){renderWork()});
- var rs=$("#hkReset");if(rs)rs.addEventListener("click",function(){if(confirm("Начать новую команду? Сохранённая работа «"+(S&&S.team?S.team.name:"")+"» будет удалена.")){S=null;try{localStorage.removeItem(KEY)}catch(e){}renderStart()}});
+ var rs=$("#hkReset");if(rs)rs.addEventListener("click",function(){
+  if(confirm("Выйти из команды «"+(S&&S.team?S.team.name:"")+"» на этом компьютере? Команда на Диске останется, в неё можно войти снова.")){
+   S=null;try{localStorage.removeItem(KEY)}catch(e){}renderStart();
+  }});
  window.scrollTo(0,0);
 }
+
+/* ---- создание команды капитаном ---- */
 function doStart(){
  var name=$("#hkName").value.trim();
  var cls=$all("#hkCls input").filter(function(x){return x.checked}).map(function(x){return +x.value});
  var members=[];var mn=0;
- for(var m=0;m<5;m++){
-  var nm=$('[data-mem="'+m+'"]').value.trim();
-  var rl=$('[data-role="'+m+'"]').value;
-  if(nm){members.push({name:nm,role:rl||"Участник"});mn++;}
+ for(var j=0;j<5;j++){
+  var nm=$('[data-mem="'+j+'"]').value.trim();
+  if(!nm)continue;
+  var rl=j===0?"Капитан":($('[data-role="'+j+'"]').value||"Участник");
+  members.push({name:nm,role:rl,captain:j===0,joined:nowStamp()});
+  mn++;
  }
  var tr=$('input[name="hktrack"]:checked');
  var err=$("#hkErr");var msg=[];
  if(!name)msg.push("название команды");
  if(!cls.length)msg.push("хотя бы один класс");
- if(mn<3)msg.push("минимум 3 участника с именами");
+ if(!mn)msg.push("ваше имя (участник 1 — капитан)");
  if(!tr)msg.push("выбор трека");
  if(msg.length){err.textContent="Заполните: "+msg.join(", ")+".";return}
+ for(var a=0;a<members.length;a++)for(var b=a+1;b<members.length;b++)
+  if(members[a].name.toLowerCase()===members[b].name.toLowerCase()){err.textContent="Имена участников не должны повторяться: «"+esc(members[a].name)+"».";return}
  err.textContent="";
  var prev=S;
- S={team:{name:name,cls:cls,members:members,track:tr.value,level:null,bonus:$("#hkBonus").checked},
-    prog:freshProg(),sent:prev&&prev.sent&&prev.team&&prev.team.track===tr.value&&prev.team.name===name?prev.sent:null};
- /* уровень по умолчанию: первый */
+ S={team:{name:name,code:HAKPROTO.hkSlug(name),cls:cls,members:members,track:tr.value,level:null,bonus:$("#hkBonus").checked,
+         captain:members[0].name,rev:0,updatedAt:new Date().toISOString(),sent:null,offline:false},
+    prog:freshProg(),
+    me:{name:members[0].name,role:"Капитан",captain:true}};
  S.team.level=curTrack().levels[0].id;
- /* массив статусов MVP — ровно по числу функций трека */
  S.prog.mvp=curTrack().mvp.map(function(){return false});
- /* восстановление прогресса той же команды */
- if(prev&&prev.team&&prev.team.track===S.team.track&&prev.team.name===S.team.name&&prev.prog){S.prog=prev.prog;S.team.level=prev.team.level;}
+ if(prev&&prev.team&&prev.team.track===S.team.track&&prev.team.name===S.team.name&&prev.prog&&prev.team.code===S.team.code){S.prog=prev.prog;S.team.level=prev.team.level;}
  save();renderWork();
+ publishNow(function(ok,msg2){ if(!ok)setSyncChip("off",msg2); });
 }
 
-/* ================= ЭКРАН 2: работа над заданием ================= */
+/* ---- поиск команды участником ---- */
+var PENDING=null; /* найденная на Диске команда {team,prog} */
+function joinFind(){
+ var name=$("#hkJoinName").value.trim();
+ var errBox=$("#hkJoinErr"),res=$("#hkJoinRes");
+ errBox.textContent="";res.innerHTML="";
+ if(!name){errBox.textContent="Введите название команды.";return}
+ if(S&&S.team&&S.team.name.toLowerCase()===name.toLowerCase()&&S.me){
+  res.innerHTML='<div class="hk-joincard"><b>Это команда, в которой вы уже работали на этом компьютере.</b><div class="hk-actions" style="margin-top:10px"><button class="btn" type="button" id="hkJoinBack">Вернуться в команду «'+esc(S.team.name)+'»</button></div></div>';
+  $("#hkJoinBack").addEventListener("click",function(){renderWork()});
+  return;
+ }
+ res.innerHTML='<p class="mute">Ищем команду «'+esc(name)+'» на Диске…</p>';
+ HAKPROTO.hkLoadTeam(name,function(team,prog,errmsg){
+  if(errmsg){res.innerHTML="";errBox.textContent="Не удалось найти команду: "+errmsg;return}
+  if(!team){res.innerHTML="";errBox.textContent="Команда «"+esc(name)+"» не найдена. Проверьте название у капитана — капитан должен создать команду на этой странице.";return}
+  PENDING={team:team,prog:prog||freshProg()};
+  var t=trackById(team.track);
+  var h='<div class="hk-joincard"><div class="hk-joinhead"><b>Команда «'+esc(team.name)+'»</b>'
+  +(t?'<span class="hk-chip">'+esc(t.track)+': «'+esc(t.name)+'»</span>':'')
+  +(team.offline?'<span class="hk-chip hk-sync-off">офлайн-копия</span>':'')+'</div>'
+  +'<p class="mute" style="margin:6px 0 10px">Капитан: '+esc(team.captain||"—")+' · участников: '+team.members.length+' · выберите своё имя (роль назначил капитан):</p><div class="hk-roster">';
+  for(var j=0;j<team.members.length;j++){
+   var m=team.members[j];
+   h+='<label class="hk-rost-row"><input type="radio" name="hkjoin" value="'+j+'">'
+   +'<span class="hk-rost-name">'+esc(m.name)+(m.captain?' <span class="hk-chip">капитан</span>':'')+'</span>'
+   +'<span class="hk-rost-role">'+esc(m.role||"Участник")+'</span>'
+   +'<span class="hk-rost-join">'+(m.joined?"вошёл "+esc(m.joined):"ещё не входил")+'</span></label>';
+  }
+  h+='</div><div class="hk-actions"><button class="btn" type="button" id="hkJoinGo">Войти в команду →</button></div>'
+  +'<p class="mute" style="font-size:13.5px">Не нашли себя? Попросите капитана добавить вас в состав — он может сделать это в любой момент, после чего нажмите «Найти команду» ещё раз.</p></div>';
+  res.innerHTML=h;
+  $("#hkJoinGo").addEventListener("click",joinGo);
+ });
+}
+function joinGo(){
+ var pick=$('input[name="hkjoin"]:checked');
+ var errBox=$("#hkJoinErr");
+ if(!pick){errBox.textContent="Выберите своё имя в составе команды.";return}
+ if(!PENDING){errBox.textContent="Команда не загружена — нажмите «Найти команду».";return}
+ var j=+pick.value;
+ var m=PENDING.team.members[j];
+ if(!m){errBox.textContent="Участник не найден — обновите состав (нажмите «Найти команду»).";return}
+ m.joined=nowStamp();
+ S={team:PENDING.team,prog:PENDING.prog,me:{name:m.name,role:m.role||"Участник",captain:!!m.captain}};
+ PENDING=null;
+ save();renderWork();
+ publishNow(function(ok,msg2){ if(!ok)setSyncChip("off",msg2); });
+}
+
+/* =====================================================================
+   Состав команды: капитан добавляет/удаляет участников и меняет роли
+   ===================================================================== */
+function renderRoster(){
+ var box=$("#hkRoster");if(!box)return;
+ var cap=isCaptain();
+ var h='<p class="mute" style="margin:0 0 8px">'+(cap
+  ?"Вы — капитан: добавляйте участников, удаляйте и меняйте роли в любой момент. Изменения сразу публикуются на Диске — участники увидят их на своих компьютерах."
+  :"Состав и роли назначает капитан. Если вас нет в списке — попросите капитана добавить вас, затем обновите состав.")+'</p>';
+ h+='<div class="hk-roster" id="hkRostList">';
+ for(var j=0;j<S.team.members.length;j++){
+  var m=S.team.members[j];
+  h+='<div class="hk-rost-row" data-rost="'+j+'">'
+  +'<span class="hk-rost-name">'+esc(m.name)+(m.captain?' <span class="hk-chip">капитан</span>':'')+(S.me&&S.me.name&&S.me.name.toLowerCase()===String(m.name).toLowerCase().trim()?' <span class="hk-chip">вы</span>':'')+'</span>';
+  if(cap&&!m.captain){
+   var sel='<select class="hk-in" data-roleedit="'+j+'">';
+   for(var r=1;r<ROLES.length;r++)sel+='<option value="'+ROLES[r]+'"'+((m.role||"Участник")===ROLES[r]?" selected":"")+'>'+ROLES[r]+'</option>';
+   sel+='</select>';
+   h+=sel+'<button class="btn ghost sm" type="button" data-del="'+j+'" title="Удалить участника">✕</button>';
+  }else{
+   h+='<span class="hk-rost-role">'+esc(m.role||"Участник")+'</span>';
+  }
+  h+='<span class="hk-rost-join">'+(m.joined?"вошёл "+esc(m.joined):"ещё не входил")+'</span></div>';
+ }
+ h+='</div>';
+ if(cap){
+  h+='<div class="hk-rost-add"><input class="hk-in" id="hkAddName" type="text" maxlength="40" placeholder="Имя нового участника">'
+  +'<select class="hk-in" id="hkAddRole">';
+  for(r=1;r<ROLES.length;r++)h+='<option value="'+ROLES[r]+'"'+(r===1?" selected":"")+'>'+ROLES[r]+'</option>';
+  h+='<option value="Участник">Участник</option></select>'
+  +'<button class="btn sm" type="button" id="hkAddGo">+ Добавить</button></div>'
+  +'<div class="hk-err" id="hkRostErr"></div>'
+  +'<p class="mute" style="font-size:13.5px;margin:6px 0 0">В команде от 3 до 5 участников (требование пакета заданий). Максимум 5.</p>';
+ }else{
+  h+='<div class="hk-actions" style="margin-top:10px"><button class="btn ghost sm" type="button" id="hkRostRefresh">Обновить состав</button></div>';
+ }
+ box.innerHTML=h;
+ /* события */
+ if(cap){
+  $all("[data-roleedit]",box).forEach(function(sel){sel.addEventListener("change",function(){
+   var j=+sel.getAttribute("data-roleedit");
+   S.team.members[j].role=sel.value;touch(true);renderRoster();updBoard();
+  })});
+  $all("[data-del]",box).forEach(function(btn){btn.addEventListener("click",function(){
+   var j=+btn.getAttribute("data-del");
+   var m=S.team.members[j];
+   var e=$("#hkRostErr");
+   if(m.captain){if(e)e.textContent="Капитана удалить нельзя.";return}
+   if(S.team.members.length<=3){if(e)e.textContent="В команде должно остаться минимум 3 участника — сначала добавьте кого-то нового.";return}
+   if(!confirm("Удалить участника «"+m.name+"» из команды?"))return;
+   S.team.members.splice(j,1);touch(true);renderRoster();updBoard();
+  })});
+  var addGo=$("#hkAddGo",box);
+  if(addGo)addGo.addEventListener("click",function(){
+   var inp=$("#hkAddName",box),sel=$("#hkAddRole",box),e=$("#hkRostErr");
+   var nm=(inp.value||"").trim();
+   if(!nm){e.textContent="Введите имя участника.";return}
+   if(S.team.members.length>=5){e.textContent="В команде максимум 5 участников (пакет заданий: 3–5 человек).";return}
+   for(var q=0;q<S.team.members.length;q++)
+    if(String(S.team.members[q].name).toLowerCase().trim()===nm.toLowerCase()){e.textContent="Участник с таким именем уже есть в команде.";return}
+   e.textContent="";
+   S.team.members.push({name:nm,role:sel.value||"Участник",captain:false,joined:null});
+   inp.value="";
+   touch(true);renderRoster();updBoard();
+  });
+ }else{
+  var rf=$("#hkRostRefresh",box);
+  if(rf)rf.addEventListener("click",function(){setSyncChip("sync");refreshFromDisk(function(){});});
+ }
+}
+
+/* =====================================================================
+   ЭКРАН 2: работа над заданием
+   ===================================================================== */
 function renderWork(){
+ SCREEN="work";
  var t=curTrack(),lv=curLevel();if(!t||!lv){renderStart();return}
  var done=mvpDone(),st=stagesDone();
  var pct=Math.round(100*(done+st)/(t.mvp.length+HK_DATA.stages.length));
+ var meTxt=S.me?(' <span class="hk-chip">Вы: '+esc(S.me.name)+(S.me.role?" — "+esc(S.me.role):"")+'</span>'):"";
  var h='<div class="hk-board"><span>'+esc(S.team.name)+'</span><span class="sep">·</span>'
  +'<span>'+esc(t.track)+': «'+esc(t.name)+'»</span>'
  +'<span class="hk-chip">'+esc(lv.lvl)+' · '+esc(lv.grades)+'</span>'
+ +meTxt
+ +'<span class="hk-chip" id="hkSync"></span>'
  +'<span class="pct">Выполнено: '+pct+'%</span></div>';
+ /* состав команды */
+ h+='<div class="hk-sec" id="hkRosterSec"><h2>Состав команды <span class="hk-chip" id="rostCnt">'+S.team.members.length+' из 5</span></h2><div id="hkRoster"></div></div>';
  /* карточка задания */
  h+='<div class="hk-sec"><h2>Легенда</h2>'+t.legend.map(function(p){return "<p>"+esc(p)+"</p>"}).join("")+'</div>';
  h+='<div class="hk-sec"><h2>Пользовательские истории</h2><p class="mute">Чего ждут будущие пользователи решения:</p>'
  +t.stories.map(function(s){return '<div class="hk-story">'+esc(s)+"</div>"}).join("")+'</div>';
  /* MVP */
  h+='<div class="hk-sec"><h2>Обязательные функции — минимально жизнеспособный продукт <span class="hk-chip" id="mvpCnt">'+done+' из '+t.mvp.length+'</span></h2>'
- +'<p class="mute">MVP (minimum viable product) — самая простая версия решения, которая уже работает и приносит пользу. Отмечайте выполненное — это часть протокола работы:</p><ul class="hk-mvp" id="mvpList">';
+ +'<p class="mute">MVP (minimum viable product) — самая простая версия решения, которая уже работает и приносит пользу. Отмечайте выполненное — это часть протокола работы. Отметки общие: их видит вся команда.</p><ul class="hk-mvp" id="mvpList">';
  for(var i=0;i<t.mvp.length;i++){var on=!!S.prog.mvp[i];
   h+='<li class="'+(on?"on":"")+'" data-mvp="'+i+'"><input type="checkbox"'+(on?" checked":"")+'><span class="hk-mvp-t">'+esc(t.mvp[i])+"</span></li>";}
  h+='</ul></div>';
@@ -500,7 +772,7 @@ function renderWork(){
   +'<textarea placeholder="Заметка команды: что сделано, какие решения…">'+esc(ps.note||"")+"</textarea></div>";}
  h+='</div>';
  /* самооценка */
- h+='<div class="hk-sec"><h2>Самооценка по рубрике жюри</h2><p class="mute">Оцените свою работу по пяти критериям рубрики жюри (100 баллов). Честная самооценка помогает добрать баллы перед защитой.</p><div class="hk-rub">';
+ h+='<div class="hk-sec"><h2>Самооценка по рубрике жюри</h2><p class="mute">Оцените работу команды по пяти критериям рубрики жюри (100 баллов). Честная самооценка помогает добрать баллы перед защитой.</p><div class="hk-rub">';
  for(i=0;i<HK_DATA.rubric.length;i++){var rr=HK_DATA.rubric[i];
   h+='<div class="r-row"><div class="r-name">'+esc(rr[0])+'<small>'+esc(rr[2])+'</small></div>'
   +'<input type="number" min="0" max="'+rr[1]+'" step="1" value="'+(S.prog.rub[i]||0)+'" data-rub="'+i+'" aria-label="Баллы: '+esc(rr[0])+'">'
@@ -511,26 +783,28 @@ function renderWork(){
  h+='</div><div class="hk-total">Итог самооценки: <span id="rubTotal">'+totalScore()+'</span> из '+(S.team.bonus?110:100)+' <small>(самооценка команды; окончательные баллы выставит жюри)</small></div></div>';
  /* действия */
  h+='<div class="hk-actions"><button class="btn" type="button" id="hkFinal">К итогу и отправке →</button>'
- +'<button class="btn ghost" type="button" id="hkBackStart">Изменить данные команды</button>'
+ +'<button class="btn ghost" type="button" id="hkBackStart">Данные команды</button>'
  +'<button class="btn ghost" type="button" id="hkRzNow">Посмотреть полный разбор</button></div>';
  app.innerHTML=h;
- /* события */
+ renderRoster();
+ setSyncChip(S.team.offline?"off":"ok");
+ /* события: MVP */
  $all("#mvpList li").forEach(function(li){li.addEventListener("click",function(e){
   if(e.target.tagName==="INPUT"&&e.target.type!=="checkbox")return;
   var i=+li.getAttribute("data-mvp");var cb=$('input',li);cb.checked=!cb.checked;
-  S.prog.mvp[i]=cb.checked;li.classList.toggle("on",cb.checked);save();updBoard();});});
+  S.prog.mvp[i]=cb.checked;li.classList.toggle("on",cb.checked);touch();updBoard();});});
  $all(".hk-stage").forEach(function(div){var i=+div.getAttribute("data-st");
   $('input[type=checkbox]',div).addEventListener("change",function(){
-   S.prog.stages[i].done=this.checked;div.classList.toggle("done",this.checked);save();updBoard();});
-  $("textarea",div).addEventListener("input",function(){S.prog.stages[i].note=this.value;save();});});
+   S.prog.stages[i].done=this.checked;div.classList.toggle("done",this.checked);touch();updBoard();});
+  $("textarea",div).addEventListener("input",function(){S.prog.stages[i].note=this.value;touch();});});
  $all('input[name="hklvl"]').forEach(function(r){r.addEventListener("change",function(){
-  S.team.level=this.value;save();renderWork();});});
+  S.team.level=this.value;touch(true);renderWork();});});
  $all("[data-rub]").forEach(function(inp){inp.addEventListener("input",function(){
   var k=this.getAttribute("data-rub");var v=Math.max(0,Math.round(+this.value||0));
   var mx=k==="bonus"?10:HK_DATA.rubric[+k][1];
   if(v>mx){v=mx;this.value=mx;}
   if(k==="bonus")S.prog.bonus=v;else S.prog.rub[+k]=v;
-  $("#rubTotal").textContent=totalScore();save();});});
+  $("#rubTotal").textContent=totalScore();touch();});});
  $("#hkFinal").addEventListener("click",function(){renderFinal()});
  $("#hkBackStart").addEventListener("click",function(){renderStart()});
  $("#hkRzNow").addEventListener("click",function(){renderRazbor()});
@@ -540,57 +814,73 @@ function updBoard(){
  var t=curTrack();if(!t)return;
  var done=mvpDone(),st=stagesDone();
  var pct=Math.round(100*(done+st)/(t.mvp.length+HK_DATA.stages.length));
- var mc=$("#mvpCnt"),sc=$("#stCnt"),pc=$(".hk-board .pct");
+ var mc=$("#mvpCnt"),sc=$("#stCnt"),pc=$(".hk-board .pct"),rc=$("#rostCnt");
  if(mc)mc.textContent=done+" из "+t.mvp.length;
  if(sc)sc.textContent=st+" из "+HK_DATA.stages.length;
  if(pc)pc.textContent="Выполнено: "+pct+"%";
+ if(rc)rc.textContent=S.team.members.length+" из 5";
 }
 
-/* ================= ЭКРАН 3: итог и отправка ================= */
+/* =====================================================================
+   ЭКРАН 3: итог и отправка
+   ===================================================================== */
 function renderFinal(){
+ SCREEN="final";
  var t=curTrack(),lv=curLevel();if(!t||!lv){renderStart();return}
  var P=HAKPROTO.buildProtocol(S);
- var members=S.team.members.map(function(m){return esc(m.name)+" — "+esc(m.role)}).join("; ");
- var h='<div class="hk-board"><span>'+esc(S.team.name)+'</span><span class="sep">·</span><span>'+esc(t.track)+': «'+esc(t.name)+'»</span><span class="hk-chip">'+esc(lv.lvl)+'</span><span class="pct">Итог: '+P.total+' из 110</span></div>';
+ var members=S.team.members.map(function(m){return esc(m.name)+" — "+esc(m.role)+(m.joined?' <span class="hk-chip">вошёл '+esc(m.joined)+"</span>":"")}).join("; ");
+ var meTxt=S.me?('Вы на этом компьютере: <b>'+esc(S.me.name)+"</b>"+(S.me.role?" — "+esc(S.me.role):"")+(S.me.captain?" (капитан)":"")):"";
+ var h='<div class="hk-board"><span>'+esc(S.team.name)+'</span><span class="sep">·</span><span>'+esc(t.track)+': «'+esc(t.name)+'»</span><span class="hk-chip">'+esc(lv.lvl)+'</span><span class="hk-chip" id="hkSync"></span><span class="pct">Итог: '+P.total+' из '+(S.team.bonus?110:100)+'</span></div>';
  h+='<div class="hk-sec"><h2>Сводка для учителя</h2><table class="hk-table">'
  +'<tr><td>Команда</td><td>'+esc(S.team.name)+'</td></tr>'
- +'<tr><td>Классы участников</td><td>'+S.team.cls.sort().join(", ")+' классы</td></tr>'
- +'<tr><td>Состав</td><td>'+members+'</td></tr>'
+ +'<tr><td>Капитан</td><td>'+esc(S.team.captain||"—")+'</td></tr>'
+ +'<tr><td>Классы участников</td><td>'+S.team.cls.slice().sort().join(", ")+' классы</td></tr>'
+ +'<tr><td>Состав ('+S.team.members.length+')</td><td>'+members+'</td></tr>'
  +'<tr><td>Задание</td><td>Трек '+t.n+' «'+esc(t.name)+'» ('+esc(t.track)+')</td></tr>'
  +'<tr><td>Уровень</td><td>'+esc(lv.lvl)+' · '+esc(lv.grades)+'</td></tr>'
  +'<tr><td>Бонусный трек ИИ</td><td>'+(S.team.bonus?"выполняется (до +10 баллов)":"не выполняется")+'</td></tr>'
  +'<tr><td>Функции MVP</td><td class="'+(P.mvpDone===P.mvpTotal?"hk-ok":"")+'">'+P.mvpDone+' из '+P.mvpTotal+(P.mvpDone===P.mvpTotal?" — все выполнены":"")+'</td></tr>'
  +'<tr><td>Этапы работы</td><td>'+P.stagesDone+' из '+P.stagesTotal+'</td></tr>'
  +'<tr><td>Самооценка по рубрике</td><td>'+rubSum()+' из 100'+(S.team.bonus?" + бонус "+(S.prog.bonus||0)+" из 10":"")+'</td></tr>'
- +'<tr class="hl"><td><b>Итог команды</b></td><td><b>'+P.total+' из 110</b> (самооценка)</td></tr></table>'
+ +'<tr class="hl"><td><b>Итог команды</b></td><td><b>'+P.total+' из '+(S.team.bonus?110:100)+'</b> (самооценка)</td></tr></table>'
+ +(meTxt?'<p class="mute" style="font-size:13.5px">'+meTxt+'</p>':'')
  +'<p class="mute" style="font-size:13.5px">Протокол работы — два файла: <b>XLSX</b> для учителя и жюри (сводка, самооценка, статус функций и этапов) и <b>DOCX</b> — протокол работы команды (сведения, состав, этапы, заметки, подписи).</p></div>';
  h+='<div class="hk-sec"><h2>Отправка протокола</h2>'
  +'<p>Протокол работы команды отправляется учителю <b>на Яндекс.Диск, в папку «Хакатон»</b>. Файлы называются по команде и треку, при повторной отправке заменяются.</p>'
- +(S.sent?'<p class="hk-ok">✓ '+(S.sent.way==="disk"?"Протокол отправлен на Яндекс.Диск (папка «Хакатон»)":"Файлы протокола скачаны — передайте их учителю")+' · '+esc(S.sent.stamp||"")+'</p>':'')
+ +(S.team.sent?'<p class="hk-ok">✓ '+(S.team.sent.way==="disk"?"Протокол отправлен на Яндекс.Диск (папка «Хакатон»)":"Файлы протокола скачаны — передайте их учителю")+' · '+esc(S.team.sent.stamp||"")+'</p>':'')
+ +(S.team.members.length<3?'<p class="hk-status err" id="hkMinWarn">В команде сейчас '+S.team.members.length+' участников. По пакету заданий состав команды — от 3 человек: добавьте участников на экране работы в разделе «Состав команды», иначе протокол не примут.</p>':'')
  +'<div class="hk-actions">'
  +'<button class="btn" type="button" id="hkSend">Отправить протокол учителю на Яндекс.Диск</button>'
  +'<button class="btn ghost" type="button" id="hkDl">Скачать файлы протокола</button></div>'
  +'<div class="hk-status" id="hkSt"></div></div>';
  h+='<div class="hk-sec" style="border-color:var(--blue)"><h2>Полный разбор задания</h2>'
- +(S.sent?'<p>Разбор открывается после отправки протокола: план на 48 часов, как доехать до максимума на своём уровне, типичные ошибки и вопросы жюри.</p><div class="hk-actions"><button class="btn" type="button" id="hkRaz">Открыть полный разбор →</button></div>'
+ +(S.team.sent?'<p>Разбор открывается после отправки протокола: план на 48 часов, как доехать до максимума на своём уровне, типичные ошибки и вопросы жюри.</p><div class="hk-actions"><button class="btn" type="button" id="hkRaz">Открыть полный разбор →</button></div>'
  :'<p class="mute">Разбор откроется после отправки протокола учителю (или скачивания файлов). Пока — работайте по карточке задания и подсказкам.</p>')
  +'</div>';
- h+='<div class="hk-actions"><button class="btn ghost" type="button" id="hkBackWork">← Вернуться к работе над заданием</button></div>';
+ h+='<div class="hk-actions"><button class="btn ghost" type="button" id="hkBackWork">← Вернуться к работе над заданием</button><button class="btn ghost" type="button" id="hkToRoster">Состав команды</button></div>';
  app.innerHTML=h;
  $("#hkBackWork").addEventListener("click",function(){renderWork()});
+ var toR=$("#hkToRoster");if(toR)toR.addEventListener("click",function(){renderWork()});
  $("#hkDl").addEventListener("click",function(){doDownload()});
  if($("#hkSend"))$("#hkSend").addEventListener("click",function(){askSend()});
  if($("#hkRaz"))$("#hkRaz").addEventListener("click",function(){renderRazbor()});
+ setSyncChip(S.team.offline?"off":"ok");
  window.scrollTo(0,0);
 }
 function doDownload(){
  var P=HAKPROTO.buildProtocol(S);
  HAKPROTO.hkDownload(P.xlsx.data,P.xlsx.name,"application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
- setTimeout(function(){HAKPROTO.hkDownload(P.docx.data,P.docx.name,"application/vnd.openxmlformats-officedocument.wordprocessingml.document")},700);
- var st=$("#hkSt");if(st){st.textContent="Файлы протокола скачаны: "+P.xlsx.name+" и "+P.docx.name+". Передайте их учителю.";st.className="hk-status ok"}
- if(!S.sent){S.sent={way:"download",stamp:new Date().toLocaleString("ru-RU")};save();setTimeout(renderFinal,50)}
+ HAKPROTO.hkDownload(P.docx.data,P.docx.name,"application/vnd.openxmlformats-officedocument.wordprocessingml.document");
+ var st=$("#hkSt");
+ if(st){st.textContent="Файлы протокола скачаны: "+P.xlsx.name+" и "+P.docx.name+". Передайте их учителю.";st.className="hk-status ok"}
+ if(!S.team.sent){S.team.sent={way:"download",stamp:new Date().toLocaleString("ru-RU")};touch(true);setTimeout(renderFinal,50)}
 }
 function askSend(){
+ if(S.team.members.length<3){
+  var st0=$("#hkSt");
+  if(st0){st0.textContent="По пакету заданий в команде минимум 3 участника. Вернитесь к работе и добавьте состав в разделе «Состав команды».";st0.className="hk-status err"}
+  return;
+ }
  if(S.sending)return;
  var m=document.createElement("div");m.className="hk-modal";
  m.innerHTML='<div class="hk-modal-box"><h3>Отправить протокол учителю?</h3><p>Вы точно уверены, может быть перепроверите результаты?</p>'
@@ -606,7 +896,7 @@ function askSend(){
   HAKPROTO.hkUpload(P,function(res,msg){
    S.sending=false;
    if(res==="ok"){
-    S.sent={way:"disk",stamp:new Date().toLocaleString("ru-RU")};save();
+    S.team.sent={way:"disk",stamp:new Date().toLocaleString("ru-RU")};touch(true);
     st.textContent="✓ Протокол отправлен учителю на Яндекс.Диск (папка «Хакатон»): "+P.xlsx.name+" и "+P.docx.name+".";
     st.className="hk-status ok";setTimeout(renderFinal,900);
    }else if(res==="notoken"){
@@ -620,8 +910,11 @@ function askSend(){
  });
 }
 
-/* ================= ЭКРАН 4: полный разбор ================= */
+/* =====================================================================
+   ЭКРАН 4: полный разбор
+   ===================================================================== */
 function renderRazbor(){
+ SCREEN="razbor";
  var t=curTrack(),lv=curLevel();if(!t||!lv){renderStart();return}
  var h='<div class="hk-board"><span>Полный разбор</span><span class="sep">·</span><span>'+esc(t.track)+': «'+esc(t.name)+'»</span><span class="hk-chip">'+esc(lv.lvl)+' · '+esc(lv.grades)+'</span></div>';
  h+='<div class="hk-sec"><h2>Что должно получиться</h2><p>'+esc(t.rzIntro)+'</p>'
@@ -645,6 +938,16 @@ function renderRazbor(){
  window.scrollTo(0,0);
 }
 
+/* =====================================================================
+   Запуск: отрисовка + фоновая синхронизация (каждые 20 секунд и при
+   возвращении на вкладку). Обновление применяется, только если на Диске
+   версия новее (по счётчику правок rev), поэтому локальная работа не
+   затирается случайным старым состоянием.
+   ===================================================================== */
 renderStart();
+if(S&&S.team&&S.team.code){
+ setInterval(function(){refreshFromDisk()},20000);
+ window.addEventListener("focus",function(){refreshFromDisk()});
+}
 </script>
 </body></html>

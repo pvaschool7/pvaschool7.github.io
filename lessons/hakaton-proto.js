@@ -125,7 +125,7 @@ function buildProtocol(S) {
   var bonus = +prog.bonus || 0;
   var cls = (team.cls || []).sort().join(", ");
   var members = (team.members || []).map(function (m) {
-    return (m.name || "—") + " — " + m.role;
+    return (m.name || "—") + " — " + m.role + (m.joined ? " (вошёл " + m.joined + ")" : "");
   }).join("; ");
   var bonusTxt = team.bonus ? "да (трек «Добавь нейросеть!»)" : "нет";
 
@@ -180,7 +180,7 @@ function buildProtocol(S) {
   paras.push({ sp: 1 });
   paras.push({ h: 2, t: "2. Состав команды и роли" });
   for (i = 0; i < (team.members || []).length; i++) {
-    paras.push({ s: 1, t: (team.members[i].name || "—") + " — " + team.members[i].role });
+    paras.push({ s: 1, t: (team.members[i].name || "—") + " — " + team.members[i].role + (team.members[i].joined ? " (вошёл " + team.members[i].joined + ")" : "") });
   }
   paras.push({ sp: 1 });
   paras.push({ h: 2, t: "3. Этапы работы" });
@@ -202,7 +202,7 @@ function buildProtocol(S) {
   paras.push({ b: 1, t: "Итог команды: " + (total + bonus) + " из 110 баллов (самооценка)" });
   paras.push({ sp: 1 });
   paras.push({ h: 2, t: "6. Подписи" });
-  paras.push({ t: "Капитан команды: ______________________ / ______________ /" });
+  paras.push({ t: "Капитан команды" + (team.captain ? " (" + team.captain + ")" : "") + ": ______________________ / ______________ /" });
   paras.push({ t: "Учитель (руководитель): ______________________ / ______________ /" });
   paras.push({ sp: 1 });
   paras.push({ c: 1, i: 1, t: "Протокол сформирован на странице «Хакатон» сайта Плотникова В. А. · " + stampRu(now) });
@@ -286,8 +286,92 @@ function hkDownload(data, name, mime) {
   } catch (e) {}
 }
 
+/* =====================================================================
+   Файл команды: общее хранилище для всех компьютеров команды.
+   Папка на Диске: «<HK_DISK.folder>/команды» — в ней лежит
+   <название-команды>.json вида {v:1, team:{...}, prog:{...}}.
+   Капитан публикует команду, участники читают её и вносят свои правки;
+   правки объединяются по счётчику team.rev (кто последний опубликовал).
+   ===================================================================== */
+
+/* имя файла команды: читаемое, безопасное, без повторов регистра */
+function hkSlug(name){
+  var s = String(name || "").toLowerCase()
+    .replace(/[\\/:*?"<>|]+/g, " ")
+    .replace(/\s+/g, " ").trim();
+  s = s.replace(/\s+/g, "-");
+  return (s || "komanda").slice(0, 50);
+}
+function hkTeamPath(name){
+  return "disk:/" + String((HK_DISK && HK_DISK.folder) || "Хакатон") + "/команды/" + hkSlug(name) + ".json";
+}
+/* создаёт папку на Диске, если её нет; path вида "disk:/Хакатон/команды" */
+function hkEnsureDir(path, fh) {
+  var url = "https://cloud-api.yandex.net/v1/disk/resources?path=" + encodeURIComponent(path);
+  return hkApi(url, { headers: fh }, 2).then(function (r) {
+    if (r.status === 200) return;
+    if (r.status === 404) return hkApi(url, { method: "PUT", headers: fh }, 2).then(function (r2) {
+      if (r2.status === 201 || r2.status === 409) return;
+      return r2.text().then(function (t) { throw new Error("HTTP " + r2.status + " при создании папки " + path + ": " + String(t).slice(0, 120)); });
+    });
+    return r.text().then(function (t) { throw new Error("HTTP " + r.status + " при проверке папки " + path + ": " + String(t).slice(0, 120)); });
+  });
+}
+/* Публикует команду: hkSaveTeam(team, prog, cb), cb(ok, errMsg) */
+function hkSaveTeam(team, prog, cb) {
+  var cfg = HK_DISK || {};
+  if (!cfg.token) { cb(false, "нет токена Диска"); return; }
+  var fh = { Authorization: "OAuth " + cfg.token };
+  var body = JSON.stringify({ v: 1, team: team, prog: prog });
+  var fname = hkSlug(team && team.name) + ".json";
+  var dir2 = "disk:/" + cfg.folder + "/команды";
+  hkEnsureDir("disk:/" + cfg.folder, fh)
+    .then(function () { return hkEnsureDir(dir2, fh); })
+    .then(function () {
+      var path = dir2 + "/" + fname;
+      return hkApi(cfg.api + "?overwrite=true&path=" + encodeURIComponent(path), { headers: fh }, 3)
+        .then(function (r) {
+          if (!r.ok) return r.text().then(function (t) { throw new Error("HTTP " + r.status + ": " + String(t).slice(0, 140)); });
+          return r.json();
+        }).then(function (j) {
+          if (!j || !j.href) throw new Error("Диск не вернул ссылку загрузки");
+          return fetch(j.href, { method: "PUT", body: new Blob([body], { type: "application/json" }) })
+            .then(function (r2) {
+              if (!r2.ok) throw new Error("HTTP " + r2.status + " при загрузке файла команды");
+            });
+        });
+    }).then(function () { cb(true); })
+    .catch(function (e) { cb(false, String(e && e.message || e)); });
+}
+/* Читает команду: hkLoadTeam(name, cb), cb(team|null, prog|null, errMsg|null);
+   team=null без ошибки — команды просто нет на Диске */
+function hkLoadTeam(name, cb) {
+  var cfg = HK_DISK || {};
+  if (!cfg.token) { cb(null, null, "нет токена Диска"); return; }
+  var fh = { Authorization: "OAuth " + cfg.token };
+  var path = "disk:/" + cfg.folder + "/команды/" + hkSlug(name) + ".json";
+  var url = "https://cloud-api.yandex.net/v1/disk/resources/download?path=" + encodeURIComponent(path);
+  hkApi(url, { headers: fh }, 2).then(function (r) {
+    if (r.status === 404) { cb(null, null, null); return null; }
+    if (!r.ok) return r.text().then(function (t) { throw new Error("HTTP " + r.status + ": " + String(t).slice(0, 140)); });
+    return r.json();
+  }).then(function (j) {
+    if (!j) return;
+    if (!j.href) throw new Error("Диск не вернул ссылку скачивания");
+    return fetch(j.href, { headers: { "Cache-Control": "no-cache" } }).then(function (r2) {
+      if (!r2.ok) throw new Error("HTTP " + r2.status + " при скачивании файла команды");
+      return r2.text();
+    }).then(function (txt) {
+      var o;
+      try { o = JSON.parse(txt); } catch (e) { throw new Error("файл команды повреждён"); }
+      if (!o || !o.team) throw new Error("файл команды пуст");
+      cb(o.team, o.prog || null, null);
+    });
+  }).catch(function (e) { cb(null, null, String(e && e.message || e)); });
+}
 var API = {
   HK_DISK: HK_DISK, buildProtocol: buildProtocol, hkUpload: hkUpload,
+  hkSlug: hkSlug, hkTeamPath: hkTeamPath, hkSaveTeam: hkSaveTeam, hkLoadTeam: hkLoadTeam, hkEnsureDir: hkEnsureDir,
   hkDownload: hkDownload, safeName: safeName, docxBuild: docxBuild
 };
 if (typeof module !== "undefined" && module.exports) { module.exports = API; }
