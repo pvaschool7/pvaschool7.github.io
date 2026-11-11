@@ -1114,19 +1114,26 @@ function genFunc1(rng){
   var n=ri(rng,3,9);
   var ys=xs.map(function(x){return x*(x-n)});
   var nsign=" − "+n;
-  /* таблица с полями ввода */
-  var rows=xs.map(function(x,idx){
-   var xstr=x<0?"−"+Math.abs(x):String(x);
-   return "<tr><td class='tx'>"+xstr+"</td><td><input class='tz-table-in' data-i='"+idx+"' type='text' inputmode='decimal' placeholder='?'></td></tr>";
+  /* горизонтальная таблица: x — в первой строке, y (поля ввода) — во второй */
+  var xCells=xs.map(function(x){
+   return "<td class='tx'>"+(x<0?"−"+Math.abs(x):String(x))+"</td>";
   }).join("");
-  var tableHtml="<table class='tz-table-fill'>"
-   +"<tr><th>x</th><th>y</th></tr>"+rows+"</table>";
-  /* подробное решение: заполненная таблица */
-  var detRows=xs.map(function(x,idx){
-   var xstr=x<0?"−"+Math.abs(x):String(x);
-   return "<tr><td class='tx'>"+xstr+"</td><td class='ty'>"+ys[idx]+"</td></tr>";
+  var yInputs=xs.map(function(x,idx){
+   return "<td><input class='tz-table-in' data-i='"+idx+"' type='text' inputmode='decimal' placeholder='?'></td>";
   }).join("");
-  var detTable="<table class='tz-table-fill tz-table-solved'><tr><th>x</th><th>y</th></tr>"+detRows+"</table>";
+  var tableHtml="<table class='tz-table-fill tz-table-h'>"
+   +"<tr><th>x</th>"+xCells+"</tr>"
+   +"<tr><th>y</th>"+yInputs+"</tr></table>";
+  /* подробное решение: заполненная горизонтальная таблица */
+  var detX=xs.map(function(x){
+   return "<td class='tx'>"+(x<0?"−"+Math.abs(x):String(x))+"</td>";
+  }).join("");
+  var detY=ys.map(function(y){
+   return "<td class='ty'>"+y+"</td>";
+  }).join("");
+  var detTable="<table class='tz-table-fill tz-table-h tz-table-solved'>"
+   +"<tr><th>x</th>"+detX+"</tr>"
+   +"<tr><th>y</th>"+detY+"</tr></table>";
   t.push({type:"table",
    q:"Функция задана формулой y = x(x"+nsign+"). Заполни таблицу значений функции."+tableHtml,
    xs:xs,answers:ys,
