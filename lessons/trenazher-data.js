@@ -1032,6 +1032,101 @@ function genSysHex(rng){
  return t;
 }
 
+/* ================= ТЕМА 8. Тренажёр: Функции и графики (математика, 7 кл) =================
+   30 вариантов по 3 блока (12 заданий). По образцу № 283–286 учебника:
+   блок 1 — вычисление значений функции по формуле (№ 283);
+   блок 2 — принадлежность точки графику (№ 284);
+   блок 3 — чтение графика по таблице значений (№ 285–286). */
+
+/* ---- Блок 1: Значения функции по формуле (№ 283) ---- */
+/* Красивое форматирование линейной функции y = kx + b */
+function fmtLinear(k,b){
+ var s="y = ";
+ if(k===1)s+="x"; else if(k===-1)s+="−x"; else s+=k+"x";
+ if(b>0)s+=" + "+b; else if(b<0)s+=" − "+Math.abs(b);
+ return s;
+}
+function genFunc1(rng){
+ var t=[];
+ var xs=[-2,-1.5,-1,-0.5,0,0.5,1,1.5,2];
+ for(var i=0;i<4;i++){
+  var n=ri(rng,3,9);
+  var x=pick(rng,xs);
+  var y=x*(x-n);
+  var ystr=y.toFixed(2).replace(/\.?0+$/,"");
+  if(ystr==="-0")ystr="0";
+  var xstr=String(x);
+  var nsign=" − "+n;
+  t.push({type:"num",
+   q:"Функция задана формулой y = x(x"+nsign+"). Найди значение функции при x = "+xstr+".",
+   a:y,unit:"",
+   hint:"Подставь x в формулу: y = "+xstr+"·("+xstr+nsign+")",
+   detailed:"Подставляем x = "+xstr+" в формулу y = x(x"+nsign+"):<br>"
+    +"y = "+xstr+"·("+xstr+nsign+") = "+xstr+"·"+(x-n)+" = "+ystr+"."});
+ }
+ return t;
+}
+
+/* ---- Блок 2: Принадлежность точки графику (№ 284) ---- */
+function genFunc2(rng){
+ var t=[];
+ var ks=[-3,-2,-1,1,2,3];
+ for(var i=0;i<4;i++){
+  var k=pick(rng,ks);
+  var b=ri(rng,-5,5);
+  var a=ri(rng,-4,4);
+  var onGraph=rng()<0.5;
+  var c;
+  if(onGraph){
+   c=k*a+b;
+  }else{
+   var off=pick(rng,[-3,-2,-1,1,2,3]);
+   c=k*a+b+off;
+  }
+  var funcStr=fmtLinear(k,b);
+  var yCalc=k*a+b;
+  t.push({type:"mc",
+   q:"Принадлежит ли точка ("+a+"; "+c+") графику функции "+funcStr+"?",
+   opts:shuf(rng,["да","нет"]),
+   c:onGraph?"да":"нет",
+   hint:"Подставь x = "+a+" в формулу и сравни полученный y с "+c,
+   detailed:"Подставляем x = "+a+" в формулу "+funcStr+":<br>"
+    +"y = "+(k===1?"":k===-1?"−":k)+"·"+a+(b>0?" + "+b:b<0?" − "+Math.abs(b):"")+" = "+yCalc+".<br>"
+    +"Получили y = "+yCalc+", а у точки y = "+c+". "
+    +(onGraph?"Значения совпадают — точка принадлежит графику.":"Значения не совпадают — точка НЕ принадлежит графику.")});
+ }
+ return t;
+}
+
+/* ---- Блок 3: Чтение графика по таблице (№ 285–286) ---- */
+function genFunc3(rng){
+ var t=[];
+ var ks=[-2,-1,1,2];
+ var allXs=[-3,-2,-1,0,1,2,3,4];
+ for(var i=0;i<4;i++){
+  var k=pick(rng,ks);
+  var b=ri(rng,-3,3);
+  var tableXs=shuf(rng,allXs).slice(0,5).sort(function(a,b){return a-b});
+  var tableYs=tableXs.map(function(x){return k*x+b});
+  var askIdx=ri(rng,0,4);
+  var askX=tableXs[askIdx];
+  var ansY=tableYs[askIdx];
+  var funcStr=fmtLinear(k,b);
+  t.push({type:"num",
+   q:"На рисунке изображён график функции "+funcStr+". По таблице значений найди y при x = "+askX+"."
+    +"<br><table style='border-collapse:collapse;margin:8px 0;font-size:18px'>"
+    +"<tr><td style='border:1px solid var(--line);padding:4px 12px;font-weight:600'>x</td>"
+    +tableXs.map(function(x){return "<td style='border:1px solid var(--line);padding:4px 12px;text-align:center'>"+x+"</td>"}).join("")
+    +"</tr><tr><td style='border:1px solid var(--line);padding:4px 12px;font-weight:600'>y</td>"
+    +tableYs.map(function(y){return "<td style='border:1px solid var(--line);padding:4px 12px;text-align:center'>"+y+"</td>"}).join("")
+    +"</tr></table>",
+   a:ansY,unit:"",
+   hint:"Найди в таблице столбец с x = "+askX+" и прочитай соответствующее значение y",
+   detailed:"В таблице значений функции находим столбец с x = "+askX+" — соответствующее значение y = "+ansY+"."});
+ }
+ return t;
+}
+
 /* ================= Каталог тем ================= */
 var TOPICS=[
  {id:"izmerenie",subject:"Информатика",grade:"7 класс",title:"Измерение информации",
@@ -1061,6 +1156,13 @@ var TOPICS=[
    {name:"Простые уравнения",gen:genUravn1},
    {name:"Скобки и две части",gen:genUravn2},
    {name:"Применяем",gen:genUravn3}
+  ]},
+ {id:"funkcii",subject:"Математика",grade:"7 класс",title:"Функции и графики",variants:30,
+  desc:"Вычисление значений функции по формуле, проверка принадлежности точки графику, чтение графика по таблице значений. По образцу № 283–286 учебника.",
+  blocks:[
+   {name:"Значения функции по формуле",gen:genFunc1},
+   {name:"Принадлежность точки графику",gen:genFunc2},
+   {name:"Чтение графика по таблице",gen:genFunc3}
   ]},
  {id:"proizvod",subject:"Математика",grade:"11 класс",title:"Производная суммы, произведения и частного",dz:true,variants:200,
   level:"базовый уровень",sample:"№ 4.30",fileTitle:"Производная суммы, произведения и частного функций",filePrefix:"ДЗ_Производная",
