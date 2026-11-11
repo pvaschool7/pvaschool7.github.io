@@ -1034,11 +1034,10 @@ function genSysHex(rng){
 
 /* ================= ТЕМА 8. Тренажёр: Функции и графики (математика, 7 кл) =================
    30 вариантов по 3 блока (12 заданий). По образцу № 283–286 учебника:
-   блок 1 — вычисление значений функции по формуле (№ 283);
+   блок 1 — заполнение таблицы значений функции по формуле (№ 283);
    блок 2 — принадлежность точки графику (№ 284);
-   блок 3 — чтение графика по таблице значений (№ 285–286). */
+   блок 3 — чтение графика функции (№ 285–286). */
 
-/* ---- Блок 1: Значения функции по формуле (№ 283) ---- */
 /* Красивое форматирование линейной функции y = kx + b */
 function fmtLinear(k,b){
  var s="y = ";
@@ -1046,23 +1045,93 @@ function fmtLinear(k,b){
  if(b>0)s+=" + "+b; else if(b<0)s+=" − "+Math.abs(b);
  return s;
 }
+
+/* SVG-график линейной функции y = kx + b.
+   askX — значение x, при котором нужно найти y (помечается на графике).
+   Возвращает строку с SVG (координатная плоскость с сеткой, осями и прямой). */
+function drawLinearGraph(k,b,askX){
+ var xMin=Math.min(-4,Math.floor(askX-2));
+ var xMax=Math.max(4,Math.ceil(askX+2));
+ var yMin=Math.min(k*xMin+b,k*xMax+b);var yMax=Math.max(k*xMin+b,k*xMax+b);
+ yMin=Math.floor(yMin-1);yMax=Math.ceil(yMax+1);
+ if(yMin>0)yMin=0;if(yMax<0)yMax=0;
+ if(yMax-yMin<6){yMin=Math.floor(yMin-2);yMax=Math.ceil(yMax+2)}
+ var w=460,h=340,pad=36;
+ var plotW=w-2*pad,plotH=h-2*pad;
+ function sx(x){return pad+(x-xMin)/(xMax-xMin)*plotW}
+ function sy(y){return h-pad-(y-yMin)/(yMax-yMin)*plotH}
+ var p=[];
+ p.push('<svg class="tz-graph" width="'+w+'" height="'+h+'" viewBox="0 0 '+w+' '+h+'" xmlns="http://www.w3.org/2000/svg">');
+ /* сетка */
+ for(var x=xMin;x<=xMax;x++){
+  var px=sx(x).toFixed(1);
+  p.push('<line x1="'+px+'" y1="'+pad+'" x2="'+px+'" y2="'+(h-pad)+'" stroke="var(--line)" stroke-width="1" opacity="0.6"/>');
+ }
+ for(var y=yMin;y<=yMax;y++){
+  var py=sy(y).toFixed(1);
+  p.push('<line x1="'+pad+'" y1="'+py+'" x2="'+(w-pad)+'" y2="'+py+'" stroke="var(--line)" stroke-width="1" opacity="0.6"/>');
+ }
+ /* оси */
+ var ox=sx(0).toFixed(1),oy=sy(0).toFixed(1);
+ p.push('<line x1="'+pad+'" y1="'+oy+'" x2="'+(w-pad)+'" y2="'+oy+'" stroke="var(--ink)" stroke-width="2"/>');
+ p.push('<line x1="'+ox+'" y1="'+pad+'" x2="'+ox+'" y2="'+(h-pad)+'" stroke="var(--ink)" stroke-width="2"/>');
+ /* подписи осей */
+ p.push('<text x="'+(w-pad+10)+'" y="'+(parseFloat(oy)+4)+'" font-size="15" fill="var(--ink)" font-family="Golos Text,sans-serif">x</text>');
+ p.push('<text x="'+(parseFloat(ox)+6)+'" y="'+(pad-10)+'" font-size="15" fill="var(--ink)" font-family="Golos Text,sans-serif">y</text>');
+ /* числа на осях */
+ for(x=xMin;x<=xMax;x++){
+  if(x!==0){
+   px=sx(x).toFixed(1);
+   p.push('<text x="'+px+'" y="'+(parseFloat(oy)+17)+'" font-size="11" fill="var(--mute)" text-anchor="middle" font-family="Golos Text,sans-serif">'+x+'</text>');
+  }
+ }
+ for(y=yMin;y<=yMax;y++){
+  if(y!==0){
+   py=sy(y).toFixed(1);
+   p.push('<text x="'+(parseFloat(ox)-8)+'" y="'+(parseFloat(py)+4)+'" font-size="11" fill="var(--mute)" text-anchor="end" font-family="Golos Text,sans-serif">'+y+'</text>');
+  }
+ }
+ p.push('<text x="'+(parseFloat(ox)-8)+'" y="'+(parseFloat(oy)+17)+'" font-size="11" fill="var(--mute)" text-anchor="end" font-family="Golos Text,sans-serif">0</text>');
+ /* прямая y = kx + b */
+ var y1=k*xMin+b,y2=k*xMax+b;
+ p.push('<line x1="'+sx(xMin).toFixed(1)+'" y1="'+sy(y1).toFixed(1)+'" x2="'+sx(xMax).toFixed(1)+'" y2="'+sy(y2).toFixed(1)+'" stroke="var(--blue)" stroke-width="2.5"/>');
+ /* отметка искомого x: пунктирная вертикаль от оси до прямой */
+ var askY=k*askX+b;
+ var ax=sx(askX).toFixed(1),ay=sy(askY).toFixed(1);
+ p.push('<line x1="'+ax+'" y1="'+oy+'" x2="'+ax+'" y2="'+ay+'" stroke="var(--red)" stroke-width="1.5" stroke-dasharray="5,4" opacity="0.7"/>');
+ p.push('<circle cx="'+ax+'" cy="'+ay+'" r="4" fill="var(--red)"/>');
+ p.push('</svg>');
+ return p.join('');
+}
+
+/* ---- Блок 1: Таблица значений функции по формуле (№ 283) ----
+   4 задания: в каждом дана функция y = x(x−n) и таблица из 10 значений x.
+   Ученик заполняет все 10 значений y. Тип задания — «table» (массив ответов). */
 function genFunc1(rng){
  var t=[];
- var xs=[-2,-1.5,-1,-0.5,0,0.5,1,1.5,2];
+ var xs=[-2,-1.5,-1,-0.5,0,0.5,1,1.5,2,2.5];
  for(var i=0;i<4;i++){
   var n=ri(rng,3,9);
-  var x=pick(rng,xs);
-  var y=x*(x-n);
-  var ystr=y.toFixed(2).replace(/\.?0+$/,"");
-  if(ystr==="-0")ystr="0";
-  var xstr=String(x);
+  var ys=xs.map(function(x){return x*(x-n)});
   var nsign=" − "+n;
-  t.push({type:"num",
-   q:"Функция задана формулой y = x(x"+nsign+"). Найди значение функции при x = "+xstr+".",
-   a:y,unit:"",
-   hint:"Подставь x в формулу: y = "+xstr+"·("+xstr+nsign+")",
-   detailed:"Подставляем x = "+xstr+" в формулу y = x(x"+nsign+"):<br>"
-    +"y = "+xstr+"·("+xstr+nsign+") = "+xstr+"·"+(x-n)+" = "+ystr+"."});
+  /* таблица с полями ввода */
+  var rows=xs.map(function(x,idx){
+   var xstr=x<0?"−"+Math.abs(x):String(x);
+   return "<tr><td class='tx'>"+xstr+"</td><td><input class='tz-table-in' data-i='"+idx+"' type='text' inputmode='decimal' placeholder='?'></td></tr>";
+  }).join("");
+  var tableHtml="<table class='tz-table-fill'>"
+   +"<tr><th>x</th><th>y</th></tr>"+rows+"</table>";
+  /* подробное решение: заполненная таблица */
+  var detRows=xs.map(function(x,idx){
+   var xstr=x<0?"−"+Math.abs(x):String(x);
+   return "<tr><td class='tx'>"+xstr+"</td><td class='ty'>"+ys[idx]+"</td></tr>";
+  }).join("");
+  var detTable="<table class='tz-table-fill tz-table-solved'><tr><th>x</th><th>y</th></tr>"+detRows+"</table>";
+  t.push({type:"table",
+   q:"Функция задана формулой y = x(x"+nsign+"). Заполни таблицу значений функции."+tableHtml,
+   xs:xs,answers:ys,
+   hint:"Подставляй каждое значение x в формулу: y = x·(x"+nsign+")",
+   detailed:"Подставляем каждое значение x в формулу y = x(x"+nsign+") и заполняем таблицу:"+detTable});
  }
  return t;
 }
@@ -1098,34 +1167,27 @@ function genFunc2(rng){
  return t;
 }
 
-/* ---- Блок 3: Чтение графика по таблице (№ 285–286) ---- */
+/* ---- Блок 3: Чтение графика функции (№ 285–286) ----
+   4 задания: нарисован график линейной функции (SVG), нужно найти y при заданном x. */
 function genFunc3(rng){
  var t=[];
  var ks=[-2,-1,1,2];
- var allXs=[-3,-2,-1,0,1,2,3,4];
  for(var i=0;i<4;i++){
   var k=pick(rng,ks);
   var b=ri(rng,-3,3);
-  var tableXs=shuf(rng,allXs).slice(0,5).sort(function(a,b){return a-b});
-  var tableYs=tableXs.map(function(x){return k*x+b});
-  var askIdx=ri(rng,0,4);
-  var askX=tableXs[askIdx];
-  var ansY=tableYs[askIdx];
+  var askX=ri(rng,-3,3);
+  var ansY=k*askX+b;
   var funcStr=fmtLinear(k,b);
+  var svg=drawLinearGraph(k,b,askX);
   t.push({type:"num",
-   q:"На рисунке изображён график функции "+funcStr+". По таблице значений найди y при x = "+askX+"."
-    +"<br><table style='border-collapse:collapse;margin:8px 0;font-size:18px'>"
-    +"<tr><td style='border:1px solid var(--line);padding:4px 12px;font-weight:600'>x</td>"
-    +tableXs.map(function(x){return "<td style='border:1px solid var(--line);padding:4px 12px;text-align:center'>"+x+"</td>"}).join("")
-    +"</tr><tr><td style='border:1px solid var(--line);padding:4px 12px;font-weight:600'>y</td>"
-    +tableYs.map(function(y){return "<td style='border:1px solid var(--line);padding:4px 12px;text-align:center'>"+y+"</td>"}).join("")
-    +"</tr></table>",
+   q:"На рисунке изображён график функции "+funcStr+". Пользуясь графиком, найди значение функции при x = "+askX+"."+svg,
    a:ansY,unit:"",
-   hint:"Найди в таблице столбец с x = "+askX+" и прочитай соответствующее значение y",
-   detailed:"В таблице значений функции находим столбец с x = "+askX+" — соответствующее значение y = "+ansY+"."});
+   hint:"Найди на оси x значение "+askX+", поднимись по пунктирной линии до графика и прочитай значение y",
+   detailed:"На графике находим x = "+askX+" (отмечен пунктиром), поднимаемся до графика функции и читаем значение на оси y: y = "+ansY+"."});
  }
  return t;
 }
+
 
 /* ================= Каталог тем ================= */
 var TOPICS=[
@@ -1158,11 +1220,11 @@ var TOPICS=[
    {name:"Применяем",gen:genUravn3}
   ]},
  {id:"funkcii",subject:"Математика",grade:"7 класс",title:"Функции и графики",variants:30,
-  desc:"Вычисление значений функции по формуле, проверка принадлежности точки графику, чтение графика по таблице значений. По образцу № 283–286 учебника.",
+  desc:"Заполнение таблицы значений функции по формуле, проверка принадлежности точки графику, чтение графика функции. По образцу № 283–286 учебника. 3 блока · 12 заданий · 30 вариантов.",
   blocks:[
-   {name:"Значения функции по формуле",gen:genFunc1},
+   {name:"Таблица значений функции",gen:genFunc1},
    {name:"Принадлежность точки графику",gen:genFunc2},
-   {name:"Чтение графика по таблице",gen:genFunc3}
+   {name:"Чтение графика функции",gen:genFunc3}
   ]},
  {id:"proizvod",subject:"Математика",grade:"11 класс",title:"Производная суммы, произведения и частного",dz:true,variants:200,
   level:"базовый уровень",sample:"№ 4.30",fileTitle:"Производная суммы, произведения и частного функций",filePrefix:"ДЗ_Производная",

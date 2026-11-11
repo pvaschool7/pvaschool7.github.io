@@ -42,6 +42,15 @@
 .tz-num:focus{outline:none;border-color:var(--green)}
 .tz-unit{font-weight:600;color:var(--mute);font-size:17px}
 .tz-unit sup{font-size:.62em}
+/* Таблица для заполнения (тип table) */
+.tz-table-fill{border-collapse:collapse;margin:12px 0;font-size:18px}
+.tz-table-fill th,.tz-table-fill td{border:1.5px solid var(--line);padding:7px 18px;text-align:center;min-width:60px}
+.tz-table-fill th{font-weight:600;background:var(--paper);color:var(--ink)}
+.tz-table-fill td.tx{font-weight:600;color:var(--mute)}
+.tz-table-fill input{width:80px;text-align:center;font:600 18px "Golos Text",sans-serif;border:2px solid var(--blue);border-radius:8px;padding:5px 8px;background:var(--card);color:var(--ink)}
+.tz-table-fill input:focus{outline:none;border-color:var(--green)}
+.tz-table-fill.tz-table-solved td.ty{font-weight:600;color:var(--green)}
+.tz-graph{margin:12px 0;max-width:100%;height:auto;display:block;border-radius:10px;background:var(--paper);padding:4px}
 .tz-opts{display:grid;gap:10px;margin:16px 0}
 .tz-opt{text-align:left;padding:13px 18px;border:2px solid var(--line);border-radius:12px;background:var(--paper);font:600 16.5px "Golos Text",sans-serif;color:var(--ink);cursor:pointer;transition:.12s}
 .tz-opt:hover{border-color:var(--blue)}
@@ -497,9 +506,21 @@ function saveCurrent(){
  var sl=S.slides[S.cur];
  if(!sl||sl.kind!=="task")return;
  var prev=S.ans[sl.g],val=null;
- if(S.data.blocks[sl.bi].tasks[sl.ti].type==="mc"){
+ var taskType=S.data.blocks[sl.bi].tasks[sl.ti].type;
+ if(taskType==="mc"){
   var sel=app.querySelector(".tz-opt.sel");
   val=sel?sel.getAttribute("data-v"):null;
+ }else if(taskType==="table"){
+  /* собираем все поля таблицы в массив */
+  var inputs=app.querySelectorAll(".tz-table-in");
+  if(inputs.length>0){
+   val=[];
+   for(var j=0;j<inputs.length;j++){val.push(inputs[j].value.trim())}
+   /* если все пустые — считаем неотвеченным */
+   var any=false;
+   for(j=0;j<val.length;j++){if(val[j]){any=true;break}}
+   if(!any)val=null;
+  }
  }else{
   var inp=document.getElementById("tzin");
   val=inp&&inp.value.trim()!==""?inp.value.trim():null;
@@ -523,6 +544,8 @@ function renderRun(){
   h+="<div class='slide'>"+slideBadge(sl.bi)+"<div class='tz-n'>"+(sl.g+1)+"</div><div class='tz-q'>"+task.q+"</div>";
   if(task.type==="num"){
    h+="<div class='tz-answer'><input class='tz-num' id='tzin' type='text' inputmode='text' autocomplete='off' value='"+(saved||"")+"' aria-label='Ответ'>"+(task.unit?"<span class='tz-unit'>"+task.unit+"</span>":"")+"</div>";
+  }else if(task.type==="table"){
+   /* таблица с полями ввода уже внутри task.q — отдельная область ответа не нужна */
   }else{
    h+="<div class='tz-opts'>";
    task.opts.forEach(function(o){
@@ -537,6 +560,11 @@ function renderRun(){
  h+="<div class='tz-nav' style='max-width:960px;margin:0 auto 26px'>"+(S.cur>0?"<button class='btn ghost' type='button' id='prev'>← Назад</button>":"")+"<span class='spacer'></span>"+(last?"<button class='btn' type='button' id='fin'>Показать результат →</button>":"<button class='btn' type='button' id='next'>"+(sl.kind==="div"?"К заданиям →":"Далее →")+"</button>")+"</div>";
  if(last&&sl.kind==="task"&&unanswered>0)h+="<p class='tz-warn' style='max-width:960px;margin:0 auto 26px'>Не отвечено заданий: "+unanswered+". Можно вернуться «Назад» — или показать результат как есть.</p>";
  app.innerHTML=h;
+ /* восстанавливаем сохранённые значения в поля таблицы */
+ if(saved&&Array.isArray(saved)){
+  var tinputs=app.querySelectorAll(".tz-table-in");
+  for(i=0;i<tinputs.length&&i<saved.length;i++){tinputs[i].value=saved[i]||""}
+ }
  var np=document.getElementById("next"),pv=document.getElementById("prev"),fin=document.getElementById("fin");
  if(np)np.addEventListener("click",next);
  if(pv)pv.addEventListener("click",prev);
@@ -551,6 +579,14 @@ function renderRun(){
   inp.addEventListener("keydown",function(e){if(e.key==="Enter"){e.preventDefault();(last&&fin?fin:np||fin).click()}});
   inp.focus();
  }
+ /* для таблицы: Enter в последнем поле → далее, Tab-навигация естественная */
+ var tinputs2=app.querySelectorAll(".tz-table-in");
+ for(i=0;i<tinputs2.length;i++){
+  (function(idx,last2){tinputs2[idx].addEventListener("keydown",function(e){
+   if(e.key==="Enter"){e.preventDefault();(last&&fin?fin:np||fin).click()}
+  })})(i,i===tinputs2.length-1);
+ }
+ if(tinputs2.length>0&&!inp)tinputs2[0].focus();
  if(sl.kind==="div"&&np)np.focus();
  window.scrollTo(0,0);
 }
@@ -758,12 +794,47 @@ function finish(){
   b.tasks.forEach(function(task,ti){
    var a=S.ans[g],right=false;
    if(task.type==="num")right=a!==null&&D.checkNum(a,task.a);
+   else if(task.type==="table"){
+    if(a&&Array.isArray(a)&&task.answers){
+     var nOk=0;
+     for(var ai=0;ai<task.answers.length;ai++){
+      if(a[ai]&&D.checkNum(a[ai],task.answers[ai]))nOk++;
+     }
+     /* засчитываем, если все значения верны */
+     right=nOk===task.answers.length;
+    }
+   }
    else right=(a===task.c);
    if(right)got++;
-   var st=right?"<span class='st ok'>✓</span>":(a===null||a===""?"<span class='st na'>—</span>":"<span class='st no'>✗</span>");
-   var my=a===null||a===""?"нет ответа":a;
-   var corr=task.type==="num"?(task.a+(task.unit?" "+task.unit.replace(/<[^>]+>/g,""):"")):task.c;
-   review+="<div class='rev'><p>"+st+"<b>Задание "+(g+1)+"</b></p><p>"+task.q+"</p><p class='ans'>Твой ответ: <b>"+esc(my)+"</b>"+(right?"":" · Верно: <b>"+esc(corr)+"</b>")+(task.type==="num"&&task.hint?" · <span style='color:var(--mute)'>"+task.hint.replace(/<[^>]+>/g,"")+"</span>":"")+"</p></div>";
+   var st=right?"<span class='st ok'>✓</span>":(a===null||a===""||(Array.isArray(a)&&a.length===0)?"<span class='st na'>—</span>":"<span class='st no'>✗</span>");
+   var myText;
+   if(task.type==="table"){
+    /* для таблицы показываем сколько значений верны */
+    var nOkT=0;
+    if(a&&Array.isArray(a)&&task.answers){
+     for(var ai2=0;ai2<task.answers.length;ai2++){if(a[ai2]&&D.checkNum(a[ai2],task.answers[ai2]))nOkT++}
+    }
+    myText=nOkT+" из "+task.answers.length+" верно";
+   } else {
+    myText=a===null||a===""?"нет ответа":(Array.isArray(a)?a.join(", "):a);
+   }
+   var corrText;
+   if(task.type==="table"){
+    /* показываем подробное решение с заполненной таблицей */
+    corrText=task.detailed||"";
+   } else {
+    corrText=task.type==="num"?(task.a+(task.unit?" "+task.unit.replace(/<[^>]+>/g,""):"")):task.c;
+   }
+   /* очищаем вопрос от полей ввода для разбора */
+   var qClean=task.q.replace(/<input[^>]*>/gi,"").replace(/<table class='tz-table-fill'[^>]*>([\s\S]*?)<\/table>/i,function(m){
+    /* заменяем таблицу на краткое описание */
+    return "";
+   });
+   if(task.type==="table"){
+    review+="<div class='rev'><p>"+st+"<b>Задание "+(g+1)+"</b> · "+myText+"</p><p class='ans'>"+qClean+"</p><p class='ans'>Твой результат: <b>"+myText+"</b></p>"+(right?"":"<p class='ans'>Верная таблица:</p>"+(task.detailed||""))+"</div>";
+   } else {
+    review+="<div class='rev'><p>"+st+"<b>Задание "+(g+1)+"</b></p><p>"+task.q+"</p><p class='ans'>Твой ответ: <b>"+esc(myText)+"</b>"+(right?"":" · Верно: <b>"+esc(corrText)+"</b>")+(task.type==="num"&&task.hint?" · <span style='color:var(--mute)'>"+task.hint.replace(/<[^>]+>/g,"")+"</span>":"")+"</p></div>";
+   }
    g++;
   });
   perBlock.push({name:b.name,got:got,of:b.tasks.length});
