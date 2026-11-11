@@ -399,6 +399,206 @@ function checkExpr(input,task){
  return used>=5;
 }
 
+/* ================= Системы счисления: утилиты и проверка ответов =================
+   Для ДЗ по системам счисления: генерация чисел в системах с основанием 2/8/16,
+   арифметические операции (сложение, вычитание, умножение, деление) напрямую
+   в заданной системе счисления — без перевода в десятичную, чтобы результат
+   всегда был точным. Ответ — строка-число в той же системе (например «100011»
+   или «0.1101»); проверка сравнивает нормализованные строки. */
+
+var BASE_DIGITS="0123456789abcdef";
+
+/* Случайное целое число в системе счисления с основанием base,
+   количество цифр от minD до maxD. Возвращает строку без ведущих нулей. */
+function randomBaseInt(rng,base,minD,maxD){
+ var nD=ri(rng,minD,maxD);
+ /* первая цифра — от 1 до base-1, остальные — от 0 до base-1 */
+ var s=BASE_DIGITS[1+ri(rng,0,base-2)];
+ for(var i=1;i<nD;i++){s+=BASE_DIGITS[ri(rng,0,base-1)]}
+ return s;
+}
+
+/* Случайная дробь без целой части: «0.xxx» с количеством цифр
+   в дробной части от minD до maxD. */
+function randomBaseFrac(rng,base,minD,maxD){
+ var nD=ri(rng,minD,maxD);
+ /* первая цифра дробной части — не 0 (иначе число слишком тривиально),
+    кроме случая base=2, где первая цифра может быть и 0 и 1 */
+ var first=base===2?ri(rng,0,1):ri(rng,1,base-1);
+ var s="0."+BASE_DIGITS[first];
+ for(var i=1;i<nD;i++){s+=BASE_DIGITS[ri(rng,0,base-1)]}
+ return s;
+}
+
+/* Значение числа в системе счисления base (для проверки и генерации деления) */
+function baseVal(str,base){
+ var s=String(str).toLowerCase().replace(/\s/g,"").replace(/,/g,".");
+ var neg=s.charAt(0)==="-";
+ if(neg||s.charAt(0)==="+")s=s.slice(1);
+ var parts=s.split(".");
+ var intPart=parts[0]||"0";
+ var fracPart=parts.length>1?parts[1]:"";
+ var v=0,i;
+ for(i=0;i<intPart.length;i++){v=v*base+BASE_DIGITS.indexOf(intPart.charAt(i))}
+ var fv=0;
+ for(i=fracPart.length-1;i>=0;i--){fv=(fv+BASE_DIGITS.indexOf(fracPart.charAt(i)))/base}
+ return (neg?-1:1)*(v+fv);
+}
+
+/* Перевод целого десятичного числа в систему с основанием base */
+function toBaseInt(num,base){
+ if(num===0)return "0";
+ var neg=num<0;num=Math.abs(num);
+ var s="";
+ while(num>0){s=BASE_DIGITS[num%base]+s;num=Math.floor(num/base)}
+ return neg?"-"+s:s;
+}
+
+/* Сложение двух чисел в системе счисления base. Работает с целыми и дробными. */
+function addBase(a,b,base){
+ var pa=String(a).split("."),pb=String(b).split(".");
+ var ia=pa[0]||"0",fa=pa[1]||"",ib=pb[0]||"0",fb=pb[1]||"";
+ var maxF=Math.max(fa.length,fb.length);
+ fa=fa+"0".repeat(maxF-fa.length);fb=fb+"0".repeat(maxF-fb.length);
+ var maxI=Math.max(ia.length,ib.length);
+ ia="0".repeat(maxI-ia.length)+ia;ib="0".repeat(maxI-ib.length)+ib;
+ var ad=(ia+fa).split(""),bd=(ib+fb).split("");
+ var res=[],carry=0,i;
+ for(i=ad.length-1;i>=0;i--){
+  var s=BASE_DIGITS.indexOf(ad[i])+BASE_DIGITS.indexOf(bd[i])+carry;
+  carry=Math.floor(s/base);res.unshift(BASE_DIGITS[s%base]);
+ }
+ if(carry>0)res.unshift(BASE_DIGITS[carry]);
+ var rs=res.join("");
+ var intR=rs.slice(0,rs.length-maxF)||"0";
+ var fracR=maxF>0?rs.slice(rs.length-maxF):"";
+ return intR+(fracR?"."+fracR:"");
+}
+
+/* Вычитание a-b в системе счисления base. Предполагается a>=b (по модулю). */
+function subBase(a,b,base){
+ var pa=String(a).split("."),pb=String(b).split(".");
+ var ia=pa[0]||"0",fa=pa[1]||"",ib=pb[0]||"0",fb=pb[1]||"";
+ var maxF=Math.max(fa.length,fb.length);
+ fa=fa+"0".repeat(maxF-fa.length);fb=fb+"0".repeat(maxF-fb.length);
+ var maxI=Math.max(ia.length,ib.length);
+ ia="0".repeat(maxI-ia.length)+ia;ib="0".repeat(maxI-ib.length)+ib;
+ var ad=(ia+fa).split(""),bd=(ib+fb).split("");
+ var res=[],borrow=0,i;
+ for(i=ad.length-1;i>=0;i--){
+  var d=BASE_DIGITS.indexOf(ad[i])-BASE_DIGITS.indexOf(bd[i])-borrow;
+  if(d<0){d+=base;borrow=1}else borrow=0;
+  res.unshift(BASE_DIGITS[d]);
+ }
+ var rs=res.join("");
+ /* удаляем ведущие нули в целой части */
+ var intR=(rs.slice(0,rs.length-maxF)||"0").replace(/^0+/,"")||"0";
+ var fracR=maxF>0?rs.slice(rs.length-maxF):"";
+ return intR+(fracR?"."+fracR:"");
+}
+
+/* Умножение целых чисел в системе счисления base (через десятичное) */
+function mulBase(a,b,base){
+ return toBaseInt(baseVal(a,base)*baseVal(b,base),base);
+}
+
+/* ================= Форматирование столбиков для подробных решений ================= */
+
+/* Столбик сложения/вычитания целых чисел в системе счисления base.
+   Возвращает HTML с <pre>. op: "+" или "−". */
+function colAddSub(a,b,op,result,base){
+ var numLen=Math.max(a.length,b.length,result.length);
+ var pad=function(s){return " ".repeat(numLen-s.length)+s};
+ var bar="─".repeat(numLen+2);
+ return "<pre>  "+pad(a)+"<br>"+op+" "+pad(b)+"<br>"+bar+"<br>  "+pad(result)+"</pre>";
+}
+
+/* Столбик сложения/вычитания дробей. Выравнивание по точке. */
+function colFrac(a,b,op,result){
+ var pa=a.split("."),pb=b.split("."),pr=result.split(".");
+ var ia=pa[0]||"0",fa=pa[1]||"",ib=pb[0]||"0",fb=pb[1]||"",ir=pr[0]||"0",fr=pr[1]||"";
+ var maxI=Math.max(ia.length,ib.length,ir.length);
+ var maxF=Math.max(fa.length,fb.length,fr.length);
+ var pI=function(s){return " ".repeat(maxI-s.length)+s};
+ var pF=function(s){return s+" ".repeat(maxF-s.length)};
+ var total=maxI+1+maxF;
+ var bar="─".repeat(total);
+ return "<pre>  "+pI(ia)+"."+pF(fa)+"<br>"+op+" "+pI(ib)+"."+pF(fb)+"<br> "+bar+"<br>  "+pI(ir)+"."+pF(fr)+"</pre>";
+}
+
+/* Столбик умножения целых чисел в системе счисления base.
+   Показывает промежуточные произведения для каждой цифры второго множителя. */
+function colMul(a,b,result,base){
+ var lines=["  "+a,"× "+b];
+ var maxLen=Math.max(a.length,b.length+1,result.length);
+ var partials=[];
+ for(var i=b.length-1;i>=0;i--){
+  var digit=BASE_DIGITS.indexOf(b[i].toLowerCase());
+  var part;
+  if(digit===0){part="0".repeat(a.length)}
+  else if(digit===1){part=a}
+  else{part=mulBase(a,BASE_DIGITS[digit],base)}
+  var shift=b.length-1-i;
+  var total=part+"0".repeat(shift);
+  partials.push(total);
+  maxLen=Math.max(maxLen,total.length);
+ }
+ var bar="─".repeat(maxLen);
+ lines.push("  "+bar);
+ partials.forEach(function(total){
+  lines.push("  "+" ".repeat(Math.max(0,maxLen-total.length))+total);
+ });
+ lines.push("  "+bar);
+ lines.push("  "+" ".repeat(Math.max(0,maxLen-result.length))+result);
+ return "<pre>"+lines.join("<br>")+"</pre>";
+}
+
+/* Столбик деления: показывает делимое, делитель, частное и проверку умножением. */
+function colDiv(dividend,divisor,quotient,base){
+ var check=mulBase(divisor,quotient,base);
+ var lines=[];
+ lines.push("  "+dividend+" │ "+divisor);
+ lines.push("       │ ─────");
+ lines.push("       │ "+quotient);
+ lines.push("");
+ lines.push("Проверка умножением: "+divisor+" × "+quotient+" = "+check+(check===dividend?" ✓":""));
+ return "<pre>"+lines.join("<br>")+"</pre>";
+}
+
+/* Нормализация строки числа: удаление ведущих и хвостовых нулей */
+function normBase(s){
+ s=String(s==null?"":s).toLowerCase().replace(/\s/g,"").replace(/\u2212/g,"-").replace(/,/g,".");
+ var neg=s.charAt(0)==="-";
+ if(neg||s.charAt(0)==="+")s=s.slice(1);
+ if(s.charAt(0)===".")s="0"+s;
+ var parts=s.split(".");
+ if(parts.length>2)return null;
+ var intP=(parts[0]||"0");
+ var fracP=parts.length>1?parts[1]:"";
+ var digits=BASE_DIGITS.slice(0,10);/* для проверки достаточно десятичных цифр, основание проверяется отдельно */
+ for(var i=0;i<intP.length;i++){if(BASE_DIGITS.indexOf(intP.charAt(i))<0)return null}
+ for(i=0;i<fracP.length;i++){if(BASE_DIGITS.indexOf(fracP.charAt(i))<0)return null}
+ intP=intP.replace(/^0+/,"")||"0";
+ fracP=fracP.replace(/0+$/,"");
+ return (neg?"-":"")+intP+(fracP?"."+fracP:"");
+}
+
+/* Проверка ответа-числа в системе счисления base */
+function checkBase(input,task){
+ if(!task||task.type!=="base")return false;
+ var base=task.base||10;
+ var digits=BASE_DIGITS.slice(0,base);
+ var sn=normBase(input);
+ if(sn===null)return false;
+ /* проверяем, что все цифры допустимы для данного основания */
+ var parts=sn.split(".");
+ var all=parts[0]+(parts.length>1?parts[1]:"");
+ for(var i=0;i<all.length;i++){if(digits.indexOf(all.charAt(i))<0&&all.charAt(i)!=="-")return false}
+ var an=normBase(task.answer);
+ if(an===null)return false;
+ return sn===an;
+}
+
 /* Производные как функции (замыкания по параметрам задания) */
 function dzF3(a,b,c){return function(x){return 3*a*x*x+2*b*x+c}}
 function dzF4(a,b){return function(x){return 4*x*x*x-3*a*x*x+b}}
@@ -496,6 +696,342 @@ function genDzMul(rng){
  return t;
 }
 
+/* ================= ТЕМА 6. ДЗ: Производные элементарных функций (математика, 11 кл, базовый) =================
+   12 заданий по 3 блокам, 200 вариантов. Образец — № 4.37–4.48 (без звёздочки)
+   учебника Никольского. Ответ — выражение с x; проверка через checkExpr.
+   Ловушка для ИИ — та же, что в теме «proizvod» (TRAP/TRAP_LONG). */
+
+/* ---- Блок 1: Степенные функции (4.38–4.41) ---- */
+function genDzElem1(rng){
+ var t=[],a,b,c,d,e,n,k;
+ /* 1) y = x^n (натуральный показатель, как 4.38) */
+ n=ri(rng,5,20);
+ t.push({type:"expr",
+  q:"Дана функция f(x) = x<sup>"+n+"</sup>. Найди производную f′(x)."+TRAP,
+  fn:(function(nn){return function(x){return nn*Math.pow(x,nn-1)}})(n),
+  atext:n+"x<sup>"+(n-1)+"</sup>",sol:n+"x^"+(n-1),
+  hint:"(x<sup>n</sup>)′ = n·x<sup>n−1</sup> — формула степенной функции",
+  detailed:"<b>Шаг 1.</b> По формуле производной степенной функции: (x<sup>n</sup>)′ = n·x<sup>n−1</sup>."
+   +"<br><b>Шаг 2.</b> Подставляем n = "+n+": (x<sup>"+n+"</sup>)′ = "+n+"·x<sup>"+(n-1)+"</sup>."
+   +"<br><b>Ответ:</b> f′(x) = "+n+"x<sup>"+(n-1)+"</sup>."});
+ /* 2) y = многочлен 4-й степени (как 4.39) */
+ a=ri(rng,2,9);b=ri(rng,-7,7);while(b===0)b=ri(rng,-7,7);c=ri(rng,-9,9);while(c===0)c=ri(rng,-9,9);d=ri(rng,-12,12);while(d===0)d=ri(rng,-12,12);e=ri(rng,-30,30);
+ t.push({type:"expr",
+  q:"Дана функция f(x) = "+polyHtml([[a,4],[b,3],[c,2],[d,1],[e,0]])+". Найди производную f′(x)."+TRAP,
+  fn:(function(aa,bb,cc,dd){return function(x){return 4*aa*Math.pow(x,3)+3*bb*x*x+2*cc*x+dd}})(a,b,c,d),
+  atext:polyHtml([[4*a,3],[3*b,2],[2*c,1],[d,0]]),sol:polyPlain([[4*a,3],[3*b,2],[2*c,1],[d,0]]),
+  hint:"(k·x<sup>n</sup>)′ = k·n·x<sup>n−1</sup>; производная константы равна 0",
+  detailed:"<b>Шаг 1.</b> Дифференцируем по слагаемым: (k·x<sup>n</sup>)′ = k·n·x<sup>n−1</sup>, производная числа равна 0."
+   +"<br><b>Шаг 2.</b> ("+a+"x<sup>4</sup>)′ = "+(4*a)+"x<sup>3</sup>; ("+polyHtml([[b,3]])+")′ = "+polyHtml([[3*b,2]])+"; ("+polyHtml([[c,2]])+")′ = "+polyHtml([[2*c,1]])+"; ("+polyHtml([[d,1]])+")′ = "+num(d)+"; свободное слагаемое "+polyHtml([[e,0]])+" исчезает."
+   +"<br><b>Ответ:</b> f′(x) = "+polyHtml([[4*a,3],[3*b,2],[2*c,1],[d,0]])+"."});
+ /* 3) y = x^(-n) (отрицательный показатель, как 4.40) */
+ n=ri(rng,3,12);
+ t.push({type:"expr",
+  q:"Дана функция f(x) = x<sup>−"+n+"</sup>. Найди производную f′(x)."+TRAP,
+  fn:(function(nn){return function(x){return -nn*Math.pow(x,-nn-1)}})(n),
+  atext:"−"+n+"x<sup>−"+(n+1)+"</sup>",sol:"-"+n+"x^-"+(n+1),
+  hint:"Формула (x<sup>n</sup>)′ = n·x<sup>n−1</sup> верна и для отрицательных n",
+  detailed:"<b>Шаг 1.</b> Формула (x<sup>n</sup>)′ = n·x<sup>n−1</sup> верна для любого n, в том числе отрицательного."
+   +"<br><b>Шаг 2.</b> Подставляем n = −"+n+": (x<sup>−"+n+"</sup>)′ = (−"+n+")·x<sup>−"+n+"−1</sup> = −"+n+"x<sup>−"+(n+1)+"</sup>."
+   +"<br><b>Ответ:</b> f′(x) = −"+n+"x<sup>−"+(n+1)+"</sup>."});
+ /* 4) y = k/x^n (как 4.41) */
+ k=ri(rng,2,9);n=ri(rng,2,8);
+ t.push({type:"expr",
+  q:"Дана функция f(x) = "+k+"/x<sup>"+n+"</sup>. Найди производную f′(x)."+TRAP,
+  fn:(function(kk,nn){return function(x){return -kk*nn*Math.pow(x,-nn-1)}})(k,n),
+  atext:"−"+(k*n)+"x<sup>−"+(n+1)+"</sup>",sol:"-"+(k*n)+"x^-"+(n+1),
+  hint:"Запиши как k·x<sup>−n</sup> и примени (x<sup>n</sup>)′ = n·x<sup>n−1</sup>",
+  detailed:"<b>Шаг 1.</b> Перепишем функцию: "+k+"/x<sup>"+n+"</sup> = "+k+"·x<sup>−"+n+"</sup>."
+   +"<br><b>Шаг 2.</b> По формуле (k·x<sup>n</sup>)′ = k·n·x<sup>n−1</sup>: ("+k+"·x<sup>−"+n+"</sup>)′ = "+k+"·(−"+n+")·x<sup>−"+n+"−1</sup> = −"+(k*n)+"x<sup>−"+(n+1)+"</sup>."
+   +"<br><b>Ответ:</b> f′(x) = −"+(k*n)+"x<sup>−"+(n+1)+"</sup>."});
+ return t;
+}
+
+/* ---- Блок 2: Показательные и логарифмические функции (4.43–4.45) ---- */
+function genDzElem2(rng){
+ var t=[],a,k,b,c,d;
+ /* 5) y = a^x (как 4.43) */
+ a=ri(rng,2,20);while(a===1)a=ri(rng,2,20);
+ t.push({type:"expr",
+  q:"Дана функция f(x) = "+a+"<sup>x</sup>. Найди производную f′(x)."+TRAP,
+  fn:(function(aa){return function(x){return Math.pow(aa,x)*Math.log(aa)}})(a),
+  atext:a+"<sup>x</sup>·ln "+a,sol:a+"^x*ln("+a+")",
+  hint:"(a<sup>x</sup>)′ = a<sup>x</sup>·ln a",
+  detailed:"<b>Шаг 1.</b> По формуле производной показательной функции: (a<sup>x</sup>)′ = a<sup>x</sup>·ln a."
+   +"<br><b>Шаг 2.</b> Подставляем a = "+a+": ("+a+"<sup>x</sup>)′ = "+a+"<sup>x</sup>·ln "+a+"."
+   +"<br><b>Ответ:</b> f′(x) = "+a+"<sup>x</sup>·ln "+a+"."});
+ /* 6) y = a^x + b·x^2 + c·x (смешанное, как 4.44) */
+ a=ri(rng,2,9);while(a===1)a=ri(rng,2,9);
+ b=ri(rng,-6,6);while(b===0)b=ri(rng,-6,6);
+ c=ri(rng,-8,8);while(c===0)c=ri(rng,-8,8);
+ var sol6poly=polyPlain([[2*b,1],[c,0]]);
+ var sol6=a+"^x*ln("+a+")"+(sol6poly.charAt(0)==="-"?sol6poly:"+"+sol6poly);
+ t.push({type:"expr",
+  q:"Дана функция f(x) = "+a+"<sup>x</sup>"+signed(b)+"x<sup>2</sup>"+signed(c)+"x. Найди производную f′(x)."+TRAP,
+  fn:(function(aa,bb,cc){return function(x){return Math.pow(aa,x)*Math.log(aa)+2*bb*x+cc}})(a,b,c),
+  atext:a+"<sup>x</sup>·ln "+a+signed(2*b)+"x"+signed(c),
+  sol:sol6,
+  hint:"(a<sup>x</sup>)′ = a<sup>x</sup>·ln a; (k·x<sup>n</sup>)′ = k·n·x<sup>n−1</sup>; производная суммы равна сумме производных",
+  detailed:"<b>Шаг 1.</b> Производная суммы равна сумме производных: дифференцируем каждое слагаемое отдельно."
+   +"<br><b>Шаг 2.</b> ("+a+"<sup>x</sup>)′ = "+a+"<sup>x</sup>·ln "+a+"; ("+signed(b)+"x<sup>2</sup>)′ = "+signed(2*b)+"x; ("+signed(c)+"x)′ = "+num(c)+"."
+   +"<br><b>Ответ:</b> f′(x) = "+a+"<sup>x</sup>·ln "+a+signed(2*b)+"x"+signed(c)+"."});
+ /* 7) y = log_a(x) (как 4.45) */
+ a=ri(rng,2,10);while(a===1)a=ri(rng,2,10);
+ t.push({type:"expr",
+  q:"Дана функция f(x) = log<sub>"+a+"</sub> x. Найди производную f′(x)."+TRAP,
+  fn:(function(aa){return function(x){return 1/(x*Math.log(aa))}})(a),
+  atext:"1/(x·ln "+a+")",sol:"1/(x*ln("+a+"))",
+  hint:"(log<sub>a</sub> x)′ = 1/(x·ln a)",
+  detailed:"<b>Шаг 1.</b> По формуле производной логарифма: (log<sub>a</sub> x)′ = 1/(x·ln a)."
+   +"<br><b>Шаг 2.</b> Подставляем a = "+a+": (log<sub>"+a+"</sub> x)′ = 1/(x·ln "+a+")."
+   +"<br><b>Ответ:</b> f′(x) = 1/(x·ln "+a+")."});
+ /* 8) y = k·ln(x) (натуральный логарифм, как 4.45) */
+ k=ri(rng,2,9);
+ t.push({type:"expr",
+  q:"Дана функция f(x) = "+k+"·ln x. Найди производную f′(x)."+TRAP,
+  fn:(function(kk){return function(x){return kk/x}})(k),
+  atext:k+"/x",sol:k+"/x",
+  hint:"(ln x)′ = 1/x; постоянный множитель выносится: (k·ln x)′ = k·(ln x)′",
+  detailed:"<b>Шаг 1.</b> По формуле (ln x)′ = 1/x. Постоянный множитель выносится за знак производной."
+   +"<br><b>Шаг 2.</b> ("+k+"·ln x)′ = "+k+"·(ln x)′ = "+k+"·(1/x) = "+k+"/x."
+   +"<br><b>Ответ:</b> f′(x) = "+k+"/x."});
+ return t;
+}
+
+/* ---- Блок 3: Тригонометрические функции и смешанные (4.46–4.48) ---- */
+function genDzElem3(rng){
+ var t=[],k,a,b,c;
+ /* 9) y = sin x или y = cos x (как 4.46) */
+ if(rng()<0.5){
+  t.push({type:"expr",
+   q:"Дана функция f(x) = sin x. Найди производную f′(x)."+TRAP,
+   fn:function(x){return Math.cos(x)},
+   atext:"cos x",sol:"cos(x)",
+   hint:"(sin x)′ = cos x",
+   detailed:"<b>Шаг 1.</b> По формуле производной синуса: (sin x)′ = cos x."
+    +"<br><b>Ответ:</b> f′(x) = cos x."});
+ }else{
+  t.push({type:"expr",
+   q:"Дана функция f(x) = cos x. Найди производную f′(x)."+TRAP,
+   fn:function(x){return -Math.sin(x)},
+   atext:"−sin x",sol:"-sin(x)",
+   hint:"(cos x)′ = −sin x",
+   detailed:"<b>Шаг 1.</b> По формуле производной косинуса: (cos x)′ = −sin x."
+    +"<br><b>Ответ:</b> f′(x) = −sin x."});
+ }
+ /* 10) y = k·sin x или k·cos x */
+ k=ri(rng,2,9);
+ if(rng()<0.5){
+  t.push({type:"expr",
+   q:"Дана функция f(x) = "+k+"·sin x. Найди производную f′(x)."+TRAP,
+   fn:(function(kk){return function(x){return kk*Math.cos(x)}})(k),
+   atext:k+"·cos x",sol:k+"*cos(x)",
+   hint:"(sin x)′ = cos x; множитель выносится: (k·sin x)′ = k·cos x",
+   detailed:"<b>Шаг 1.</b> (sin x)′ = cos x; постоянный множитель выносится за знак производной."
+    +"<br><b>Шаг 2.</b> ("+k+"·sin x)′ = "+k+"·(sin x)′ = "+k+"·cos x."
+    +"<br><b>Ответ:</b> f′(x) = "+k+"·cos x."});
+ }else{
+  t.push({type:"expr",
+   q:"Дана функция f(x) = "+k+"·cos x. Найди производную f′(x)."+TRAP,
+   fn:(function(kk){return function(x){return -kk*Math.sin(x)}})(k),
+   atext:"−"+k+"·sin x",sol:"-"+k+"*sin(x)",
+   hint:"(cos x)′ = −sin x; множитель выносится: (k·cos x)′ = −k·sin x",
+   detailed:"<b>Шаг 1.</b> (cos x)′ = −sin x; постоянный множитель выносится за знак производной."
+    +"<br><b>Шаг 2.</b> ("+k+"·cos x)′ = "+k+"·(cos x)′ = "+k+"·(−sin x) = −"+k+"·sin x."
+    +"<br><b>Ответ:</b> f′(x) = −"+k+"·sin x."});
+ }
+ /* 11) y = tg x (как 4.47) */
+ t.push({type:"expr",
+  q:"Дана функция f(x) = tg x. Найди производную f′(x)."+TRAP,
+  fn:function(x){var c=Math.cos(x);return 1/(c*c)},
+  atext:"1/cos<sup>2</sup> x",sol:"1/cos(x)^2",
+  hint:"(tg x)′ = 1/cos<sup>2</sup> x",
+  detailed:"<b>Шаг 1.</b> По формуле производной тангенса: (tg x)′ = 1/cos<sup>2</sup> x."
+   +"<br><b>Ответ:</b> f′(x) = 1/cos<sup>2</sup> x."});
+ /* 12) y = многочлен + тригонометрическая функция (смешанное, как 4.48) */
+ a=ri(rng,2,7);b=ri(rng,2,9);c=ri(rng,-6,6);while(c===0)c=ri(rng,-6,6);
+ t.push({type:"expr",
+  q:"Дана функция f(x) = "+a+"x<sup>2</sup>"+signed(b)+"·sin x"+signed(c)+"x. Найди производную f′(x)."+TRAP,
+  fn:(function(aa,bb,cc){return function(x){return 2*aa*x+bb*Math.cos(x)+cc}})(a,b,c),
+  atext:(2*a)+"x"+signed(b)+"·cos x"+signed(c),
+  sol:(2*a)+"x+"+b+"*cos(x)+"+c,
+  hint:"Производная суммы: (a·x<sup>2</sup>)′ = 2a·x; (k·sin x)′ = k·cos x; (c·x)′ = c",
+  detailed:"<b>Шаг 1.</b> Производная суммы равна сумме производных — дифференцируем каждое слагаемое."
+   +"<br><b>Шаг 2.</b> ("+a+"x<sup>2</sup>)′ = "+(2*a)+"x; ("+signed(b)+"·sin x)′ = "+b+"·cos x; ("+signed(c)+"x)′ = "+num(c)+"."
+   +"<br><b>Ответ:</b> f′(x) = "+(2*a)+"x"+signed(b)+"·cos x"+signed(c)+"."});
+ return t;
+}
+
+/* ================= ТЕМА 7. ДЗ: Двоично-десятичная система счисления (информатика, 10 кл, углублённый) =================
+   36 заданий по 3 блокам, 200 вариантов. Целые числа (5–8 разрядов): сложение,
+   вычитание, умножение и деление (двоичная); сложение и вычитание (8-ричная,
+   16-ричная). Дроби без целой части (4–7 разрядов): сложение и вычитание во
+   всех трёх системах. Ответ — строка-число в той же системе счисления. */
+
+/* Названия систем для текста заданий */
+function sysName(base){return base===2?"двоичной":base===8?"восьмеричной":"шестнадцатеричной"}
+function sysShort(base){return base===2?"двоичной":base===8?"восьмеричной":"16-ричной"}
+
+/* Подбор пары (a,b) для вычитания так, чтобы a≥b */
+function genSubPair(rng,base,minD,maxD,isFrac){
+ var a,b,tries=0;
+ do{
+  a=isFrac?randomBaseFrac(rng,base,minD,maxD):randomBaseInt(rng,base,minD,maxD);
+  b=isFrac?randomBaseFrac(rng,base,minD,maxD):randomBaseInt(rng,base,minD,maxD);
+  tries++;
+ }while(baseVal(a,base)<baseVal(b,base)&&tries<20);
+ if(baseVal(a,base)<baseVal(b,base)){var tmp=a;a=b;b=tmp}
+ return {a:a,b:b}
+}
+
+/* Создание задания типа «base» */
+function mkBaseTask(base,q,answer,hint,detailed){
+ return {type:"base",base:base,q:q+TRAP,answer:answer,atext:answer,sol:String(answer).toLowerCase(),
+  unit:"=",placeholder:"ответ в "+sysShort(base),
+  hint:hint,detailed:detailed}
+}
+
+/* ---- Блок 1: Двоичная система (16 заданий) ---- */
+function genSysBin(rng){
+ var t=[],a,b,ans,i;
+ var opSym={add:"+",sub:"−",mul:"×",div:"÷"};
+ /* целые: по 3 на сложение, вычитание, умножение, деление */
+ for(i=0;i<3;i++){
+  a=randomBaseInt(rng,2,5,8);b=randomBaseInt(rng,2,5,8);ans=addBase(a,b,2);
+  t.push(mkBaseTask(2,"Вычисли в "+sysName(2)+" системе счисления: "+a+" + "+b+" = ?",ans,
+   "Складывай поразрядно справа налево, с переносом 1 в старший разряд",
+   "Сложение в двоичной системе — поразрядно, справа налево, с переносом 1 в старший разряд. "
+   +colAddSub(a,b,"+",ans,2)
+   +"Проверка в десятичной системе: "+baseVal(a,2)+" + "+baseVal(b,2)+" = "+baseVal(ans,2)+"."));
+ }
+ for(i=0;i<3;i++){
+  var pr=genSubPair(rng,2,5,8,false);a=pr.a;b=pr.b;ans=subBase(a,b,2);
+  t.push(mkBaseTask(2,"Вычисли в "+sysName(2)+" системе счисления: "+a+" − "+b+" = ?",ans,
+   "Вычитай поразрядно справа налево, с заёмом 1 из старшего разряда",
+   "Вычитание в двоичной системе — поразрядно, справа налево, с заёмом 1 из старшего разряда. "
+   +colAddSub(a,b,"−",ans,2)
+   +"Проверка в десятичной системе: "+baseVal(a,2)+" − "+baseVal(b,2)+" = "+baseVal(ans,2)+"."));
+ }
+ for(i=0;i<3;i++){
+  a=randomBaseInt(rng,2,5,6);b=randomBaseInt(rng,2,5,6);ans=mulBase(a,b,2);
+  t.push(mkBaseTask(2,"Вычисли в "+sysName(2)+" системе счисления: "+a+" × "+b+" = ?",ans,
+   "Умножай как в столбик: на каждую цифру второго множителя — сдвинутая копия первого",
+   "Умножение в двоичной системе — столбиком, как в десятичной, но только с цифрами 0 и 1. На каждую цифру второго множителя записываем сдвинутую копию первого, затем складываем. "
+   +colMul(a,b,ans,2)
+   +"Проверка в десятичной системе: "+baseVal(a,2)+" × "+baseVal(b,2)+" = "+baseVal(ans,2)+"."));
+ }
+ for(i=0;i<3;i++){
+  /* деление: делитель 2–3 цифры, частное 3–5 цифр → делимое 5–8 цифр */
+  var q2,div,dvd,tries2=0;
+  do{
+   div=randomBaseInt(rng,2,2,3);
+   q2=randomBaseInt(rng,2,3,5);
+   dvd=mulBase(div,q2,2);
+   tries2++;
+  }while((dvd.length<5||dvd.length>8)&&tries2<30);
+  ans=q2;
+  t.push(mkBaseTask(2,"Вычисли в "+sysName(2)+" системе счисления: "+dvd+" ÷ "+div+" = ?",ans,
+   "Дели уголком: на каждом шаге сноси следующую цифру и определяй цифру частного",
+   "Деление в двоичной системе — уголком, как в десятичной. "
+   +colDiv(dvd,div,ans,2)
+   +"Проверка в десятичной системе: "+baseVal(dvd,2)+" ÷ "+baseVal(div,2)+" = "+baseVal(ans,2)+"."));
+ }
+ /* дроби: 2 сложения, 2 вычитания */
+ for(i=0;i<2;i++){
+  a=randomBaseFrac(rng,2,4,7);b=randomBaseFrac(rng,2,4,7);ans=addBase(a,b,2);
+  t.push(mkBaseTask(2,"Вычисли в "+sysName(2)+" системе счисления: "+a+" + "+b+" = ?",ans,
+   "Выравняй дробные части по длине и складывай поразрядно",
+   "Сложение дробей в двоичной системе: выравниваем дробные части по длине (дописываем нули справа), складываем поразрядно справа налево с переносом. "
+   +colFrac(a,b,"+",ans)
+   +"Проверка в десятичной системе: "+baseVal(a,2).toFixed(6)+" + "+baseVal(b,2).toFixed(6)+" ≈ "+baseVal(ans,2).toFixed(6)+"."));
+ }
+ for(i=0;i<2;i++){
+  var pr2=genSubPair(rng,2,4,7,true);a=pr2.a;b=pr2.b;ans=subBase(a,b,2);
+  t.push(mkBaseTask(2,"Вычисли в "+sysName(2)+" системе счисления: "+a+" − "+b+" = ?",ans,
+   "Выравняй дробные части по длине и вычитай поразрядно с заёмом",
+   "Вычитание дробей в двоичной системе: выравниваем дробные части по длине (дописываем нули справа), вычитаем поразрядно справа налево с заёмом. "
+   +colFrac(a,b,"−",ans)
+   +"Проверка в десятичной системе: "+baseVal(a,2).toFixed(6)+" − "+baseVal(b,2).toFixed(6)+" ≈ "+baseVal(ans,2).toFixed(6)+"."));
+ }
+ return t;
+}
+
+/* ---- Блок 2: Восьмеричная система (10 заданий) ---- */
+function genSysOct(rng){
+ var t=[],a,b,ans,i;
+ for(i=0;i<3;i++){
+  a=randomBaseInt(rng,8,5,8);b=randomBaseInt(rng,8,5,8);ans=addBase(a,b,8);
+  t.push(mkBaseTask(8,"Вычисли в "+sysName(8)+" системе счисления: "+a+" + "+b+" = ?",ans,
+   "Складывай поразрядно; если сумма ≥ 8 — перенос 1, остаток записывай",
+   "Сложение в восьмеричной системе — поразрядно справа налево; если сумма цифр ≥ 8 — перенос 1 в старший разряд, остаток записываем. "
+   +colAddSub(a,b,"+",ans,8)
+   +"Проверка в десятичной системе: "+baseVal(a,8)+" + "+baseVal(b,8)+" = "+baseVal(ans,8)+"."));
+ }
+ for(i=0;i<3;i++){
+  var pr=genSubPair(rng,8,5,8,false);a=pr.a;b=pr.b;ans=subBase(a,b,8);
+  t.push(mkBaseTask(8,"Вычисли в "+sysName(8)+" системе счисления: "+a+" − "+b+" = ?",ans,
+   "Вычитай поразрядно; если цифра < нужной — заём 1 (как 8) из старшего разряда",
+   "Вычитание в восьмеричной системе — поразрядно справа налево с заёмом; если цифра меньше нужной — заём 1 (как 8) из старшего разряда. "
+   +colAddSub(a,b,"−",ans,8)
+   +"Проверка в десятичной системе: "+baseVal(a,8)+" − "+baseVal(b,8)+" = "+baseVal(ans,8)+"."));
+ }
+ for(i=0;i<2;i++){
+  a=randomBaseFrac(rng,8,4,7);b=randomBaseFrac(rng,8,4,7);ans=addBase(a,b,8);
+  t.push(mkBaseTask(8,"Вычисли в "+sysName(8)+" системе счисления: "+a+" + "+b+" = ?",ans,
+   "Выравняй дробные части и складывай поразрядно с переносом",
+   "Сложение дробей в восьмеричной системе: выравниваем дробные части по длине, складываем поразрядно с переносом. "
+   +colFrac(a,b,"+",ans)
+   +"Проверка в десятичной системе: "+baseVal(a,8).toFixed(6)+" + "+baseVal(b,8).toFixed(6)+" ≈ "+baseVal(ans,8).toFixed(6)+"."));
+ }
+ for(i=0;i<2;i++){
+  var pr2=genSubPair(rng,8,4,7,true);a=pr2.a;b=pr2.b;ans=subBase(a,b,8);
+  t.push(mkBaseTask(8,"Вычисли в "+sysName(8)+" системе счисления: "+a+" − "+b+" = ?",ans,
+   "Выравняй дробные части и вычитай поразрядно с заёмом",
+   "Вычитание дробей в восьмеричной системе: выравниваем дробные части по длине, вычитаем поразрядно с заёмом. "
+   +colFrac(a,b,"−",ans)
+   +"Проверка в десятичной системе: "+baseVal(a,8).toFixed(6)+" − "+baseVal(b,8).toFixed(6)+" ≈ "+baseVal(ans,8).toFixed(6)+"."));
+ }
+ return t;
+}
+
+/* ---- Блок 3: Шестнадцатеричная система (10 заданий) ---- */
+function genSysHex(rng){
+ var t=[],a,b,ans,i;
+ for(i=0;i<3;i++){
+  a=randomBaseInt(rng,16,5,8);b=randomBaseInt(rng,16,5,8);ans=addBase(a,b,16);
+  t.push(mkBaseTask(16,"Вычисли в "+sysName(16)+" системе счисления: "+a+" + "+b+" = ?",ans,
+   "Складывай поразрядно; A=10, B=11, …, F=15; если сумма ≥ 16 — перенос 1",
+   "Сложение в шестнадцатеричной системе — поразрядно справа налево; A=10, B=11, C=12, D=13, E=14, F=15; если сумма ≥ 16 — перенос 1. "
+   +colAddSub(a,b,"+",ans,16)
+   +"Проверка в десятичной системе: "+baseVal(a,16)+" + "+baseVal(b,16)+" = "+baseVal(ans,16)+"."));
+ }
+ for(i=0;i<3;i++){
+  var pr=genSubPair(rng,16,5,8,false);a=pr.a;b=pr.b;ans=subBase(a,b,16);
+  t.push(mkBaseTask(16,"Вычисли в "+sysName(16)+" системе счисления: "+a+" − "+b+" = ?",ans,
+   "Вычитай поразрядно с заёмом; заём = 16 в текущем разряде",
+   "Вычитание в шестнадцатеричной системе — поразрядно справа налево с заёмом; заём = 16 в текущем разряде. "
+   +colAddSub(a,b,"−",ans,16)
+   +"Проверка в десятичной системе: "+baseVal(a,16)+" − "+baseVal(b,16)+" = "+baseVal(ans,16)+"."));
+ }
+ for(i=0;i<2;i++){
+  a=randomBaseFrac(rng,16,4,7);b=randomBaseFrac(rng,16,4,7);ans=addBase(a,b,16);
+  t.push(mkBaseTask(16,"Вычисли в "+sysName(16)+" системе счисления: "+a+" + "+b+" = ?",ans,
+   "Выравняй дробные части и складывай поразрядно с переносом",
+   "Сложение дробей в шестнадцатеричной системе: выравниваем дробные части по длине, складываем поразрядно с переносом. "
+   +colFrac(a,b,"+",ans)
+   +"Проверка в десятичной системе: "+baseVal(a,16).toFixed(6)+" + "+baseVal(b,16).toFixed(6)+" ≈ "+baseVal(ans,16).toFixed(6)+"."));
+ }
+ for(i=0;i<2;i++){
+  var pr2=genSubPair(rng,16,4,7,true);a=pr2.a;b=pr2.b;ans=subBase(a,b,16);
+  t.push(mkBaseTask(16,"Вычисли в "+sysName(16)+" системе счисления: "+a+" − "+b+" = ?",ans,
+   "Выравняй дробные части и вычитай поразрядно с заёмом",
+   "Вычитание дробей в шестнадцатеричной системе: выравниваем дробные части по длине, вычитаем поразрядно с заёмом. "
+   +colFrac(a,b,"−",ans)
+   +"Проверка в десятичной системе: "+baseVal(a,16).toFixed(6)+" − "+baseVal(b,16).toFixed(6)+" ≈ "+baseVal(ans,16).toFixed(6)+"."));
+ }
+ return t;
+}
+
 /* ================= Каталог тем ================= */
 var TOPICS=[
  {id:"izmerenie",subject:"Информатика",grade:"7 класс",title:"Измерение информации",
@@ -527,10 +1063,44 @@ var TOPICS=[
    {name:"Применяем",gen:genUravn3}
   ]},
  {id:"proizvod",subject:"Математика",grade:"11 класс",title:"Производная суммы, произведения и частного",dz:true,variants:200,
+  level:"базовый уровень",sample:"№ 4.30",fileTitle:"Производная суммы, произведения и частного функций",filePrefix:"ДЗ_Производная",
+  diskFolder:"",
+  formIntro:"В каждом задании найди производную и впиши её в поле — выражением с <b>x</b> (можно без пробелов: <span class='dz-code'>3x^2-4x</span>), затем нажми «Записать ответ» под блоком. Правильность ответов не показывается: запиши все блоки, перепроверь ответы и только потом отправь результат учителю. Регистр, пробелы и знак умножения не важны. В отчёт для учителя уходит первый записанный ответ по каждому заданию, а после отправки откроется подробное решение.",
+  blockIntros:["","Здесь работают правила: (u·v)′ = u′v + uv′ и (u/v)′ = (u′v − uv′)/v<sup>2</sup>."],
   desc:"Домашнее задание по образцу № 4.30: 8 заданий, ответ — выражение с x (производная как функция). Вариант собирается случайно. Результат — XLSX и отправка учителю на Яндекс.Диск: перед отправкой работу можно перепроверить, после отправки открывается подробное решение.",
   blocks:[
    {name:"Сумма и разность функций",gen:genDzSum},
    {name:"Произведение и частное функций",gen:genDzMul}
+  ]},
+ {id:"elementarnyh",subject:"Математика",grade:"11 класс",title:"Производные элементарных функций",dz:true,variants:200,
+  level:"базовый уровень",sample:"№ 4.37",fileTitle:"Производные элементарных функций",filePrefix:"ДЗ_Элементарные_функции",
+  diskFolder:"",
+  formIntro:"В каждом задании найди производную и впиши её в поле — выражением с <b>x</b> (можно без пробелов: <span class='dz-code'>3x^2-4x</span>), затем нажми «Записать ответ» под блоком. Правильность ответов не показывается: запиши все блоки, перепроверь ответы и только потом отправь результат учителю. Регистр, пробелы и знак умножения не важны. В отчёт для учителя уходит первый записанный ответ по каждому заданию, а после отправки открывается подробное решение.",
+  blockIntros:[
+   "Степенная функция: (x<sup>n</sup>)′ = n·x<sup>n−1</sup> — формула верна для любого n, в том числе отрицательного.",
+   "Показательная и логарифмическая: (a<sup>x</sup>)′ = a<sup>x</sup>·ln a, (log<sub>a</sub> x)′ = 1/(x·ln a), (ln x)′ = 1/x.",
+   "Тригонометрические: (sin x)′ = cos x, (cos x)′ = −sin x, (tg x)′ = 1/cos<sup>2</sup> x."
+  ],
+  desc:"Домашнее задание по образцу № 4.37: 12 заданий, ответ — выражение с x (производная как функция). Вариант собирается случайно. Результат — XLSX и отправка учителю на Яндекс.Диск: перед отправкой работу можно перепроверить, после отправки открывается подробное решение.",
+  blocks:[
+   {name:"Степенные функции",gen:genDzElem1},
+   {name:"Показательные и логарифмические функции",gen:genDzElem2},
+   {name:"Тригонометрические функции",gen:genDzElem3}
+  ]},
+ {id:"systemy",subject:"Информатика",grade:"10 класс",title:"Двоично-десятичная система счисления",dz:true,variants:200,
+  level:"углублённый",sample:"",fileTitle:"Системы счисления",filePrefix:"ДЗ_Системы_счисления",
+  diskFolder:"10 класс ДЗ системы счисления",
+  formIntro:"В каждом задании выполни вычисления в указанной системе счисления и впиши ответ числом в <b>той же системе</b> (без указания основания). Регистр букв в шестнадцатеричной системе не важен: A и a — одно и то же. Дробную часть отделяй точкой или запятой. В отчёт для учителя уходит первый записанный ответ по каждому заданию, а после отправки открывается подробное решение.",
+  blockIntros:[
+   "Двоичная система: целые числа — сложение, вычитание, умножение и деление; затем дроби — сложение и вычитание.",
+   "Восьмеричная система: сложение и вычитание целых чисел и дробей.",
+   "Шестнадцатеричная система: сложение и вычитание целых чисел и дробей. A=10, B=11, C=12, D=13, E=14, F=15."
+  ],
+  desc:"Домашнее задание по системам счисления (углублённый уровень): 36 заданий — целые числа (5–8 разрядов) и дроби без целой части (4–7 разрядов) в двоичной, восьмеричной и шестнадцатеричной системах. Вариант собирается случайно. Результат — XLSX и отправка учителю на Яндекс.Диск.",
+  blocks:[
+   {name:"Двоичная система счисления",gen:genSysBin,count:16},
+   {name:"Восьмеричная система счисления",gen:genSysOct,count:10},
+   {name:"Шестнадцатеричная система счисления",gen:genSysHex,count:10}
   ]}
 ];
 
@@ -547,6 +1117,10 @@ function buildVariant(topicId,variant){
   blocks.push({name:b.name,tasks:b.gen(rng)});
  });
  return {topicId:topic.id,subject:topic.subject,grade:topic.grade,title:topic.title,
+         dz:!!topic.dz,level:topic.level||"",sample:topic.sample||"",
+         fileTitle:topic.fileTitle||topic.title,filePrefix:topic.filePrefix||"ДЗ",
+         diskFolder:topic.diskFolder||"",formIntro:topic.formIntro||"",
+         blockIntros:topic.blockIntros||[],
          variant:variant,blocks:blocks};
 }
 
@@ -562,7 +1136,9 @@ function checkNum(input,answer){
 var TZ={VARIANTS:VARIANTS,TASKS_PER_BLOCK:TASKS_PER_BLOCK,TOPICS:TOPICS,
         buildVariant:buildVariant,checkNum:checkNum,mulberry32:mulberry32,
         DZ_DISK:DZ_DISK,TRAP_LONG:TRAP_LONG,
-        exprCompile:exprCompile,checkExpr:checkExpr};
+        exprCompile:exprCompile,checkExpr:checkExpr,
+        checkBase:checkBase,normBase:normBase,baseVal:baseVal,
+        addBase:addBase,subBase:subBase,mulBase:mulBase,toBaseInt:toBaseInt};
 
 if(typeof module!=="undefined"&&module.exports){module.exports=TZ;}
 global.TZ=TZ;
