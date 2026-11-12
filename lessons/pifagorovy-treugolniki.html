@@ -1,0 +1,441 @@
+<!doctype html><html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" media="(prefers-color-scheme: light)" content="#f7f4ec"><meta name="theme-color" media="(prefers-color-scheme: dark)" content="#111916">
+<title>Пифагоровы треугольники — интерактивный урок геометрии · Плотников В. А.</title>
+<meta name="description" content="Интерактивный урок геометрии для 8 класса «Пифагоровы треугольники»: теорема Пифагора, визуальное доказательство, пифагоровы тройки, калькулятор, проверь себя, задачи. Технологическая карта урока доступна для скачивания.">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Golos+Text:wght@400;600&family=Marck+Script&family=PT+Serif:ital@1&display=swap" rel="stylesheet"><link rel="stylesheet" href="../style.css"><link rel="icon" href="../favicon.ico" sizes="48x48"><link rel="icon" href="../icon-pva.svg" type="image/svg+xml">
+<style>
+.lwrap{max-width:1240px;margin:0 auto;padding:0 clamp(20px,3.4vw,40px)}
+.lhero{position:relative;color:#fff;padding:30px 0 36px;margin-bottom:26px;overflow:hidden;background-image:radial-gradient(1.5px 1.5px at 12% 25%,rgba(255,255,255,.7) 50%,transparent 51%),radial-gradient(2px 2px at 78% 18%,rgba(255,255,255,.5) 50%,transparent 51%),radial-gradient(1.5px 1.5px at 55% 65%,rgba(255,255,255,.45) 50%,transparent 51%),radial-gradient(2.5px 2.5px at 88% 70%,rgba(255,215,110,.55) 50%,transparent 51%),radial-gradient(1.5px 1.5px at 35% 80%,rgba(255,255,255,.4) 50%,transparent 51%),linear-gradient(160deg,#0c1830,#16264a 55%,#20365f)}
+.lhero .tag{background:var(--yellow);color:var(--ink);border:none}
+.back{display:inline-block;color:#ffd76e;text-decoration:none;font-weight:600;font-size:15px;margin-right:20px}
+.back:hover{text-decoration:underline}
+.lhero h1{color:#fff;font-size:clamp(34px,5vw,54px);margin:.4em 0 .25em}
+.lhero .lead{color:#c9d6ef;max-width:780px;font-size:18px;margin:.4em 0 0}
+.lfoot{border-top:1px solid var(--line);margin-top:34px;padding:22px 0 30px;color:var(--mute);font-size:14px;background:var(--card)}
+.lfoot a{color:var(--blue)}
+.lsec{background:var(--card);border:1px solid var(--line);border-radius:16px;box-shadow:5px 6px 0 var(--line);padding:28px clamp(20px,3vw,38px);margin:0 auto 22px;max-width:1160px}
+.lsec h2{font-size:clamp(24px,3.4vw,32px);margin:0 0 .5em}
+.lsec h3{font-size:20px;margin:1.2em 0 .4em}
+.lsec p{margin:.5em 0;line-height:1.65}
+.lsec .note{border-left:4px solid var(--blue);padding:8px 16px;margin:14px 0;background:var(--paper);border-radius:0 8px 8px 0}
+.lsec .formula{display:inline-block;background:var(--paper);border:1.5px solid var(--blue);border-radius:8px;padding:4px 14px;font-size:20px;font-weight:600;margin:8px 0}
+.lsec .formula sup{font-size:.65em}
+.tk-table{width:100%;border-collapse:collapse;margin:14px 0;font-size:14.5px}
+.tk-table th,.tk-table td{border:1px solid var(--line);padding:8px 10px;text-align:left;vertical-align:top}
+.tk-table th{background:var(--paper);font-weight:600}
+.tk-table td.tk-stage{font-weight:600;color:var(--blue);white-space:nowrap}
+.tk-table td.tk-time{text-align:center;white-space:nowrap}
+.triples-table{width:100%;border-collapse:collapse;margin:14px 0;font-size:17px}
+.triples-table th,.triples-table td{border:1.5px solid var(--line);padding:8px 14px;text-align:center}
+.triples-table th{background:var(--paper);font-weight:600}
+.triples-table .prim{color:var(--green);font-weight:600}
+.svg-center{text-align:center;margin:16px 0}
+.svg-center svg{max-width:100%;height:auto}
+.calc-box{background:var(--paper);border:2px solid var(--blue);border-radius:14px;padding:20px 24px;margin:16px 0}
+.calc-row{display:flex;gap:12px;align-items:flex-end;flex-wrap:wrap;margin:10px 0}
+.calc-row label{font-weight:600;font-size:15px;display:block;margin-bottom:4px}
+.calc-row input{font:600 18px "Golos Text",sans-serif;padding:8px 12px;border:2px solid var(--blue);border-radius:8px;background:var(--card);color:var(--ink);width:90px;text-align:center}
+.calc-row input:focus{outline:none;border-color:var(--green)}
+.calc-row select{font:600 16px "Golos Text",sans-serif;padding:8px 12px;border:2px solid var(--blue);border-radius:8px;background:var(--card);color:var(--ink)}
+.calc-out{margin-top:14px;padding:14px 18px;border-radius:10px;font-size:17px;line-height:1.6}
+.calc-out.ok{background:linear-gradient(150deg,#eefaf0,#dcf5e3);border:1.5px solid var(--green);color:var(--ink)}
+.calc-out.err{background:linear-gradient(150deg,#fef0f0,#fde0e0);border:1.5px solid var(--red);color:var(--ink)}
+.calc-out.triple{background:linear-gradient(150deg,#fff8e6,#ffe9b3);border:1.5px solid var(--yellow)}
+@media(prefers-color-scheme:dark){.calc-out.ok{background:linear-gradient(150deg,#122b1e,#173828)}.calc-out.err{background:linear-gradient(150deg,#2b1212,#381717)}.calc-out.triple{background:linear-gradient(150deg,#2b2410,#383012)}}
+.quiz-q{background:var(--paper);border:1.5px solid var(--line);border-radius:12px;padding:16px 20px;margin:12px 0}
+.quiz-q .qq{font-weight:600;font-size:17px;margin-bottom:10px}
+.quiz-opts{display:grid;gap:8px}
+.quiz-opt{text-align:left;padding:10px 16px;border:2px solid var(--line);border-radius:10px;background:var(--card);font:600 16px "Golos Text",sans-serif;color:var(--ink);cursor:pointer;transition:.12s}
+.quiz-opt:hover{border-color:var(--blue)}
+.quiz-opt.sel{background:var(--blue);border-color:var(--blue);color:var(--on-accent)}
+.quiz-opt.correct{background:var(--green);border-color:var(--green);color:#fff}
+.quiz-opt.wrong{background:var(--red);border-color:var(--red);color:#fff}
+.quiz-fb{margin-top:8px;padding:8px 14px;border-radius:8px;font-size:15px;display:none}
+.quiz-fb.show{display:block}
+.quiz-fb.ok{background:rgba(76,175,80,.15);color:var(--green)}
+.quiz-fb.no{background:rgba(231,76,60,.15);color:var(--red)}
+.quiz-score{margin-top:16px;padding:14px 18px;border-radius:10px;font-size:18px;font-weight:600;text-align:center}
+.prob{background:var(--paper);border:1.5px solid var(--line);border-radius:12px;padding:16px 20px;margin:12px 0}
+.prob .pq{font-weight:600;font-size:17px;margin-bottom:8px}
+.prob details{margin-top:10px}
+.prob summary{cursor:pointer;font-weight:600;color:var(--blue);padding:6px 0}
+.prob details[open] summary{color:var(--green)}
+.prob .sol{margin-top:10px;padding:10px 14px;background:var(--card);border-left:4px solid var(--green);border-radius:0 8px 8px 0;font-size:15px;line-height:1.6}
+.dl-btn{display:inline-flex;align-items:center;gap:8px;background:var(--blue);color:var(--on-accent);text-decoration:none;font:600 17px "Golos Text",sans-serif;padding:12px 24px;border-radius:12px;box-shadow:3px 4px 0 var(--line);transition:.15s}
+.dl-btn:hover{transform:translate(-1px,-1px);box-shadow:4px 5px 0 var(--line)}
+.dl-btn svg{width:20px;height:20px}
+.collapse-toggle{display:inline-block;cursor:pointer;background:var(--paper);border:2px solid var(--blue);border-radius:10px;padding:8px 18px;font-weight:600;color:var(--blue);margin:8px 0 0;font-size:15px}
+.collapse-toggle:hover{background:var(--blue);color:var(--on-accent)}
+.collapse-body{display:none;margin-top:14px}
+.collapse-body.open{display:block}
+@media(max-width:700px){.lsec{padding:20px 16px}.tk-table{font-size:13px}.tk-table th,.tk-table td{padding:6px 8px}.calc-row input{width:70px}}
+</style>
+</head>
+<body>
+<div class="layout"><aside class="side"><a class="logo" href="../index.html"><img class="logo-ico" src="../icon-pva.svg" alt="" width="44" height="44"><span>Плотников В. А.</span></a><input type="checkbox" id="menu-toggle" aria-label="Открыть меню"><label for="menu-toggle" class="burger">Меню</label><nav class="menu" aria-label="Разделы сайта"><ul><li><a href="../index.html">Главная</a></li><li class="menu-search"><input type="search" id="site-search" class="site-search" placeholder="Поиск по сайту…" aria-label="Поиск по сайту" autocomplete="off" spellcheck="false"><div class="search-drop" id="search-drop" hidden></div></li><li><a href="../informatika.html">Информатика</a><ul><li><a href="../informatika-uchenikam.html">Ученикам</a></li><li><a href="../informatika-uchitelyam.html">Учителям</a></li><li><a href="../informatika-hakaton.html">Хакатон</a></li><li><a href="../informatika-propushel-urok.html">Если ты пропустил урок</a></li></ul></li><li><a href="../matematika.html">Математика</a><ul><li><a href="../matematika-uchenikam.html">Ученикам</a></li><li><a href="../matematika-uchitelyam.html">Учителям</a></li><li><a href="../matematika-propushel-urok.html">Если ты пропустил урок</a></li></ul></li><li><a href="../kontakty.html">Контакты</a></li></ul></nav></aside><div class="col">
+<main class="lwrap">
+<div class="lhero">
+<a class="back" href="../matematika-uchenikam.html">← Математика: ученикам</a>
+<span class="tag">Геометрия · 8 класс · ЦОР</span>
+<h1>Пифагоровы треугольники</h1>
+<p class="lead">Интерактивный урок геометрии с использованием ЦОР: теорема Пифагора и её визуальное доказательство, пифагоровы тройки, калькулятор для вычисления сторон прямоугольного треугольника, проверочная викторина и задачи для самостоятельного решения. Технологическая карта урока доступна для скачивания.</p>
+</div>
+
+<!-- ====== ТЕХНОЛОГИЧЕСКАЯ КАРТА ====== -->
+<section class="lsec" id="tech-map">
+<h2>Технологическая карта урока</h2>
+<p>Урок геометрии в 8 классе по теме «Пифагоровы треугольники» с использованием цифровых образовательных ресурсов (ЦОР) — данной интерактивной страницы.</p>
+<div class="note"><b>Тема урока:</b> Пифагоровы треугольники.<br><b>Класс:</b> 8 класс.<br><b>Предмет:</b> Геометрия.<br><b>Тип урока:</b> урок открытия нового знания (с элементами практикума).<br><b>Продолжительность:</b> 45 минут.<br><b>Образовательная технология:</b> смешанное обучение с использованием ЦОР (собственный сайт учителя).</p></div>
+<h3>Цели урока</h3>
+<p><b>Предметная:</b> сформировать понятие пифагорова треугольника и пифагоровой тройки; научить применять теорему Пифагора для нахождения сторон прямоугольного треугольника и распознавать пифагоровы тройки.</p>
+<p><b>Метапредметная:</b> развивать умение работать с интерактивными моделями (ЦОР), анализировать и интерпретировать результаты вычислений, делать выводы.</p>
+<p><b>Личностная:</b> формировать интерес к геометрии через исторический материал и практические приложения теоремы Пифагора.</p>
+<h3>Планируемые результаты</h3>
+<p><b>Предметные:</b> учащийся знает формулировку теоремы Пифагора, умеет находить неизвестную сторону прямоугольного треугольника, перечисляет основные пифагоровы тройки, проверяет, является ли тройка чисел пифагоровой.</p>
+<p><b>Метапредметные (УУД):</b> познавательные — анализ визуальной информации (SVG-чертежи), использование интерактивного калькулятора; регулятивные — самоконтроль через викторину; коммуникативные — обсуждение в парах.</p>
+<h3>Основные понятия</h3>
+<p>Прямоугольный треугольник, катеты, гипотенуза, теорема Пифагора, пифагоров треугольник, пифагорова тройка, примитивная тройка.</p>
+<h3>Ресурсы</h3>
+<p>Интерактивная страница урока (ЦОР) — данный сайт; проектор или персональные устройства учащихся; чертёжные инструменты; учебник геометрии.</p>
+<h3>Этапы урока</h3>
+<table class="tk-table">
+<tr><th>Этап</th><th>Деятельность учителя</th><th>Деятельность ученика</th><th>УУД</th><th>Время</th></tr>
+<tr><td class="tk-stage">1. Оргмомент</td><td>Приветствие, проверка готовности, объявление темы</td><td>Подготовка к уроку, запись темы</td><td>Л: самоорганизация</td><td class="tk-time">2 мин</td></tr>
+<tr><td class="tk-stage">2. Мотивация</td><td>Показывает страницу урока на экране, рассказывает о Пифагоре, ставит проблемный вопрос: «Как найти длину лестницы, приставленной к стене?»</td><td>Слушают, выдвигают гипотезы, формулируют цель урока</td><td>П: постановка проблемы; Р: целеполагание</td><td class="tk-time">3 мин</td></tr>
+<tr><td class="tk-stage">3. Актуализация</td><td>Повторяет понятия: прямоугольный треугольник, катеты, гипотенуза. Использует SVG-чертёж со страницы урока</td><td>Отвечают на вопросы, называют элементы треугольника</td><td>П: воспроизведение знаний</td><td class="tk-time">5 мин</td></tr>
+<tr><td class="tk-stage">4. Новое знание</td><td>Формулирует теорему Пифагора, показывает визуальное доказательство (SVG с квадратами на сторонах). Знакомит с пифагоровыми тройками, показывает таблицу</td><td>Конспектируют формулу a² + b² = c², рассматривают чертёж, записывают тройки</td><td>П: анализ модели; К: конспектирование</td><td class="tk-time">12 мин</td></tr>
+<tr><td class="tk-stage">5. Закрепление</td><td>Демонстрирует калькулятор Пифагора и проверку троек на странице урока. Решает 1–2 примера вместе с классом</td><td>Работают с интерактивным калькулятором на устройствах, проверяют тройки</td><td>П: использование ЦОР; Р: самоконтроль</td><td class="tk-time">8 мин</td></tr>
+<tr><td class="tk-stage">6. Самостоятельная работа</td><td>Предлагает пройти викторину (раздел «Проверь себя») и решить 2 задачи из раздела «Задачи»</td><td>Проходят викторину на устройствах, решают задачи, проверяют по раскрытым решениям</td><td>Р: самоконтроль; П: применение знаний</td><td class="tk-time">10 мин</td></tr>
+<tr><td class="tk-stage">7. Рефлексия</td><td>Спрашивает: «Что нового узнали? Какие тройки запомнили?» Подводит итоги</td><td>Отвечают, оценивают свою работу</td><td>Р: самооценка; К: выражение мыслей</td><td class="tk-time">3 мин</td></tr>
+<tr><td class="tk-stage">8. ДЗ</td><td>Задаёт домашнее задание (раздел «Домашнее задание» на странице урока)</td><td>Записывают задание</td><td>Р: планирование</td><td class="tk-time">2 мин</td></tr>
+</table>
+<div style="margin-top:16px">
+<a class="dl-btn" href="../materials/tehnologicheskaya-karta-pifagorovy-treugolniki.docx" download>
+<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg>
+Скачать технологическую карту (.docx)</a>
+</div>
+</section>
+
+<!-- ====== ТЕОРИЯ: ТЕОРЕМА ПИФАГОРА ====== -->
+<section class="lsec" id="theory">
+<h2>Теорема Пифагора</h2>
+<p>В прямоугольном треугольнике квадрат гипотенузы равен сумме квадратов катетов.</p>
+<div class="formula">a<sup>2</sup> + b<sup>2</sup> = c<sup>2</sup></div>
+<p>где <b>a</b> и <b>b</b> — катеты (стороны, прилежащие к прямому углу), <b>c</b> — гипотенуза (сторона, противолежащая прямому углу).</p>
+<div class="svg-center">
+<svg width="420" height="300" viewBox="0 0 420 300" xmlns="http://www.w3.org/2000/svg" style="font-family:Golos Text,sans-serif">
+<!-- Квадрат на катете a (снизу) -->
+<rect x="80" y="160" width="100" height="100" fill="rgba(47,111,208,.15)" stroke="var(--blue)" stroke-width="2"/>
+<text x="130" y="215" font-size="20" fill="var(--blue)" text-anchor="middle" font-weight="600">a²</text>
+<!-- Квадрат на катете b (слева) -->
+<rect x="0" y="60" width="80" height="100" fill="rgba(76,175,80,.15)" stroke="var(--green)" stroke-width="2"/>
+<text x="40" y="115" font-size="20" fill="var(--green)" text-anchor="middle" font-weight="600">b²</text>
+<!-- Квадрат на гипотенузе c -->
+<polygon points="80,160 180,160 260,60 160,60" fill="rgba(231,76,60,.12)" stroke="var(--red)" stroke-width="2"/>
+<text x="170" y="115" font-size="20" fill="var(--red)" text-anchor="middle" font-weight="600">c²</text>
+<!-- Сам треугольник -->
+<polygon points="80,160 180,160 160,60" fill="rgba(255,255,255,.85)" stroke="var(--ink)" stroke-width="2.5"/>
+<!-- Подписи сторон -->
+<text x="130" y="178" font-size="16" fill="var(--ink)" text-anchor="middle" font-weight="600">a</text>
+<text x="65" y="115" font-size="16" fill="var(--ink)" text-anchor="middle" font-weight="600">b</text>
+<text x="125" y="100" font-size="16" fill="var(--ink)" text-anchor="middle" font-weight="600" transform="rotate(-30 125 100)">c</text>
+<!-- Прямой угол -->
+<rect x="170" y="150" width="12" height="12" fill="none" stroke="var(--ink)" stroke-width="2"/>
+<!-- Проверка -->
+<text x="210" y="260" font-size="16" fill="var(--mute)">a² + b² = c²</text>
+</svg>
+</div>
+<p>На рисунке: квадраты, построенные на катетах (a² и b²), в сумме равны по площади квадрату, построенному на гипотенузе (c²).</p>
+<div class="note"><b>Историческая справка.</b> Теорема названа в честь древнегреческого философа и математика Пифагора (VI век до н. э.), хотя была известна задолго до него в Вавилоне и Египте. Пифагор (или его школа) первым доказал её в общем виде.</div>
+
+<h3>Пифагоровы треугольники и тройки</h3>
+<p><b>Пифагоров треугольник</b> — это прямоугольный треугольник, длины всех трёх сторон которого выражаются целыми числами. Такие тройки чисел называются <b>пифагоровыми тройками</b>.</p>
+<p>Тройка (a, b, c) называется пифагоровой, если выполняется равенство a² + b² = c².</p>
+<table class="triples-table">
+<tr><th>№</th><th>a</th><th>b</th><th>c</th><th>Проверка</th><th>Тип</th></tr>
+<tr><td>1</td><td>3</td><td>4</td><td>5</td><td>9 + 16 = 25</td><td class="prim">примитивная</td></tr>
+<tr><td>2</td><td>5</td><td>12</td><td>13</td><td>25 + 144 = 169</td><td class="prim">примитивная</td></tr>
+<tr><td>3</td><td>8</td><td>15</td><td>17</td><td>64 + 225 = 289</td><td class="prim">примитивная</td></tr>
+<tr><td>4</td><td>7</td><td>24</td><td>25</td><td>49 + 576 = 625</td><td class="prim">примитивная</td></tr>
+<tr><td>5</td><td>6</td><td>8</td><td>10</td><td>36 + 64 = 100</td><td>кратная (3·2, 4·2, 5·2)</td></tr>
+<tr><td>6</td><td>9</td><td>12</td><td>15</td><td>81 + 144 = 225</td><td>кратная (3·3, 4·3, 5·3)</td></tr>
+</table>
+<p><b>Примитивная тройка</b> — тройка, у которой наибольший общий делитель всех трёх чисел равен 1 (например, (3, 4, 5)). Остальные тройки получаются умножением примитивной на натуральное число.</p>
+<div class="note"><b>Египетский треугольник</b> — треугольник со сторонами 3, 4, 5. Древние египтяне использовали его для построения прямых углов при разметке полей: верёвка с узлами на расстояниях 3, 4 и 5 единиц натягивалась в треугольник, и угол между сторонами 3 и 4 оказывался прямым.</p></div>
+</section>
+
+<!-- ====== ИНТЕРАКТИВНЫЙ КАЛЬКУЛЯТОР ====== -->
+<section class="lsec" id="calculator">
+<h2>Калькулятор Пифагора</h2>
+<p>Введите две известные стороны прямоугольного треугольника — калькулятор найдёт третью и покажет решение.</p>
+<div class="calc-box">
+<div class="calc-row">
+<div><label for="calc-mode">Что найти:</label>
+<select id="calc-mode" onchange="calcPif()">
+<option value="c">Гипотенузу c (известны a и b)</option>
+<option value="b">Катет b (известны a и c)</option>
+<option value="a">Катет a (известны b и c)</option>
+</select></div>
+<div><label for="calc-a">Сторона a:</label><input id="calc-a" type="number" inputmode="decimal" placeholder="?" oninput="calcPif()"></div>
+<div><label for="calc-b">Сторона b:</label><input id="calc-b" type="number" inputmode="decimal" placeholder="?" oninput="calcPif()"></div>
+<div><label for="calc-c">Сторона c:</label><input id="calc-c" type="number" inputmode="decimal" placeholder="?" oninput="calcPif()"></div>
+</div>
+<div id="calc-out" class="calc-out" style="display:none"></div>
+</div>
+<script>
+function calcPif(){
+ var mode=document.getElementById("calc-mode").value;
+ var a=document.getElementById("calc-a").value;
+ var b=document.getElementById("calc-b").value;
+ var c=document.getElementById("calc-c").value;
+ var out=document.getElementById("calc-out");
+ out.style.display="none";
+ var av=a!==""?parseFloat(a):NaN;
+ var bv=b!==""?parseFloat(b):NaN;
+ var cv=c!==""?parseFloat(c):NaN;
+ var html="";
+ if(mode==="c"){
+  if(isNaN(av)||isNaN(bv)||av<=0||bv<=0){return}
+  var c2=av*av+bv*bv;
+  var cr=Math.sqrt(c2);
+  var isInt=Math.abs(cr-Math.round(cr))<1e-9;
+  html="<b>Решение:</b><br>По теореме Пифагора: c² = a² + b²<br>c² = "+av+"² + "+bv+"² = "+(av*av)+" + "+(bv*bv)+" = "+c2+"<br>c = √"+c2+" = "+cr.toFixed(4).replace(/\.?0+$/,"");
+  if(isInt){
+   html+="<br><b style='color:var(--green)'>Это целое число! ("+Math.round(cr)+")</b> — тройка ("+av+", "+bv+", "+Math.round(cr)+") является пифагоровой.";
+   out.className="calc-out ok triple";
+  } else {
+   html+="<br>Результат не целый — треугольник со сторонами "+av+", "+bv+", "+cr.toFixed(3)+" не является пифагоровым.";
+   out.className="calc-out ok";
+  }
+ } else if(mode==="b"){
+  if(isNaN(av)||isNaN(cv)||av<=0||cv<=0||av>=cv){
+   if(av>=cv&&av>0&&cv>0){out.style.display="block";out.className="calc-out err";out.innerHTML="<b>Ошибка:</b> катет (a = "+av+") не может быть больше или равен гипотенузе (c = "+cv+")."}
+   return
+  }
+  var b2=cv*cv-av*av;
+  var br=Math.sqrt(b2);
+  var isInt=Math.abs(br-Math.round(br))<1e-9;
+  html="<b>Решение:</b><br>По теореме Пифагора: b² = c² − a²<br>b² = "+cv+"² − "+av+"² = "+(cv*cv)+" − "+(av*av)+" = "+b2+"<br>b = √"+b2+" = "+br.toFixed(4).replace(/\.?0+$/,"");
+  if(isInt){
+   html+="<br><b style='color:var(--green)'>Это целое число! ("+Math.round(br)+")</b> — тройка ("+av+", "+Math.round(br)+", "+cv+") является пифагоровой.";
+   out.className="calc-out ok triple";
+  } else {
+   out.className="calc-out ok";
+  }
+ } else if(mode==="a"){
+  if(isNaN(bv)||isNaN(cv)||bv<=0||cv<=0||bv>=cv){
+   if(bv>=cv&&bv>0&&cv>0){out.style.display="block";out.className="calc-out err";out.innerHTML="<b>Ошибка:</b> катет (b = "+bv+") не может быть больше или равен гипотенузе (c = "+cv+")."}
+   return
+  }
+  var a2=cv*cv-bv*bv;
+  var ar=Math.sqrt(a2);
+  var isInt=Math.abs(ar-Math.round(ar))<1e-9;
+  html="<b>Решение:</b><br>По теореме Пифагора: a² = c² − b²<br>a² = "+cv+"² − "+bv+"² = "+(cv*cv)+" − "+(bv*bv)+" = "+a2+"<br>a = √"+a2+" = "+ar.toFixed(4).replace(/\.?0+$/,"");
+  if(isInt){
+   html+="<br><b style='color:var(--green)'>Это целое число! ("+Math.round(ar)+")</b> — тройка ("+Math.round(ar)+", "+bv+", "+cv+") является пифагоровой.";
+   out.className="calc-out ok triple";
+  } else {
+   out.className="calc-out ok";
+  }
+ }
+ out.innerHTML=html;
+ out.style.display="block";
+}
+</script>
+</section>
+
+<!-- ====== ПРОВЕРКА ТРОЙКИ ====== -->
+<section class="lsec" id="triple-checker">
+<h2>Проверка пифагоровой тройки</h2>
+<p>Введите три целых числа — проверим, образуют ли они пифагорову тройку.</p>
+<div class="calc-box">
+<div class="calc-row">
+<div><label for="tc-a">Число 1:</label><input id="tc-a" type="number" inputmode="numeric" placeholder="?" oninput="checkTriple()"></div>
+<div><label for="tc-b">Число 2:</label><input id="tc-b" type="number" inputmode="numeric" placeholder="?" oninput="checkTriple()"></div>
+<div><label for="tc-c">Число 3:</label><input id="tc-c" type="number" inputmode="numeric" placeholder="?" oninput="checkTriple()"></div>
+</div>
+<div id="tc-out" class="calc-out" style="display:none"></div>
+</div>
+<script>
+function gcd2(a,b){a=Math.abs(a);b=Math.abs(b);while(b){var t=b;b=a%b;a=t}return a}
+function checkTriple(){
+ var a=parseInt(document.getElementById("tc-a").value);
+ var b=parseInt(document.getElementById("tc-b").value);
+ var c=parseInt(document.getElementById("tc-c").value);
+ var out=document.getElementById("tc-out");
+ out.style.display="none";
+ if(isNaN(a)||isNaN(b)||isNaN(c)||a<=0||b<=0||c<=0)return;
+ /* Находим наибольшее — это гипотенуза */
+ var nums=[a,b,c].sort(function(x,y){return x-y});
+ var x=nums[0],y=nums[1],z=nums[2];
+ var sum=x*x+y*y;
+ var sq=z*z;
+ var isPith=sum===sq;
+ var g=gcd2(gcd2(x,y),z);
+ var isPrim=isPith&&g===1;
+ var html="";
+ if(isPith){
+  html="<b style='color:var(--green);font-size:20px'>✓ Это пифагорова тройка!</b><br>";
+  html+="Проверка: "+x+"² + "+y+"² = "+(x*x)+" + "+(y*y)+" = "+sum+" = "+z+"² = "+sq+".<br>";
+  html+="Катеты: "+x+" и "+y+", гипотенуза: "+z+".<br>";
+  if(isPrim){
+   html+="<b>Примитивная тройка</b> (НОД = 1) — не получается умножением другой тройки.";
+   out.className="calc-out ok triple";
+  } else {
+   html+="Тройка <b>не примитивная</b> (НОД = "+g+"), получается умножением примитивной ("+(x/g)+", "+(y/g)+", "+(z/g)+") на "+g+".";
+   out.className="calc-out ok";
+  }
+ } else {
+  html="<b style='color:var(--red);font-size:20px'>✗ Не пифагорова тройка</b><br>";
+  html+="Проверка: "+x+"² + "+y+"² = "+(x*x)+" + "+(y*y)+" = "+sum+" ≠ "+z+"² = "+sq+".<br>";
+  html+="Сумма квадратов двух меньших чисел не равна квадрату наибольшего.";
+  out.className="calc-out err";
+ }
+ out.innerHTML=html;
+ out.style.display="block";
+}
+</script>
+</section>
+
+<!-- ====== ВИКТОРИНА ====== -->
+<section class="lsec" id="quiz">
+<h2>Проверь себя</h2>
+<p>Ответь на вопросы викторины. Сразу после выбора варианта ты увидишь, верно ли ответил. В конце — общий результат.</p>
+<div id="quiz-container"></div>
+<div id="quiz-score" class="quiz-score" style="display:none"></div>
+<script>
+var quiz=[
+ {q:"Чему равна гипотенуза прямоугольного треугольника с катетами 6 и 8?",opts:["10","12","14","100"],c:0,fb:"c² = 6² + 8² = 36 + 64 = 100, c = √100 = 10. Это пифагорова тройка (6, 8, 10)."},
+ {q:"Какая из троек является пифагоровой?",opts:["(2, 3, 4)","(5, 12, 13)","(4, 5, 6)","(1, 2, 3)"],c:1,fb:"5² + 12² = 25 + 144 = 169 = 13². Тройка (5, 12, 13) — примитивная пифагорова."},
+ {q:"Стороны треугольника равны 3, 4 и 5. Какой это треугольник?",opts:["Остроугольный","Тупоугольный","Прямоугольный","Равносторонний"],c:2,fb:"3² + 4² = 9 + 16 = 25 = 5². По теореме, обратной теореме Пифагора, треугольник прямоугольный. Это египетский треугольник."},
+ {q:"Катет прямоугольного треугольника равен 9, гипотенуза — 15. Чему равен второй катет?",opts:["6","12","10","144"],c:1,fb:"b² = c² − a² = 15² − 9² = 225 − 81 = 144, b = √144 = 12. Тройка (9, 12, 15) — кратная, получена из (3, 4, 5) умножением на 3."},
+ {q:"Что называется пифагоровым треугольником?",opts:["Любой прямоугольный треугольник","Прямоугольный треугольник с целыми сторонами","Треугольник со сторонами 3, 4, 5","Равнобедренный прямоугольный треугольник"],c:1,fb:"Пифагоров треугольник — прямоугольный треугольник, все стороны которого выражаются целыми числами."},
+ {q:"Является ли тройка (10, 24, 26) примитивной?",opts:["Да","Нет"],c:1,fb:"НОД(10, 24, 26) = 2 ≠ 1. Тройка не примитивная, получена из (5, 12, 13) умножением на 2."},
+ {q:"Диагональ квадрата равна 6√2. Чему равна сторона квадрата?",opts:["6","12","3√2","36"],c:0,fb:"d² = a² + a² = 2a² → a² = d²/2 = (6√2)²/2 = 72/2 = 36 → a = 6."}
+];
+var quizAns=[];
+function renderQuiz(){
+ var c=document.getElementById("quiz-container");
+ var h="";
+ quiz.forEach(function(item,i){
+  h+="<div class='quiz-q' id='q"+i+"'>";
+  h+="<div class='qq'>"+(i+1)+". "+item.q+"</div>";
+  h+="<div class='quiz-opts'>";
+  item.opts.forEach(function(o,j){
+   h+="<button class='quiz-opt' data-q='"+i+"' data-o='"+j+"' type='button'>"+o+"</button>";
+  });
+  h+="</div>";
+  h+="<div class='quiz-fb' id='fb"+i+"'></div>";
+  h+="</div>";
+ });
+ c.innerHTML=h;
+ var btns=c.querySelectorAll(".quiz-opt");
+ for(var i=0;i<btns.length;i++){
+  btns[i].addEventListener("click",function(){
+   var qi=parseInt(this.getAttribute("data-q"));
+   var oi=parseInt(this.getAttribute("data-o"));
+   if(quizAns[qi]!==undefined)return;
+   quizAns[qi]=oi;
+   var correct=oi===quiz[qi].c;
+   var qEl=document.getElementById("q"+qi);
+   var opts=qEl.querySelectorAll(".quiz-opt");
+   for(var j=0;j<opts.length;j++){
+    opts[j].disabled=true;
+    if(j===quiz[qi].c)opts[j].classList.add("correct");
+    else if(j===oi&&!correct)opts[j].classList.add("wrong");
+   }
+   var fb=document.getElementById("fb"+qi);
+   fb.className="quiz-fb show "+(correct?"ok":"no");
+   fb.innerHTML=(correct?"✓ Верно! ":"✗ Неверно. ")+quiz[qi].fb;
+   updateQuizScore();
+  });
+ }
+}
+function updateQuizScore(){
+ var done=0,score=0;
+ for(var i=0;i<quiz.length;i++){
+  if(quizAns[i]!==undefined){done++;if(quizAns[i]===quiz[i].c)score++}
+ }
+ if(done===quiz.length){
+  var sc=document.getElementById("quiz-score");
+  var pct=Math.round(100*score/quiz.length);
+  var mk=pct>=90?"5":pct>=70?"4":pct>=50?"3":"2";
+  sc.style.display="block";
+  sc.className="quiz-score";
+  sc.style.background=pct>=70?"linear-gradient(150deg,#eefaf0,#dcf5e3)":"linear-gradient(150deg,#fef0f0,#fde0e0)";
+  sc.innerHTML="Результат: "+score+" из "+quiz.length+" ("+pct+"%) · отметка «"+mk+"»";
+ }
+}
+renderQuiz();
+</script>
+</section>
+
+<!-- ====== ЗАДАЧИ ====== -->
+<section class="lsec" id="practice">
+<h2>Задачи для самостоятельного решения</h2>
+<p>Попробуй решить самостоятельно, затем открой решение для проверки.</p>
+<div class="prob">
+<div class="pq">1. Найдите гипотенузу прямоугольного треугольника с катетами 9 и 12.</div>
+<details><summary>Показать решение</summary>
+<div class="sol">c² = 9² + 12² = 81 + 144 = 225<br>c = √225 = <b>15</b><br>Это пифагорова тройка (9, 12, 15), кратная тройке (3, 4, 5).</div>
+</details>
+</div>
+<div class="prob">
+<div class="pq">2. Катет прямоугольного треугольника равен 15, гипотенуза — 17. Найдите второй катет.</div>
+<details><summary>Показать решение</summary>
+<div class="sol">b² = c² − a² = 17² − 15² = 289 − 225 = 64<br>b = √64 = <b>8</b><br>Получили примитивную пифагорову тройку (8, 15, 17).</div>
+</details>
+</div>
+<div class="prob">
+<div class="pq">3. Является ли треугольник со сторонами 5, 12, 13 прямоугольным?</div>
+<details><summary>Показать решение</summary>
+<div class="sol">Проверяем: 5² + 12² = 25 + 144 = 169 = 13².<br>По теореме, обратной теореме Пифагора, треугольник <b>прямоугольный</b>.<br>Это примитивная пифагорова тройка.</div>
+</details>
+</div>
+<div class="prob">
+<div class="pq">4. Лестница длиной 13 м приставлена к стене так, что её нижний конец находится на расстоянии 5 м от стены. На какой высоте находится верхний конец лестницы?</div>
+<details><summary>Показать решение</summary>
+<div class="sol">Стена, земля и лестница образуют прямоугольный треугольник: стена и земля — катеты (a и b = 5), лестница — гипотенуза (c = 13).<br>a² = c² − b² = 13² − 5² = 169 − 25 = 144<br>a = √144 = <b>12 м</b><br>Верхний конец лестницы находится на высоте 12 м. Использована тройка (5, 12, 13).</div>
+</details>
+</div>
+<div class="prob">
+<div class="pq">5. Диагональ прямоугольника равна 10, одна сторона — 6. Найдите вторую сторону и площадь прямоугольника.</div>
+<details><summary>Показать решение</summary>
+<div class="sol">Диагональ делит прямоугольник на два прямоугольных треугольника.<br>b² = d² − a² = 10² − 6² = 100 − 36 = 64<br>b = √64 = <b>8</b><br>Площадь: S = a · b = 6 · 8 = <b>48</b><br>Использована пифагорова тройка (6, 8, 10).</div>
+</details>
+</div>
+<div class="prob">
+<div class="pq">6. Стороны треугольника равны 7, 24 и 25. Найдите площадь треугольника.</div>
+<details><summary>Показать решение</summary>
+<div class="sol">Проверяем: 7² + 24² = 49 + 576 = 625 = 25². Треугольник прямоугольный.<br>Катеты: 7 и 24. Площадь: S = (a · b) / 2 = (7 · 24) / 2 = <b>84</b>.</div>
+</details>
+</div>
+</section>
+
+<!-- ====== ДОМАШНЕЕ ЗАДАНИЕ ====== -->
+<section class="lsec" id="homework">
+<h2>Домашнее задание</h2>
+<p>1. Выучить формулировку теоремы Пифагора и записать основные пифагоровы тройки: (3, 4, 5), (5, 12, 13), (8, 15, 17).</p>
+<p>2. Найдите гипотенузу прямоугольного треугольника с катетами: а) 10 и 24; б) 20 и 21.</p>
+<p>3. Катет прямоугольного треугольника равен 20, гипотенуза — 25. Найдите второй катет.</p>
+<p>4. Является ли треугольник со сторонами 12, 16, 20 прямоугольным? Если да, найдите его площадь.</p>
+<p>5. От пристани в противоположных направлениях отплыли две лодки. Одна прошла на север 15 км, другая на восток — 20 км. Какое расстояние между лодками?</p>
+<div style="margin-top:20px">
+<a class="dl-btn" href="../materials/tehnologicheskaya-karta-pifagorovy-treugolniki.docx" download>
+<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg>
+Скачать технологическую карту урока (.docx)</a>
+</div>
+</section>
+
+<footer class="lfoot">
+<div class="lwrap">
+<p>© 2026 Плотников В. А. · Материалы можно свободно использовать в учебных целях</p>
+<p><a href="../matematika-uchenikam.html">← К материалам по математике</a> · <a href="../matematika-propushel-urok.html">Если ты пропустил урок</a></p>
+</div>
+</footer>
+</main>
+<script src="../counter.js" defer></script>
+<script src="../search-index.js" defer></script>
+<script src="../search.js" defer></script>
+</div></div>
+</body>
+</html>

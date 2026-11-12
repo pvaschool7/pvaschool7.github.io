@@ -48,6 +48,7 @@ PAGES = [
     "lessons/konspekt-izmerenie.html",
     "lessons/konspekt-processy.html",
     "lessons/trenazher.html",
+    "lessons/pifagorovy-treugolniki.html",
     "lessons/hakaton.html",
 ]
 
