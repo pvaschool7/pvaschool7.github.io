@@ -175,6 +175,11 @@
 .rev .dz-det sup{font-size:.65em}
 .rev .dz-det pre{font-family:ui-monospace,Consolas,"Courier New",monospace;font-size:14px;line-height:1.5;background:var(--paper);border:1px solid var(--line);border-radius:6px;padding:10px 14px;margin:8px 0;overflow-x:auto;white-space:pre}
 .rev .dz-det b{font-weight:700}
+/* ===== SVG-чертёж оси x для темы «Неравенства» ===== */
+.rev .dz-det .tz-axis{display:block;width:100%;max-width:560px;height:auto;margin:10px auto;background:var(--paper);border:1px solid var(--line);border-radius:10px;padding:6px 4px;box-sizing:border-box}
+.rev .dz-det .dz-code{font-family:ui-monospace,Consolas,"Courier New",monospace;background:var(--paper);border:1px solid var(--line);border-radius:6px;padding:1px 7px;white-space:nowrap}
+.rev .dz-det p{margin:.35em 0}
+.rev .dz-det .fr{font-family:ui-monospace,Consolas,"Courier New",monospace}
 /* ===== Компактный режим для экранов ~14" (низкие окна: 1366×768, 1536×864).
    Стоит в конце таблицы, чтобы перекрывать базовые правила выше. ===== */
 @media(min-width:701px) and (max-height:920px){
@@ -233,6 +238,7 @@
 <footer class="lfoot"><div class="lwrap">© Плотников В. А. · МБОУ Школа №7 г.о. Самара · <a href="../index.html">На главную</a> · <a href="../materials.html">Материалы</a></div></footer>
 <script src="xlsx-lite.js"></script>
 <script src="trenazher-data.js"></script>
+<script src="neravenstva.js"></script>
 <script>
 (function(){
 "use strict";
@@ -862,7 +868,7 @@ function finish(){
    if(task.type==="table"){
     review+="<div class='rev'><p>"+st+"<b>Задание "+(g+1)+"</b> · "+myText+"</p><p class='ans'>"+qClean+"</p><p class='ans'>Твой результат: <b>"+myText+"</b></p>"+(right?"":"<p class='ans'>Верная таблица:</p>"+(task.detailed||""))+"</div>";
    } else {
-    review+="<div class='rev'><p>"+st+"<b>Задание "+(g+1)+"</b></p><p>"+task.q+"</p><p class='ans'>Твой ответ: <b>"+esc(myText)+"</b>"+(right?"":" · Верно: <b>"+esc(corrText)+"</b>")+(task.type==="num"&&task.hint?" · <span style='color:var(--mute)'>"+task.hint.replace(/<[^>]+>/g,"")+"</span>":"")+"</p></div>";
+    review+="<div class='rev'><p>"+st+"<b>Задание "+(g+1)+"</b></p><p>"+task.q+"</p><p class='ans'>Твой ответ: <b>"+esc(myText)+"</b>"+(right?"":" · Верно: <b>"+esc(corrText)+"</b>")+(task.type==="num"&&task.hint?" · <span style='color:var(--mute)'>"+task.hint.replace(/<[^>]+>/g,"")+"</span>":"")+"</p>"+(task.detailed?"<div class='dz-det'>"+task.detailed+"</div>":"")+"</div>";
    }
    g++;
   });
