@@ -1119,7 +1119,7 @@ function genFunc1(rng){
    return "<td class='tx'>"+(x<0?"−"+Math.abs(x):String(x))+"</td>";
   }).join("");
   var yInputs=xs.map(function(x,idx){
-   return "<td><input class='tz-table-in' data-i='"+idx+"' type='text' inputmode='decimal' placeholder='?'></td>";
+   return "<td><input class='tz-table-in' data-i='"+idx+"' type='text' inputmode='text' placeholder='?'></td>";
   }).join("");
   var tableHtml="<table class='tz-table-fill tz-table-h'>"
    +"<tr><th>x</th>"+xCells+"</tr>"

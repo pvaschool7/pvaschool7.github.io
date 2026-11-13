@@ -401,8 +401,19 @@ details[open]>summary .chev{transform:rotate(45deg)}
   margin-top:16px;padding-top:14px;border-top:1px dashed var(--line);
 }
 .btn.sm{padding:9px 18px;font-size:15px;border-radius:11px}
-.card-link{font-weight:600;color:var(--blue);text-decoration:none;font-size:15px}
-.card-link:hover{text-decoration:underline}
+.card-link{
+  display:inline-flex;align-items:center;gap:6px;
+  background:var(--blue);color:var(--on-accent);text-decoration:none;
+  font-weight:600;font-size:15px;line-height:1.2;
+  padding:9px 18px;border-radius:11px;border:2px solid transparent;
+  box-shadow:0 3px 0 rgba(0,0,0,.16);
+  transition:transform .16s ease,box-shadow .16s ease,background .16s ease;
+}
+.card-link:hover{
+  transform:translateY(-2px);box-shadow:0 5px 0 rgba(0,0,0,.16);
+  color:var(--on-accent);text-decoration:none;
+}
+.card-link:active{transform:translateY(1px);box-shadow:0 2px 0 rgba(0,0,0,.16)}
 
 /* ---------- Видеокарточки: ссылка на Яндекс.Диск ---------- */
 .cards .card.wide{grid-column:1/-1}
