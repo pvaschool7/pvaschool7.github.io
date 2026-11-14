@@ -239,6 +239,7 @@
 <script src="xlsx-lite.js"></script>
 <script src="trenazher-data.js"></script>
 <script src="neravenstva.js"></script>
+<script src="uravneniya8.js"></script>
 <script>
 (function(){
 "use strict";
@@ -579,6 +580,8 @@ function renderRun(){
   h+="<div class='slide'>"+slideBadge(sl.bi)+"<div class='tz-n'>"+(sl.g+1)+"</div><div class='tz-q'>"+task.q+"</div>";
   if(task.type==="num"){
    h+="<div class='tz-answer'><input class='tz-num' id='tzin' type='text' inputmode='text' autocomplete='off' value='"+(saved||"")+"' aria-label='Ответ'>"+(task.unit?"<span class='tz-unit'>"+task.unit+"</span>":"")+"</div>";
+  }else if(task.type==="roots"){
+   h+="<div class='tz-answer'>"+(task.unit?"<span class='tz-unit'>"+task.unit+"</span>":"")+"<input class='tz-num' id='tzin' type='text' inputmode='text' autocomplete='off' placeholder='"+(task.placeholder||"напр.: 3, −2  или  нет корней").replace(/'/g,"&#39;")+"' value='"+(saved||"")+"' aria-label='Ответ'></div>";
   }else if(task.type==="table"){
    /* таблица с полями ввода уже внутри task.q — отдельная область ответа не нужна */
   }else{
@@ -658,6 +661,7 @@ function dzBuildFile(){
      Подробные решения в файл для учителя не входят. */
   if(first){
    if(t.type==="base")st.stt=D.checkBase(first,t)?"ok":"wrong";
+   else if(t.type==="roots")st.stt=D.checkRoots(first,t)?"ok":"wrong";
    else st.stt=D.checkExpr(first,t)?"ok":"wrong";
   }
   else st.stt="na";
@@ -829,6 +833,7 @@ function finish(){
   b.tasks.forEach(function(task,ti){
    var a=S.ans[g],right=false;
    if(task.type==="num")right=a!==null&&D.checkNum(a,task.a);
+   else if(task.type==="roots")right=a!==null&&a!==""&&D.checkRoots(a,task);
    else if(task.type==="table"){
     if(a&&Array.isArray(a)&&task.answers){
      var nOk=0;
@@ -858,7 +863,7 @@ function finish(){
     /* показываем подробное решение с заполненной таблицей */
     corrText=task.detailed||"";
    } else {
-    corrText=task.type==="num"?(task.a+(task.unit?" "+task.unit.replace(/<[^>]+>/g,""):"")):task.c;
+    corrText=task.type==="num"?(task.a+(task.unit?" "+task.unit.replace(/<[^>]+>/g,""):"")):(task.type==="roots"?(task.sol||""):task.c);
    }
    /* очищаем вопрос от полей ввода для разбора */
    var qClean=task.q.replace(/<input[^>]*>/gi,"").replace(/<table class='tz-table-fill'[^>]*>([\s\S]*?)<\/table>/i,function(m){
@@ -904,7 +909,7 @@ window.addEventListener("beforeunload",function(e){
 /* ---- служебный доступ для проверки: состояние работы; строки файла — только после завершения ---- */
 window.__pvaTest={dzState:function(){return S&&S.dz?{variant:S.data.variant,name:S.dz.name,cls:S.dz.cls,finished:!!S.finished,sent:!!S.sent,items:JSON.parse(JSON.stringify(S.dzItems))}:null},
  dzRows:function(){return S&&S.dzFile?S.dzFile.rows:null}};
-var m=(location.hash||"").match(/^#t=([a-zа-я-]+)/i);
+var m=(location.hash||"").match(/^#t=([a-zа-я0-9-]+)/i);
 if(m){startTopic(m[1])}else{renderPick()}
 })();
 </script></div></div><script src="../search-index.js" defer></script><script src="../search.js" defer></script></body></html>
