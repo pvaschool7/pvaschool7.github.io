@@ -41,8 +41,13 @@ function nstr(x){
   if(Math.abs(x-Math.round(x))<1e-9){var r=Math.round(x);return (r<0?"−":"")+Math.abs(r);}
   return "≈"+(Math.round(x*100)/100);
 }
-/* Строка дроби из {num,den}. */
-function rstr(r){return r.sign+r.num+(r.den!==1?"/"+r.den:"");}
+/* Строка дроби из {num,den}. sign может отсутствовать — вычисляем по знаку num. */
+function rstr(r){
+  var sign=r.sign;
+  if(sign===undefined||sign===null) sign=(r.num<0)?"−":"";
+  var n=Math.abs(r.num);
+  return sign+n+(r.den!==1?"/"+r.den:"");
+}
 function rnum(r){return r.num/r.den;}
 
 /* ---------- форматирование многочлена ---------- */
