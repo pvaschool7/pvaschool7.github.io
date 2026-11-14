@@ -36,10 +36,12 @@ function frac(n,d){
   if(d===1) return {num:n,den:1,str:sign+n,sign:sign};
   return {num:n,den:d,str:sign+n+"/"+d,sign:sign};
 }
-/* Строка числа: целое или дробь a/b. */
+/* Строка числа: целое -> "3"/"−3", дробь -> "1/2"/"−1/2" (точная, без «≈»). */
 function nstr(x){
   if(Math.abs(x-Math.round(x))<1e-9){var r=Math.round(x);return (r<0?"−":"")+Math.abs(r);}
-  return "≈"+(Math.round(x*100)/100);
+  /* точная дробь */
+  var fr=frac(Math.round(x*1000),1000);
+  return fr.sign+fr.num+(fr.den!==1?"/"+fr.den:"");
 }
 /* Строка дроби из {num,den}. sign может отсутствовать — вычисляем по знаку num. */
 function rstr(r){
@@ -49,6 +51,19 @@ function rstr(r){
   return sign+n+(r.den!==1?"/"+r.den:"");
 }
 function rnum(r){return r.num/r.den;}
+/* Строка одного корня (число или дробь): целое -> "3"/"−3", дробь -> "1/2"/"−1/2". */
+function rootStr(x){
+  if(Math.abs(x-Math.round(x))<1e-9){var r=Math.round(x);return (r<0?"−":"")+Math.abs(r);}
+  var fr=frac(Math.round(x*1000),1000);
+  return fr.sign+fr.num+(fr.den!==1?"/"+fr.den:"");
+}
+/* Строка всех корней с раздельным "x = " перед каждым:
+   [-5,5] -> "x = −5, x = 5"; [0,-9] -> "x = 0, x = −9";
+   [] -> "корней нет". */
+function rootsStr(ans){
+  if(!ans||!ans.length) return "корней нет";
+  return ans.map(function(v){return "x = "+rootStr(v);}).join(", ");
+}
 
 /* ---------- форматирование многочлена ---------- */
 /* coef = [{c, p}] — слагаемые; собираем строку с переменной x.
@@ -99,10 +114,10 @@ function quad(n){
    Если −c/a = 0 (c=0) → x = 0 (один корень, кратный 2) — избегаем, вырожденно.
    Если −c/a < 0 → корней нет. */
 function genIncompleteA(rng){
-  var a = pick(rng,[1,1,2,2,3,-1,-2,-3]);
-  var k = ri(rng,1,4);
+  var a = pick(rng,[1,1,2,2,3,3,4,-1,-2,-3,-4]);
+  var k = ri(rng,1,6);
   /* выбор: 2 корня (−c/a=k²>0) или корней нет (−c/a<0) */
-  var hasTwo = rng()<0.6;
+  var hasTwo = rng()<0.65;
   var c, roots=[], ans=[];
   if(hasTwo){
     c = -a*k*k;            /* ax² + c = 0, c = −a·k² → x² = k² */
@@ -110,7 +125,7 @@ function genIncompleteA(rng){
     ans = [-k, k];
   } else {
     /* корней нет: ax² + c = 0, c/a > 0 → x² = −c/a < 0 */
-    var cc = pick(rng,[1,2,3,4,5]) * (a>0?1:-1);   /* c того же знака, что a */
+    var cc = pick(rng,[1,2,3,4,5,6,7]) * (a>0?1:-1);   /* c того же знака, что a */
     c = cc;
     roots = []; ans = [];
   }
@@ -118,7 +133,7 @@ function genIncompleteA(rng){
   var task = {
     q:"Реши уравнение: <span class='dz-code'>"+eq+"</span>",
     answer: ans,
-    sol: ans.length? "x = "+ans.join(", ") : "корней нет",
+    sol: rootsStr(ans),
     unit:"Корни: ",
     placeholder:"напр.: 3, −2  или  нет корней",
     hint: hasTwo? "Перенеси c вправо: x² = "+(-c/a)+", извлеки корень." : "x² = отрицательному числу — действительных корней нет.",
@@ -130,8 +145,8 @@ function genIncompleteA(rng){
 /* НЕПОЛНЫЕ — тип B: ax² + bx = 0  (нет c). Выносим x: x·(ax + b) = 0.
    Корни: x = 0 и x = −b/a. */
 function genIncompleteB(rng){
-  var a = pick(rng,[1,1,2,2,3,-1,-2,-3]);
-  var b = ri(rng,-7,7);
+  var a = pick(rng,[1,2,2,3,3,4,-1,-2,-3,-4]);
+  var b = ri(rng,-12,12);
   if(b===0) b = 2;       /* иначе вырождается в ax²=0 (один корень 0) */
   /* корень 2: x = −b/a */
   var g=gcd(-b,a);
@@ -142,7 +157,7 @@ function genIncompleteB(rng){
   var task = {
     q:"Реши уравнение: <span class='dz-code'>"+eq+"</span>",
     answer: ans,
-    sol: "x = 0, x = "+rstr(r2),
+    sol: rootsStr(ans),
     unit:"Корни: ",
     placeholder:"напр.: 0, 2  или  нет корней",
     hint: "Вынеси общий множитель x за скобки: x·(ax + b) = 0.",
@@ -156,20 +171,20 @@ function genIncompleteB(rng){
    Подбираем A,B,C,D так, чтобы (D−B)/(A−C) = k² (целый квадрат) или < 0. */
 function genReduced1(rng){
   /* итог: (A−C)x² + (B−D) = 0, пусть p = A−C, q = B−D. Тогда px² + q = 0, x² = −q/p. */
-  var hasTwo = rng()<0.65;
+  var hasTwo = rng()<0.7;
   var p, q, k;
   if(hasTwo){
-    k = ri(rng,1,4);
-    p = pick(rng,[1,2,3,-1,-2,-3]);
+    k = ri(rng,1,6);
+    p = pick(rng,[1,2,3,4,-1,-2,-3,-4]);
     q = -p*k*k;                  /* x² = k² */
   } else {
     /* корней нет: q/p > 0 */
-    p = pick(rng,[1,2,3,-1,-2]);
-    q = pick(rng,[1,2,3,4]) * (p>0?1:-1);   /* q того же знака, что p → q/p>0, x²=−q/p<0 */
+    p = pick(rng,[1,2,3,4,-1,-2,-3]);
+    q = pick(rng,[1,2,3,4,5,6,7,8]) * (p>0?1:-1);   /* q того же знака, что p → q/p>0, x²=−q/p<0 */
   }
   /* разбиваем p = A−C, q = B−D на A,C и B,D */
-  var A = ri(rng,1,6), C = A - p;
-  var B = ri(rng,-6,6), D = B - q;
+  var A = ri(rng,1,8), C = A - p;
+  var B = ri(rng,-8,8), D = B - q;
   /* собираем уравнение: A·x² + B = C·x² + D */
   var left = polyStr([{c:A,p:2},{c:B,p:0}],"x",true);
   var right = polyStr([{c:C,p:2},{c:D,p:0}],"x",true);
@@ -180,7 +195,7 @@ function genReduced1(rng){
   var task = {
     q:"Реши уравнение: <span class='dz-code'>"+eq+"</span>",
     answer: ans,
-    sol: ans.length? "x = "+ans.join(", ") : "корней нет",
+    sol: rootsStr(ans),
     unit:"Корни: ",
     placeholder:"напр.: 3, −2  или  нет корней",
     hint: "Перенеси всё в левую часть и приведи подобные: получится неполное квадратное вида ax² + c = 0.",
@@ -193,12 +208,12 @@ function genReduced1(rng){
    Перенос: A·x² + (B−C)·x = 0 → x·(A·x + B − C) = 0.
    Корни: x = 0 и x = (C−B)/A. */
 function genReduced2(rng){
-  var A = pick(rng,[1,2,3,-1,-2,-3]);
+  var A = pick(rng,[1,2,2,3,3,4,-1,-2,-3,-4]);
   var r2val;             /* второй корень */
   /* подберём C,B так, чтобы (C−B)/A = r2val — целое или простая дробь */
-  var r2num = ri(rng,-5,5); if(r2num===0) r2num=2;
+  var r2num = ri(rng,-8,8); if(r2num===0) r2num=2;
   /* (C−B)/A = r2num → C−B = A·r2num */
-  var C = ri(rng,-6,6);
+  var C = ri(rng,-9,9);
   var B = C - A*r2num;
   /* итог: A·x² + (B−C)·x = 0; (B−C) = −A·r2num → A·x² − A·r2num·x = 0 */
   var r2 = {num:r2num, den:1};
@@ -213,7 +228,7 @@ function genReduced2(rng){
   var task = {
     q:"Реши уравнение: <span class='dz-code'>"+eq+"</span>",
     answer: ans,
-    sol: "x = 0, x = "+rstr(r2),
+    sol: rootsStr(ans),
     unit:"Корни: ",
     placeholder:"напр.: 0, 2  или  нет корней",
     hint: "Перенеси всё в левую часть, приведи подобные и вынеси x за скобки.",
@@ -245,7 +260,7 @@ function detailedIncompleteA(a,c,ans,hasTwo){
     steps.push("Правая часть отрицательна, а x² ≥ 0 при любом x. Поэтому <b>действительных корней нет</b>.");
     steps.push("<b>Правило:</b> уравнение x² = m при m < 0 не имеет действительных корней.");
   }
-  return detWrap(steps, ans.length? "x = "+ans.join(", ") : "корней нет");
+  return detWrap(steps, rootsStr(ans));
 }
 
 function detailedIncompleteB(a,b,r2){
@@ -272,7 +287,7 @@ function detailedReduced1(A,B,C,D,p,q,ans,hasTwo,eq,reduced){
     steps.push("Правая часть отрицательна, поэтому <b>действительных корней нет</b>.");
     steps.push("<b>Правило:</b> если после приведения подобных получилось x² = m с m < 0, корней нет.");
   }
-  return detWrap(steps, ans.length? "x = "+ans.join(", ") : "корней нет");
+  return detWrap(steps, rootsStr(ans));
 }
 
 function detailedReduced2(A,B,C,bc,r2,eq,reduced){
@@ -303,20 +318,60 @@ function mkRootsTask(t){
 }
 
 /* ---------- генераторы вариантов ---------- */
-/* Тренажёр: 10 заданий = 3 неполных A + 2 неполных B + 3 сводящихся тип 1 + 2 сводящихся тип 2 */
+/* Ключ набора корней задания (для проверки уникальности внутри варианта). */
+function rootKey(t){var a=(t.answer||[]).slice().sort(function(x,y){return x-y;});return a.join(",");}
+/* Генерация задания заданного типа с контролем уникальности корней.
+   genFn — функция(rng)->task; seen — объект уже использованных ключей корней;
+   noRootsCount — счётчик заданий «корней нет» в варианте; maxNoRoots — лимит.
+   Возвращает task или null, если за maxTries попыток не удалось получить
+   уникальный набор корней (тогда вызывающий код может заменить тип). */
+function genUnique(genFn,rng,seen,maxNoRoots,noRootsCount,maxTries){
+  maxTries=maxTries||40;
+  for(var k=0;k<maxTries;k++){
+    var t=genFn(rng);
+    if(!t)continue;
+    var key=rootKey(t);
+    /* «корней нет» — не чаще одного раза на вариант */
+    if(t.answer.length===0 && noRootsCount>=maxNoRoots) continue;
+    if(seen[key]) continue;
+    seen[key]=true;
+    return t;
+  }
+  /* не удалось — берём последний, помечаем как использованный */
+  var t=genFn(rng);
+  if(t) seen[rootKey(t)]=true;
+  return t;
+}
+/* Тренажёр: 10 заданий = 3 неполных A + 2 неполных B + 3 сводящихся тип 1 + 2 сводящихся тип 2.
+   Внутри варианта наборы корней не повторяются; «корней нет» встречается максимум 1 раз. */
 function genTrainer8(rng){
-  var t=[];
-  for(var i=0;i<3;i++) t.push(genIncompleteA(rng));
-  for(var j=0;j<2;j++) t.push(genIncompleteB(rng));
-  for(var k=0;k<3;k++) t.push(genReduced1(rng));
-  for(var m=0;m<2;m++) t.push(genReduced2(rng));
+  var t=[],seen={},noRoots=0;
+  var plan=[genIncompleteA,genIncompleteA,genIncompleteA,
+            genIncompleteB,genIncompleteB,
+            genReduced1,genReduced1,genReduced1,
+            genReduced2,genReduced2];
+  for(var i=0;i<plan.length;i++){
+    var tk=genUnique(plan[i],rng,seen,1,noRoots);
+    if(tk){
+      if(tk.answer.length===0)noRoots++;
+      t.push(tk);
+    }
+  }
   return shuf(rng,t);
 }
-/* ДЗ: 10 заданий = 5 сводящихся тип 1 + 5 сводящихся тип 2 (только сводящиеся, двух типов) */
+/* ДЗ: 10 заданий = 5 сводящихся тип 1 + 5 сводящихся тип 2 (только сводящиеся, двух типов).
+   Внутри варианта наборы корней не повторяются; «корней нет» максимум 1 раз. */
 function genDz8(rng){
-  var t=[];
-  for(var i=0;i<5;i++) t.push(genReduced1(rng));
-  for(var j=0;j<5;j++) t.push(genReduced2(rng));
+  var t=[],seen={},noRoots=0;
+  var plan=[genReduced1,genReduced1,genReduced1,genReduced1,genReduced1,
+            genReduced2,genReduced2,genReduced2,genReduced2,genReduced2];
+  for(var i=0;i<plan.length;i++){
+    var tk=genUnique(plan[i],rng,seen,1,noRoots);
+    if(tk){
+      if(tk.answer.length===0)noRoots++;
+      t.push(tk);
+    }
+  }
   return shuf(rng,t);
 }
 
@@ -371,8 +426,7 @@ function register(){
       formIntro:"В каждом задании реши уравнение, сводящееся к неполному квадратному, и впиши "
         +"корни в поле через запятую (например: <b>3, −2</b>). Если корней нет — напиши "
         +"<b>нет корней</b>. Дробные корни записывай через знак «/» (например, <b>1/2</b>). "
-        +"В отчёт для учителя уходит первый записанный ответ по каждому заданию, а после "
-        +"отправки открывается подробное решение.",
+        +"После отправки открывается подробное решение.",
       desc:"Домашнее задание для 8 класса: 10 заданий, 50 вариантов — уравнения, сводящиеся к "
          +"неполным квадратным двух типов (к виду ax² + c = 0 и к виду ax² + bx = 0). "
          +"Результат — XLSX и отправка учителю на Яндекс.Диск (папка «8 класс алгебра ДЗ»).",

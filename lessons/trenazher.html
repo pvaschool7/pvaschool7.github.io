@@ -249,7 +249,7 @@ var S=null; /* текущий сеанс */
 
 function esc(s){return String(s)}
 function escA(s){return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/\"/g,"&quot;")}
-function markFor(pct){return pct>=90?"5":(pct>=70?"4":(pct>=50?"3":"2"))}
+function markFor(pct){return pct>=86?"5":(pct>=76?"4":(pct>=56?"3":"2"))}
 /* Задание в виде чистого текста (для XLSX): без HTML и без ловушки для ИИ */
 function dzPlain(q){
  var s=String(q).replace(/<span class="ai-trap">[\s\S]*?<\/span>/gi,"");
@@ -322,6 +322,23 @@ function dzClear(){try{localStorage.removeItem(dzKey())}catch(e){}}
 function dzDone(st){return !!st&&(st.stt==="rec"||st.stt==="ok"||st.stt==="late"||st.stt==="reveal")}
 function dzAllDone(items){for(var i=0;i<items.length;i++){if(!dzDone(items[i]))return false}return true}
 function dzScore(items){var n=0,i;for(i=0;i<items.length;i++){if(items[i]&&items[i].stt==="ok")n++}return n}
+/* Выставляет stt="ok"/"wrong"/"na" по первой записанной попытке (val1) для всех заданий.
+   Вызывать ДО dzScore/dzBuildFile — иначе балл считается по stt, которое ещё не выставлено,
+   и итоговая оценка всегда получается 0. */
+function dzGrade(){
+ var d=S.data,g=0;
+ d.blocks.forEach(function(b,bi){b.tasks.forEach(function(t){
+  var st=S.dzItems[g];
+  if(!st)st=S.dzItems[g]={};
+  var first=st.val1||st.val||"";
+  if(first){
+   if(t.type==="base")st.stt=D.checkBase(first,t)?"ok":"wrong";
+   else if(t.type==="roots")st.stt=D.checkRoots(first,t)?"ok":"wrong";
+   else st.stt=D.checkExpr(first,t)?"ok":"wrong";
+  }else st.stt="na";
+  g++;
+ })});
+}
 function dzStat(st){
  if(!st)return"";
  if(st.stt==="rec")return"записано";
@@ -410,7 +427,7 @@ function dzItemHtml(g,t,st){
  var cls=S.sent?(st.stt==="ok"?" ok":" wrong"):"";
  var lock=S.sent?" disabled":"";
  var unit=t.unit!==undefined?t.unit:"f′(x) =";
- var ph=t.placeholder||"например: 3x^2-4x";
+ var ph=""; /* в ДЗ подсказки формата не показываем — ученик решает сам */
  return "<div class='titem"+cls+"' data-g='"+g+"'>"
  +"<span class='tz-n'>"+(g+1)+"</span>"
  +"<div class='tbody'><div class='tq'>"+t.q+"</div>"
@@ -428,7 +445,7 @@ function dzRender(opts){
  if(S.finished&&S.sent&&!S.dzFile)dzBuildFile();
  var h=dzBoard();
  h+="<div class='slide dz-live'><h2 class='tz-h2' style='text-align:left'>"+d.title+"</h2>"
- +"<p class='task-intro'>"+(d.formIntro||"В каждом задании найди производную и впиши её в поле — выражением с <b>x</b> (можно без пробелов: <span class='dz-code'>3x^2-4x</span>), затем нажми «Записать ответ» под блоком. Правильность ответов не показывается: запиши все блоки, перепроверь ответы и только потом отправь результат учителю. Регистр, пробелы и знак умножения не важны. В отчёт для учителя уходит первый записанный ответ по каждому заданию, а после отправки откроется подробное решение.")+"</p>";
+ +"<p class='task-intro'>"+(d.formIntro||"В каждом задании найди производную и впиши её в поле — выражением с <b>x</b> (можно без пробелов: <span class='dz-code'>3x^2-4x</span>), затем нажми «Записать ответ» под блоком. Правильность ответов не показывается: запиши все блоки, перепроверь ответы и только потом отправь результат учителю. Регистр, пробелы и знак умножения не важны. После отправки откроется подробное решение.")+"</p>";
  d.blocks.forEach(function(b,bi){
   h+="<section class='dz-block' data-b='"+bi+"'><h3 class='dz-btitle'>Блок "+(bi+1)+". "+b.name+"</h3>";
   if(d.blockIntros&&d.blockIntros[bi])h+="<p class='task-intro'>"+d.blockIntros[bi]+"</p>";
@@ -507,8 +524,8 @@ function dzResultsHtml(){
  /* Экран перед отправкой: без баллов и отметки — правильность ответов
     станет видна только после отправки результата учителю. */
  var h="<section class='dz-block' id='dzres'><h3 class='dz-btitle'>Все задания заполнены</h3>"
- +"<p class='task-intro' style='margin-top:8px'>Все ответы записаны. <b>Правильность ответов будет видна только после отправки</b> — сейчас она нигде не показывается. Учитель увидит файл с заданиями и твоими первыми записанными ответами.</p>"
- +"<p class='task-intro'>Хочешь что-то исправить — нажми «← Вернуться к ответам». Первый записанный ответ останется в отчёте, исправления можно записать заново. Всё готово — отправляй работу.</p>"
+ +"<p class='task-intro' style='margin-top:8px'>Все ответы записаны. <b>Правильность ответов будет видна только после отправки</b> — сейчас она нигде не показывается. Учитель увидит файл с заданиями и твоими ответами.</p>"
+ +"<p class='task-intro'>Хочешь что-то проверить — нажми «← Вернуться к ответам». Всё готово — отправляй работу.</p>"
  +"<div class='tz-nav'><button class='btn' type='button' id='dzsend'"+(S.sending?" disabled":"")+">"+(S.sending?"Отправляем на Яндекс.Диск…":"Отправить результат учителю →")+"</button>"
  +"<button class='btn ghost' type='button' id='dzrevise'"+(S.sending?" disabled":"")+">← Вернуться к ответам</button></div>";
  h+="</section>";
@@ -633,12 +650,14 @@ function prev(){saveCurrent();if(S.cur>0){S.cur--;renderRun()}}
 
 /* ================= ДЗ: файл XLSX и отправка на Яндекс.Диск ================= */
 function dzStatusText(st){
- if(st==="ok")return"верно, +1 (с первой попытки)";
+ if(st==="ok")return"верно, +1";
  if(st==="wrong")return"неверно";
  return"нет ответа";
 }
 function dzBuildFile(){
- var d=S.data,rows=[],now=new Date(),g=0,score=dzScore(S.dzItems);
+ var d=S.data,rows=[],now=new Date(),g=0;
+ dzGrade(); /* выставить stt по первой попытке — до подсчёта score */
+ var score=dzScore(S.dzItems);
  var pad=function(n){return (n<10?"0":"")+n};
  var stamp=now.getFullYear()+"-"+pad(now.getMonth()+1)+"-"+pad(now.getDate())+" "+pad(now.getHours())+":"+pad(now.getMinutes());
  var pct=Math.round(100*score/S.total),mk=markFor(pct);
@@ -648,10 +667,10 @@ function dzBuildFile(){
  rows.push(["Класс",S.dz.cls]);
  rows.push(["Набор заданий (служебное — для учителя)",d.variant]);
  rows.push(["Дата и время",stamp]);
- rows.push(["Верно с первой попытки",score+" из "+S.total+" ("+pct+"%)"]);
+ rows.push(["Верно",score+" из "+S.total+" ("+pct+"%)"]);
  rows.push(["Отметка",mk]);
  rows.push([]);
- rows.push(["№","Блок","Задание","Ответ ученика (первая попытка)","Верный ответ","Результат"]);
+ rows.push(["№","Блок","Задание","Ответ ученика","Верный ответ","Результат"]);
  g=0;
  d.blocks.forEach(function(b,bi){b.tasks.forEach(function(t){
   var st=S.dzItems[g];
@@ -791,11 +810,12 @@ function dzRevise(){
 /* Экран после отправки: итоги, статус файла и подробное решение каждого задания.
    Подробное решение показывается только ученику — в файл для учителя оно не попадает. */
 function dzSentHtml(){
+ dzGrade(); /* выставить stt по первой попытке — до подсчёта score */
  var d=S.data,score=dzScore(S.dzItems),pct=Math.round(100*score/S.total),mk=markFor(pct),g=0;
  var cfg=D.DZ_DISK||{},folder=d.diskFolder||cfg.folder||"";
  if(!S.dzFile)dzBuildFile();
  var h="<section class='dz-block' id='dzres'><h3 class='dz-btitle'>Итоги: работа сдана</h3>"
- +"<div class='tz-res'><div class='tz-mark'>"+mk+"</div><div class='tz-score'>"+score+" из "+S.total+"<small>верных с первой попытки · "+pct+"% · отметка «"+mk+"» · шкала: 90–100% «5», 70–89% «4», 50–69% «3»</small></div></div>";
+ +"<div class='tz-res'><div class='tz-mark'>"+mk+"</div><div class='tz-score'>"+score+" из "+S.total+"<small>верных · "+pct+"% · отметка «"+mk+"» · шкала: 86–100% «5», 76–85% «4», 56–75% «3», 0–55% «2»</small></div></div>";
  d.blocks.forEach(function(b,bi){
   var got=0,of=b.tasks.length,from=dzIndex(bi,0),i;
   for(i=0;i<of;i++){if(S.dzItems[from+i]&&S.dzItems[from+i].stt==="ok")got++}
@@ -814,7 +834,7 @@ function dzSentHtml(){
   var sth=st.stt==="ok"?"<span class='st ok'>✓ верно, +1</span>":(st.stt==="wrong"?"<span class='st no'>✗ неверно</span>":"<span class='st na'>нет ответа</span>");
   h+="<div class='rev'><p>"+sth+"<b>Задание "+(g+1)+"</b> · Блок "+(bi+1)+". "+escA(b.name)+"</p>"
   +"<p>"+dzQClean(t.q)+"</p>"
-  +"<p class='ans'>Твой ответ (первая попытка): <b>"+escA(st.val1||st.val||"—")+"</b> · Верный ответ: <b>"+t.atext+"</b></p>"
+  +"<p class='ans'>Твой ответ: <b>"+escA(st.val1||st.val||"—")+"</b> · Верный ответ: <b>"+t.atext+"</b></p>"
   +(t.detailed?"<div class='dz-det'>"+t.detailed+"</div>":"")
   +"</div>";
   g++;
@@ -881,7 +901,7 @@ function finish(){
   score+=got;
  });
  var pct=Math.round(100*score/S.total),mk=markFor(pct);
- var h=topBar("Завершено")+"<div class='slide'><span class='tz-badge'>"+S.data.subject+" · "+S.data.grade+"</span><h2 class='tz-h2' style='text-align:left'>Результат</h2><div class='tz-res'><div class='tz-mark'>"+mk+"</div><div class='tz-score'>"+score+" из "+S.total+"<small>"+pct+"% · отметка «"+mk+"» · шкала: 90–100% «5», 70–89% «4», 50–69% «3»</small></div></div>";
+ var h=topBar("Завершено")+"<div class='slide'><span class='tz-badge'>"+S.data.subject+" · "+S.data.grade+"</span><h2 class='tz-h2' style='text-align:left'>Результат</h2><div class='tz-res'><div class='tz-mark'>"+mk+"</div><div class='tz-score'>"+score+" из "+S.total+"<small>"+pct+"% · отметка «"+mk+"» · шкала: 86–100% «5», 76–85% «4», 56–75% «3», 0–55% «2»</small></div></div>";
  perBlock.forEach(function(pb){
   var p=Math.round(100*pb.got/pb.of);
   h+="<div class='tz-brow'><span class='nm'>"+pb.name+"</span><span class='vv'>"+pb.got+" из "+pb.of+"</span><div class='tz-mini'><i style='width:"+p+"%'></i></div></div>";

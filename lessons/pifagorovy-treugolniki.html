@@ -387,10 +387,10 @@ function updateQuizScore(){
  if(done===quiz.length){
   var sc=document.getElementById("quiz-score");
   var pct=Math.round(100*score/quiz.length);
-  var mk=pct>=90?"5":pct>=70?"4":pct>=50?"3":"2";
+  var mk=pct>=86?"5":pct>=76?"4":pct>=56?"3":"2";
   sc.style.display="block";
   sc.className="quiz-score";
-  sc.style.background=pct>=70?"linear-gradient(150deg,#eefaf0,#dcf5e3)":"linear-gradient(150deg,#fef0f0,#fde0e0)";
+  sc.style.background=pct>=76?"linear-gradient(150deg,#eefaf0,#dcf5e3)":"linear-gradient(150deg,#fef0f0,#fde0e0)";
   sc.innerHTML="Результат: "+score+" из "+quiz.length+" ("+pct+"%) · отметка «"+mk+"»";
  }
 }

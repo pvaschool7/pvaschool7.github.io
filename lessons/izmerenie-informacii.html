@@ -636,7 +636,7 @@ try{var x=JSON.parse(localStorage.getItem(KEY)||"null");if(x&&x.items)S=x}catch(
 S.ts=S.ts||stamp();
 function save(){try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}}
 function sname(k){return (S.names[k]||"").trim()||("Ученик "+(k==="A"?"А":"Б"))}
-function mark(p){return p>=87.5?"5":p>=68.75?"4":p>=50?"3":"2"}
+function mark(p){return p>=86?"5":p>=76?"4":p>=56?"3":"2"}
 function finPts(id){var r=S.items[id];return r&&r.ok?Math.min(8,r.pts||0):0}
 function trapCaught(bid){var el=document.querySelector('[data-block="'+bid+'"]'),r=S.items[bid];return el&&r&&r.v===el.getAttribute("data-ok")?1:0}
 function renderResults(){
