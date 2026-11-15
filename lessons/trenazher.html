@@ -240,6 +240,7 @@
 <script src="trenazher-data.js"></script>
 <script src="neravenstva.js"></script>
 <script src="uravneniya8.js"></script>
+<script src="buleva-algebra.js"></script>
 <script>
 (function(){
 "use strict";
@@ -334,6 +335,7 @@ function dzGrade(){
   if(first){
    if(t.type==="base")st.stt=D.checkBase(first,t)?"ok":"wrong";
    else if(t.type==="roots")st.stt=D.checkRoots(first,t)?"ok":"wrong";
+   else if(t.type==="tt")st.stt=D.checkTT(first,t)?"ok":"wrong";
    else st.stt=D.checkExpr(first,t)?"ok":"wrong";
   }else st.stt="na";
   g++;
@@ -661,7 +663,7 @@ function dzBuildFile(){
  var pad=function(n){return (n<10?"0":"")+n};
  var stamp=now.getFullYear()+"-"+pad(now.getMonth()+1)+"-"+pad(now.getDate())+" "+pad(now.getHours())+":"+pad(now.getMinutes());
  var pct=Math.round(100*score/S.total),mk=markFor(pct);
- rows.push(["Домашнее задание · Алгебра · 11 класс"]);
+ rows.push(["Домашнее задание · "+(d.subject||"")+" · "+(d.grade||"")]);
  rows.push(["Тема",d.fileTitle||d.title]);
  rows.push(["Ученик",S.dz.name]);
  rows.push(["Класс",S.dz.cls]);
@@ -681,6 +683,7 @@ function dzBuildFile(){
   if(first){
    if(t.type==="base")st.stt=D.checkBase(first,t)?"ok":"wrong";
    else if(t.type==="roots")st.stt=D.checkRoots(first,t)?"ok":"wrong";
+   else if(t.type==="tt")st.stt=D.checkTT(first,t)?"ok":"wrong";
    else st.stt=D.checkExpr(first,t)?"ok":"wrong";
   }
   else st.stt="na";
