@@ -256,19 +256,19 @@ function pluralOps(n){
 }
 
 /* ---------- генераторы 10 заданий ----------
-   План на вариант (от простого к сложному):
-     1) Конъюнкция ∧            — 1 операция, 2 переменные
-     2) Дизъюнкция ∨            — 1 операция, 2 переменные
-     3) Импликация →            — 1 операция, 2 переменные
-     4) Эквиваленция ↔          — 1 операция, 2 переменные
-     5) Исключающее ИЛИ ⊕       — 1 операция, 2 переменные
-     6) Три операции, 2 переменные (¬ + 2 бинарные, или 3 бинарные)
-     7) Три операции, 2 переменные (другие комбинации)
-     8) Три операции, 3 переменные
-     9) Три операции, 3 переменные
-     10) Три операции, 3 переменные (наиболее сложные выражения)
-   Все смешанные задания используют ровно 3 операции — требование «смешивать
-   3 операции» выполнено для заданий 6–10. Подсказки не даются.
+   План на вариант (от простого к сложному, с усложнением в заданиях 7–10):
+     1) Конъюнкция ∧            — 1 операция, 2 переменные (4 строки)
+     2) Дизъюнкция ∨            — 1 операция, 2 переменные (4 строки)
+     3) Импликация →            — 1 операция, 2 переменные (4 строки)
+     4) Эквиваленция ↔          — 1 операция, 2 переменные (4 строки)
+     5) Исключающее ИЛИ ⊕       — 1 операция, 2 переменные (4 строки)
+     6) 3 операции, 2 переменные (4 строки) — переход к составным выражениям
+     7) 4 операции, 2 переменные (4 строки) — тождества Де Моргана, тавтологии
+     8) 4 операции, 3 переменные (8 строк) — мультиплексоры и сложные комбинации
+     9) 5 операций, 3 переменные (8 строк) — вложенные импликации, голосование 2-из-3
+     10) 5–6 операций, 3 переменные (8 строк) — тавтологии, «все или никто», чётность
+   Используется не более 3 переменных (A, B, C). Таблицы — 4 или 8 строк.
+   Подсказки не даются.
 -------------------------------------------------------------------- */
 
 /* Случайная пара различных переменных из [A,B,C]. Возвращает массив из двух имён. */
@@ -317,55 +317,71 @@ function genTask6(rng){
   return mkTTTask(pick(rng,POOL6)(rng));
 }
 
-/* Задание 7: 3 операции, 2 переменные (другой набор, чтобы задания 6 и 7 различались).
-   Каждое выражение содержит ровно 3 операции в AST. */
+/* Задание 7: 4 операции, 2 переменные (усложнённый вариант — раньше было 3 операции).
+   Каждое выражение содержит ровно 4 операции в AST. Используются тождества Де Моргана,
+   тавтологии и выражения, эквивалентные базовым операциям — это требует от ученика
+   внимательного вычисления, а не угадывания по виду. */
 var POOL7=[
-  function(rng){var p=pair2(rng);return and(or(v(p[0]),v(p[1])),not(v(p[1])));},            /* (A ∨ B) ∧ ¬B */
-  function(rng){var p=pair2(rng);return equiv(and(v(p[0]),v(p[1])),not(v(p[0])));},         /* (A ∧ B) ↔ ¬A */
-  function(rng){var p=pair2(rng);return impl(or(v(p[0]),v(p[1])),not(v(p[0])));},           /* (A ∨ B) → ¬A */
-  function(rng){var p=pair2(rng);return or(xor(v(p[0]),v(p[1])),not(v(p[0])));},            /* (A ⊕ B) ∨ ¬A */
-  function(rng){var p=pair2(rng);return equiv(xor(v(p[0]),v(p[1])),not(v(p[0])));},         /* (A ⊕ B) ↔ ¬A */
-  function(rng){var p=pair2(rng);return xor(impl(v(p[0]),v(p[1])),not(v(p[0])));},          /* (A → B) ⊕ ¬A */
-  function(rng){var p=pair2(rng);return and(impl(v(p[0]),v(p[1])),impl(v(p[1]),v(p[0])));}, /* (A → B) ∧ (B → A) */
-  function(rng){var p=pair2(rng);return and(not(v(p[1])),equiv(v(p[0]),v(p[1])));},         /* ¬B ∧ (A ↔ B) */
-  function(rng){var p=pair2(rng);return or(not(and(v(p[0]),v(p[1]))),v(p[0]));},            /* ¬(A ∧ B) ∨ A */
-  function(rng){var p=pair2(rng);return or(not(impl(v(p[0]),v(p[1]))),v(p[0]));}            /* ¬(A → B) ∨ A */
+  function(rng){var p=pair2(rng);return or(and(v(p[0]),v(p[1])),and(v(p[0]),not(v(p[1]))));},         /* (A ∧ B) ∨ (A ∧ ¬B) — упрощается к A */
+  function(rng){var p=pair2(rng);return and(or(v(p[0]),v(p[1])),or(not(v(p[0])),v(p[1])));},        /* (A ∨ B) ∧ (¬A ∨ B) — упрощается к B */
+  function(rng){var p=pair2(rng);return or(not(and(v(p[0]),v(p[1]))),and(v(p[0]),v(p[1])));},        /* ¬(A ∧ B) ∨ (A ∧ B) — тавтология */
+  function(rng){var p=pair2(rng);return and(equiv(v(p[0]),v(p[1])),not(and(v(p[0]),v(p[1]))));},     /* (A ↔ B) ∧ ¬(A ∧ B) — это XOR */
+  function(rng){var p=pair2(rng);return and(xor(v(p[0]),v(p[1])),not(or(v(p[0]),v(p[1]))));},       /* (A ⊕ B) ∧ ¬(A ∨ B) — всегда 0 */
+  function(rng){var p=pair2(rng);return and(not(and(v(p[0]),v(p[1]))),or(v(p[0]),v(p[1])));},       /* ¬(A ∧ B) ∧ (A ∨ B) — это XOR (Де Морган) */
+  function(rng){var p=pair2(rng);return or(impl(v(p[0]),v(p[1])),not(xor(v(p[0]),v(p[1]))));},      /* (A → B) ∨ ¬(A ⊕ B) */
+  function(rng){var p=pair2(rng);return and(impl(v(p[0]),v(p[1])),or(not(v(p[0])),v(p[1])));},      /* (A → B) ∧ (¬A ∨ B) — тавтология (A → B) */
+  function(rng){var p=pair2(rng);return equiv(or(v(p[0]),v(p[1])),not(and(v(p[0]),v(p[1]))));},     /* (A ∨ B) ↔ ¬(A ∧ B) — это XOR */
+  function(rng){var p=pair2(rng);return and(not(or(v(p[0]),v(p[1]))),impl(v(p[0]),v(p[1])));}        /* ¬(A ∨ B) ∧ (A → B) — стрелка Пирса × импликация */
 ];
 function genTask7(rng){
   return mkTTTask(pick(rng,POOL7)(rng));
 }
 
-/* Задания 8–10: 3 операции, 3 переменные (A, B, C).
-   Каждый пул содержит выражения ровно с 3 операциями в AST. */
+/* Задания 8–10: усложнённые выражения (раньше было по 3 операции — теперь 4–5).
+   Задание 8: 4 операции, 3 переменные (A, B, C).
+   Задание 9: 5 операций, 3 переменные.
+   Задание 10: 4 переменные (A, B, C, D) — таблица из 16 строк, 3–5 операций. */
 var POOL8=[
-  function(rng){return and(not(v("A")),or(v("B"),v("C")));},        /* ¬A ∧ (B ∨ C) */
-  function(rng){return and(not(or(v("A"),v("B"))),v("C"));},        /* ¬(A ∨ B) ∧ C */
-  function(rng){return or(and(v("A"),v("B")),not(v("C")));},        /* (A ∧ B) ∨ ¬C */
-  function(rng){return and(or(v("A"),v("B")),not(v("C")));},       /* (A ∨ B) ∧ ¬C */
-  function(rng){return or(not(v("A")),and(v("B"),v("C")));},       /* ¬A ∨ (B ∧ C) */
-  function(rng){return and(v("A"),or(not(v("B")),v("C")));},       /* A ∧ (¬B ∨ C) */
-  function(rng){return or(and(v("A"),not(v("B"))),v("C"));},       /* (A ∧ ¬B) ∨ C */
-  function(rng){return and(not(v("C")),or(v("A"),v("B")));}        /* ¬C ∧ (A ∨ B) */
+  function(rng){return or(and(v("A"),v("B")),and(not(v("A")),v("C")));},        /* (A ∧ B) ∨ (¬A ∧ C) — мультиплексор */
+  function(rng){return and(impl(v("A"),v("B")),or(v("B"),not(v("C"))));},        /* (A → B) ∧ (B ∨ ¬C) */
+  function(rng){return and(or(v("A"),v("B")),not(and(v("A"),v("C"))));},        /* (A ∨ B) ∧ ¬(A ∧ C) */
+  function(rng){return and(not(and(v("A"),v("B"))),or(v("B"),v("C")));},        /* ¬(A ∧ B) ∧ (B ∨ C) */
+  function(rng){return and(xor(v("A"),v("B")),not(and(v("B"),v("C"))));},       /* (A ⊕ B) ∧ ¬(B ∧ C) */
+  function(rng){return or(equiv(v("A"),v("B")),and(v("B"),not(v("C"))));},      /* (A ↔ B) ∨ (B ∧ ¬C) */
+  function(rng){return equiv(and(v("A"),v("B")),not(or(v("B"),v("C"))));},      /* (A ∧ B) ↔ ¬(B ∨ C) */
+  function(rng){return xor(impl(v("A"),v("B")),not(and(v("B"),v("C"))));},      /* (A → B) ⊕ ¬(B ∧ C) */
+  function(rng){return and(not(or(v("A"),v("B"))),impl(v("A"),v("C")));},       /* ¬(A ∨ B) ∧ (A → C) */
+  function(rng){return or(and(v("A"),v("C")),and(v("B"),not(v("C"))));}         /* (A ∧ C) ∨ (B ∧ ¬C) — мультиплексор 2-в-1 */
 ];
 var POOL9=[
-  function(rng){return and(impl(v("A"),v("B")),not(v("C")));},     /* (A → B) ∧ ¬C */
-  function(rng){return and(xor(v("A"),v("B")),not(v("C")));},      /* (A ⊕ B) ∧ ¬C */
-  function(rng){return or(impl(v("A"),v("B")),not(v("C")));},      /* (A → B) ∨ ¬C */
-  function(rng){return impl(or(v("A"),v("B")),not(v("C")));},      /* (A ∨ B) → ¬C */
-  function(rng){return equiv(and(v("A"),v("B")),not(v("C")));},    /* (A ∧ B) ↔ ¬C */
-  function(rng){return and(not(v("C")),impl(v("A"),v("B")));},     /* ¬C ∧ (A → B) */
-  function(rng){return or(not(v("A")),impl(v("B"),v("C")));},      /* ¬A ∨ (B → C) */
-  function(rng){return and(not(v("B")),xor(v("A"),v("C")));}       /* ¬B ∧ (A ⊕ C) */
+  function(rng){return or(and(and(v("A"),v("B")),v("C")),not(or(v("A"),v("B"))));},             /* (A ∧ B ∧ C) ∨ ¬(A ∨ B) */
+  function(rng){return and(and(impl(v("A"),v("B")),impl(v("B"),v("C"))),not(v("A")));},         /* (A → B) ∧ (B → C) ∧ ¬A */
+  function(rng){return or(or(and(v("A"),v("B")),and(v("B"),v("C"))),and(v("A"),v("C")));},       /* (A ∧ B) ∨ (B ∧ C) ∨ (A ∧ C) — голосование 2-из-3 */
+  function(rng){return and(not(and(v("A"),v("B"))),not(impl(v("C"),v("A"))));},                  /* ¬(A ∧ B) ∧ ¬(C → A) */
+  function(rng){return and(and(xor(v("A"),v("B")),or(not(v("A")),v("C"))),v("B"));},            /* (A ⊕ B) ∧ (¬A ∨ C) ∧ B */
+  function(rng){return and(and(equiv(v("A"),v("B")),not(impl(v("C"),v("A")))),v("B"));},         /* (A ↔ B) ∧ ¬(C → A) ∧ B */
+  function(rng){return and(and(not(or(v("A"),v("B"))),impl(v("C"),v("A"))),v("B"));},           /* ¬(A ∨ B) ∧ (C → A) ∧ B */
+  function(rng){return and(impl(impl(v("A"),v("B")),v("C")),not(impl(v("B"),v("A"))));},        /* ((A → B) → C) ∧ ¬(B → A) */
+  function(rng){return and(impl(and(v("A"),v("B")),v("C")),not(impl(v("B"),v("A"))));},         /* ((A ∧ B) → C) ∧ ¬(B → A) */
+  function(rng){return equiv(xor(v("A"),v("B")),not(and(impl(v("B"),v("C")),v("A"))));}         /* (A ⊕ B) ↔ ¬((B → C) ∧ A) */
 ];
+/* Задание 10: 3 переменные (A, B, C), 5–6 операций — самая сложная категория
+   в рамках трёх переменных. Используются вложенные импликации, тавтологии
+   (транзитивность, циклическая импликация), схемы «все или никто», «нечётное
+   число единиц», и другие нетривиальные конструкции. Таблица — 8 строк. */
 var POOL10=[
-  function(rng){return and(or(v("A"),v("B")),impl(v("B"),v("C")));},   /* (A ∨ B) ∧ (B → C) */
-  function(rng){return and(impl(v("A"),v("B")),impl(v("B"),v("C")));}, /* (A → B) ∧ (B → C) */
-  function(rng){return and(impl(v("A"),v("B")),or(v("A"),v("C")));},   /* (A → B) ∧ (A ∨ C) */
-  function(rng){return and(not(v("A")),equiv(v("B"),v("C")));},        /* ¬A ∧ (B ↔ C) */
-  function(rng){return and(or(v("A"),v("B")),xor(v("A"),v("C")));},    /* (A ∨ B) ∧ (A ⊕ C) */
-  function(rng){return equiv(and(v("A"),v("B")),or(v("B"),v("C")));},  /* (A ∧ B) ↔ (B ∨ C) */
-  function(rng){return xor(impl(v("A"),v("B")),and(v("B"),v("C")));},  /* (A → B) ⊕ (B ∧ C) */
-  function(rng){return or(and(v("A"),v("B")),and(v("A"),v("C")));},    /* (A ∧ B) ∨ (A ∧ C) */
+  function(rng){return or(and(and(v("A"),v("B")),v("C")),not(or(or(v("A"),v("B")),v("C"))));},  /* (A ∧ B ∧ C) ∨ ¬(A ∨ B ∨ C) — «все или никто» */
+  function(rng){return and(not(and(and(v("A"),v("B")),v("C"))),or(or(v("A"),v("B")),v("C")));}, /* ¬(A ∧ B ∧ C) ∧ (A ∨ B ∨ C) — «хотя бы одна 1, но не все 1» */
+  function(rng){return and(and(impl(v("A"),v("B")),impl(v("B"),v("C"))),impl(v("C"),v("A")));}, /* (A → B) ∧ (B → C) ∧ (C → A) — цикл импликаций, тавтология ↔ все равны */
+  function(rng){return impl(and(impl(v("A"),v("B")),impl(v("B"),v("C"))),impl(v("A"),v("C")));}, /* ((A → B) ∧ (B → C)) → (A → C) — транзитивность импликации, тавтология */
+  function(rng){return and(impl(impl(v("A"),v("B")),v("C")),not(or(v("A"),v("B"))));},          /* ((A → B) → C) ∧ ¬(A ∨ B) */
+  function(rng){return and(impl(and(v("A"),v("B")),v("C")),not(xor(v("A"),v("B"))));},          /* ((A ∧ B) → C) ∧ ¬(A ⊕ B) */
+  function(rng){return and(xor(xor(v("A"),v("B")),v("C")),or(or(v("A"),v("B")),v("C")));},      /* (A ⊕ B ⊕ C) ∧ (A ∨ B ∨ C) — нечётное число 1 и хотя бы одна 1 */
+  function(rng){return xor(xor(impl(v("A"),v("B")),impl(v("B"),v("C"))),impl(v("A"),v("C")));}, /* (A → B) ⊕ (B → C) ⊕ (A → C) — всегда 0 (транзитивность) */
+  function(rng){return xor(and(or(v("A"),v("B")),v("C")),not(and(v("A"),v("B"))));},            /* ((A ∨ B) ∧ C) ⊕ ¬(A ∧ B) */
+  function(rng){return or(and(and(v("A"),v("B")),v("C")),and(not(v("A")),v("B")));},            /* (A ∧ B ∧ C) ∨ (¬A ∧ B) */
+  function(rng){return and(and(equiv(v("A"),v("B")),equiv(v("B"),v("C"))),equiv(v("A"),v("C")));}, /* (A ↔ B) ∧ (B ↔ C) ∧ (A ↔ C) — все равны */
+  function(rng){return or(or(impl(v("A"),v("B")),impl(v("B"),v("C"))),impl(v("A"),v("C")));}    /* (A → B) ∨ (B → C) ∨ (A → C) — почти тавтология */
 ];
 
 function genTask8(rng){return mkTTTask(pick(rng,POOL8)(rng));}
@@ -435,7 +451,9 @@ function register(){
     desc:"Домашнее задание для 10 класса (углублённый уровень): 10 заданий, "
       +"50 вариантов — построение таблиц истинности для базовых операций "
       +"(Конъюнкция, Дизъюнкция, Импликация, Эквиваленция, Исключающее ИЛИ) "
-      +"и смешанных выражений из 2–3 операций с 2–3 переменными. "
+      +"и смешанных выражений с 3–6 операциями на 2–3 переменных "
+      +"(включая тождества Де Моргана, мультиплексоры, схемы голосования, "
+      +"тавтологии транзитивности и циклы импликаций). "
       +"Результат — XLSX и отправка учителю на Яндекс.Диск "
       +"(папка «10 класс булева алгебра»). Подсказки не показываются.",
     blocks:[{name:"Таблицы истинности: базовые операции и смешанные выражения",gen:genBulevDz,count:10}]
