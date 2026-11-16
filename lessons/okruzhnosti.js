@@ -46,28 +46,41 @@ function detSteps(items, answerLine){
    SVG-ЧЕРТЕЖИ
 -------------------------------------------------------------------- */
 
-/* Правильный треугольник + описанная окружность */
+/* Правильный треугольник + описанная окружность.
+   Центр (120,125), R=68. Вершины на окружности под углами -90°, 150°, 30°. */
 function svgEqTriCirc(aLabel){
+  var cx=120,cy=125,R=68;
+  var v1x=cx, v1y=cy-R;                             /* верхняя вершина */
+  var v2x=cx+R*Math.cos(150*Math.PI/180), v2y=cy+R*Math.sin(150*Math.PI/180); /* нижняя левая */
+  var v3x=cx+R*Math.cos(30*Math.PI/180),  v3y=cy+R*Math.sin(30*Math.PI/180);  /* нижняя правая */
   return "<svg width='240' height='210' viewBox='0 0 240 210' xmlns='http://www.w3.org/2000/svg' style='font-family:Golos Text,sans-serif'>"
-    +"<circle cx='120' cy='125' r='68' fill='rgba(47,111,208,.08)' stroke='var(--blue)' stroke-width='2'/>"
-    +"<polygon points='120,57 61,158 179,158' fill='rgba(255,255,255,.85)' stroke='var(--ink)' stroke-width='2.5'/>"
-    +"<line x1='120' y1='125' x2='120' y2='57' stroke='var(--blue)' stroke-width='1.5' stroke-dasharray='4,3'/>"
+    +"<circle cx='"+cx+"' cy='"+cy+"' r='"+R+"' fill='rgba(47,111,208,.08)' stroke='var(--blue)' stroke-width='2'/>"
+    +"<polygon points='"+v1x+","+v1y+" "+v2x.toFixed(0)+","+v2y.toFixed(0)+" "+v3x.toFixed(0)+","+v3y.toFixed(0)+"' fill='rgba(255,255,255,.85)' stroke='var(--ink)' stroke-width='2.5'/>"
+    +"<line x1='"+cx+"' y1='"+cy+"' x2='"+v1x+"' y2='"+v1y+"' stroke='var(--blue)' stroke-width='1.5' stroke-dasharray='4,3'/>"
     +"<text x='128' y='95' font-size='13' fill='var(--blue)' font-weight='600'>R</text>"
     +"<text x='120' y='175' font-size='15' fill='var(--ink)' text-anchor='middle' font-weight='600'>"+aLabel+"</text>"
-    +"<circle cx='120' cy='125' r='2.5' fill='var(--blue)'/>"
+    +"<circle cx='"+cx+"' cy='"+cy+"' r='2.5' fill='var(--blue)'/>"
     +"</svg>";
 }
 
-/* Прямоугольный треугольник + описанная окружность (гипотенуза = диаметр) */
+/* Прямоугольный треугольник + описанная окружность.
+   Катеты вдоль осей: a=120px (горизонт), b=90px (вертикаль).
+   Гипотенуза = диаметр. Центр = середина гипотенузы = (115,140), R=75. */
 function svgRightTriCirc(aLabel,bLabel){
+  var rx=55,ry=185;         /* вершина прямого угла */
+  var ax=rx+120, ay=ry;     /* конец катета a */
+  var bx=rx, by=ry-90;      /* конец катета b */
+  var cx=(ax+bx)/2, cy=(ay+by)/2;  /* середина гипотенузы = центр */
+  var R=Math.sqrt(120*120+90*90)/2; /* половина гипотенузы = 75 */
   return "<svg width='250' height='220' viewBox='0 0 250 220' xmlns='http://www.w3.org/2000/svg' style='font-family:Golos Text,sans-serif'>"
-    +"<circle cx='125' cy='115' r='78' fill='rgba(47,111,208,.08)' stroke='var(--blue)' stroke-width='2'/>"
-    +"<polygon points='55,185 195,185 55,45' fill='rgba(255,255,255,.85)' stroke='var(--ink)' stroke-width='2.5'/>"
-    +"<path d='M 55 175 L 65 175 L 65 185' fill='none' stroke='var(--ink)' stroke-width='2'/>"
-    +"<text x='125' y='200' font-size='15' fill='var(--ink)' text-anchor='middle' font-weight='600'>"+aLabel+"</text>"
-    +"<text x='42' y='118' font-size='15' fill='var(--ink)' text-anchor='middle' font-weight='600'>"+bLabel+"</text>"
-    +"<text x='140' y='108' font-size='14' fill='var(--red)' font-weight='600' transform='rotate(-49 140 108)'>c</text>"
-    +"<line x1='55' y1='185' x2='195' y2='45' stroke='var(--red)' stroke-width='1' stroke-dasharray='3,3' opacity='0.5'/>"
+    +"<circle cx='"+cx+"' cy='"+cy+"' r='"+R.toFixed(1)+"' fill='rgba(47,111,208,.08)' stroke='var(--blue)' stroke-width='2'/>"
+    +"<polygon points='"+rx+","+ry+" "+ax+","+ay+" "+bx+","+by+"' fill='rgba(255,255,255,.85)' stroke='var(--ink)' stroke-width='2.5'/>"
+    +"<path d='M "+(rx+10)+" "+ry+" L "+(rx+10)+" "+(ry-10)+" L "+rx+" "+(ry-10)+"' fill='none' stroke='var(--ink)' stroke-width='2'/>"
+    +"<text x='"+((rx+ax)/2)+"' y='"+(ry+18)+"' font-size='15' fill='var(--ink)' text-anchor='middle' font-weight='600'>"+aLabel+"</text>"
+    +"<text x='"+(rx-15)+"' y='"+((ry+by)/2)+"' font-size='15' fill='var(--ink)' text-anchor='middle' font-weight='600'>"+bLabel+"</text>"
+    +"<text x='"+((ax+bx)/2+8)+"' y='"+((ay+by)/2-5)+"' font-size='14' fill='var(--red)' font-weight='600' transform='rotate(-37 "+((ax+bx)/2+8)+" "+((ay+by)/2-5)+")'>c</text>"
+    +"<line x1='"+ax+"' y1='"+ay+"' x2='"+bx+"' y2='"+by+"' stroke='var(--red)' stroke-width='1' stroke-dasharray='3,3' opacity='0.5'/>"
+    +"<circle cx='"+cx+"' cy='"+cy+"' r='2.5' fill='var(--blue)'/>"
     +"</svg>";
 }
 
@@ -82,43 +95,56 @@ function svgSquareInscribed(aLabel){
     +"</svg>";
 }
 
-/* Прямоугольник + описанная окружность (диагональ = диаметр) */
+/* Прямоугольник + описанная окружность.
+   Прямоугольник 150×90, центр (130,100). Диагональ = диаметр = √(150²+90²)≈175, R≈88. */
 function svgRectCirc(aLabel,bLabel){
+  var w=150,h=90,x=55,y=55;
+  var cx=x+w/2, cy=y+h/2;     /* центр прямоугольника = центр окружности */
+  var R=Math.sqrt(w*w+h*h)/2;  /* половина диагонали ≈ 87.5 */
   return "<svg width='260' height='200' viewBox='0 0 260 200' xmlns='http://www.w3.org/2000/svg' style='font-family:Golos Text,sans-serif'>"
-    +"<circle cx='130' cy='100' r='82' fill='rgba(47,111,208,.08)' stroke='var(--blue)' stroke-width='2'/>"
-    +"<rect x='55' y='55' width='150' height='90' fill='rgba(255,255,255,.85)' stroke='var(--ink)' stroke-width='2.5'/>"
-    +"<line x1='55' y1='55' x2='205' y2='145' stroke='var(--red)' stroke-width='1.5' stroke-dasharray='4,3'/>"
-    +"<text x='130' y='162' font-size='15' fill='var(--ink)' text-anchor='middle' font-weight='600'>"+aLabel+"</text>"
-    +"<text x='42' y='104' font-size='15' fill='var(--ink)' text-anchor='middle' font-weight='600'>"+bLabel+"</text>"
-    +"<text x='142' y='95' font-size='14' fill='var(--red)' font-weight='600' transform='rotate(31 142 95)'>d</text>"
+    +"<circle cx='"+cx+"' cy='"+cy+"' r='"+R.toFixed(1)+"' fill='rgba(47,111,208,.08)' stroke='var(--blue)' stroke-width='2'/>"
+    +"<rect x='"+x+"' y='"+y+"' width='"+w+"' height='"+h+"' fill='rgba(255,255,255,.85)' stroke='var(--ink)' stroke-width='2.5'/>"
+    +"<line x1='"+x+"' y1='"+y+"' x2='"+(x+w)+"' y2='"+(y+h)+"' stroke='var(--red)' stroke-width='1.5' stroke-dasharray='4,3'/>"
+    +"<text x='"+cx+"' y='"+(y+h+18)+"' font-size='15' fill='var(--ink)' text-anchor='middle' font-weight='600'>"+aLabel+"</text>"
+    +"<text x='"+(x-15)+"' y='"+(cy+5)+"' font-size='15' fill='var(--ink)' text-anchor='middle' font-weight='600'>"+bLabel+"</text>"
+    +"<text x='"+(cx+8)+"' y='"+(cy-5)+"' font-size='14' fill='var(--red)' font-weight='600' transform='rotate(31 "+(cx+8)+" "+(cy-5)+")'>d</text>"
+    +"<circle cx='"+cx+"' cy='"+cy+"' r='2.5' fill='var(--blue)'/>"
     +"</svg>";
 }
 
-/* Правильный треугольник + вписанная окружность */
+/* Правильный треугольник + вписанная окружность.
+   Вершины на R=68 от центра (120,125). Центр вписанной = центроид = (120,125).
+   Вписанный радиус = R/2 = 34. */
 function svgEqTriInscribed(aLabel){
+  var cx=120,cy=125,R=68;
+  var v1x=cx, v1y=cy-R;
+  var v2x=cx+R*Math.cos(150*Math.PI/180), v2y=cy+R*Math.sin(150*Math.PI/180);
+  var v3x=cx+R*Math.cos(30*Math.PI/180),  v3y=cy+R*Math.sin(30*Math.PI/180);
+  var r=R/2;  /* вписанный радиус = половине описанного для равностороннего */
   return "<svg width='240' height='210' viewBox='0 0 240 210' xmlns='http://www.w3.org/2000/svg' style='font-family:Golos Text,sans-serif'>"
-    +"<polygon points='120,57 61,158 179,158' fill='rgba(255,255,255,.85)' stroke='var(--ink)' stroke-width='2.5'/>"
-    +"<circle cx='120' cy='135' r='34' fill='rgba(76,175,80,.1)' stroke='var(--green)' stroke-width='2'/>"
-    +"<line x1='120' y1='135' x2='120' y2='158' stroke='var(--green)' stroke-width='1.5' stroke-dasharray='4,3'/>"
-    +"<text x='128' y='152' font-size='13' fill='var(--green)' font-weight='600'>r</text>"
+    +"<polygon points='"+v1x+","+v1y+" "+v2x.toFixed(0)+","+v2y.toFixed(0)+" "+v3x.toFixed(0)+","+v3y.toFixed(0)+"' fill='rgba(255,255,255,.85)' stroke='var(--ink)' stroke-width='2.5'/>"
+    +"<circle cx='"+cx+"' cy='"+cy+"' r='"+r+"' fill='rgba(76,175,80,.1)' stroke='var(--green)' stroke-width='2'/>"
+    +"<line x1='"+cx+"' y1='"+cy+"' x2='"+cx+"' y2='"+(cy+r)+"' stroke='var(--green)' stroke-width='1.5' stroke-dasharray='4,3'/>"
+    +"<text x='128' y='"+(cy+r/2+5)+"' font-size='13' fill='var(--green)' font-weight='600'>r</text>"
     +"<text x='120' y='175' font-size='15' fill='var(--ink)' text-anchor='middle' font-weight='600'>"+aLabel+"</text>"
     +"</svg>";
 }
 
-/* Сектор круга: радиус R, угол alpha° */
-function svgSector(rLabel,alphaLabel,arcLabel){
-  var cx=120,cy=145,R=72;
-  /* первая сторона: вверх */
-  var x1=cx, y1=cy-R;
-  /* вторая сторона: под углом alpha вправо от первой */
-  var ang=(-90+30)*Math.PI/180; /* фиксированный угол 30° для красоты */
+/* Сектор круга: радиус R, угол alpha° (реальный угол из задачи). */
+function svgSector(rLabel,alphaDeg,alphaLabel,arcLabel){
+  var cx=120,cy=150,R=70;
+  var x1=cx, y1=cy-R;                          /* первая сторона: вверх */
+  var ang=(-90+alphaDeg)*Math.PI/180;          /* вторая сторона под углом alpha */
   var x2=cx+R*Math.cos(ang), y2=cy+R*Math.sin(ang);
-  var largeArc=0;
+  var largeArc = alphaDeg>180 ? 1 : 0;
+  /* биссектриса угла — для размещения подписи дуги */
+  var bisAng=(-90+alphaDeg/2)*Math.PI/180;
+  var lblX=cx+R*0.55*Math.cos(bisAng), lblY=cy+R*0.55*Math.sin(bisAng);
   return "<svg width='240' height='200' viewBox='0 0 240 200' xmlns='http://www.w3.org/2000/svg' style='font-family:Golos Text,sans-serif'>"
-    +"<path d='M "+cx+" "+cy+" L "+x1+" "+y1+" A "+R+" "+R+" 0 "+largeArc+" 1 "+x2+" "+y2+" Z' fill='rgba(47,111,208,.12)' stroke='var(--blue)' stroke-width='2'/>"
-    +"<text x='"+(cx-8)+"' y='"+(cy-R/2)+"' font-size='14' fill='var(--blue)' font-weight='600'>"+rLabel+"</text>"
-    +"<text x='"+(cx+5)+"' y='"+(cy+16)+"' font-size='14' fill='var(--red)' font-weight='600'>"+alphaLabel+"</text>"
-    +"<text x='"+(cx+R/2+5)+"' y='"+(cy-R/3)+"' font-size='13' fill='var(--ink)' font-weight='600'>"+arcLabel+"</text>"
+    +"<path d='M "+cx+" "+cy+" L "+x1.toFixed(1)+" "+y1.toFixed(1)+" A "+R+" "+R+" 0 "+largeArc+" 1 "+x2.toFixed(1)+" "+y2.toFixed(1)+" Z' fill='rgba(47,111,208,.12)' stroke='var(--blue)' stroke-width='2'/>"
+    +"<text x='"+(cx-15)+"' y='"+(cy-R/2)+"' font-size='14' fill='var(--blue)' font-weight='600'>"+rLabel+"</text>"
+    +"<text x='"+(cx+8)+"' y='"+(cy-5)+"' font-size='14' fill='var(--red)' font-weight='600'>"+alphaLabel+"</text>"
+    +"<text x='"+lblX.toFixed(0)+"' y='"+lblY.toFixed(0)+"' font-size='13' fill='var(--ink)' font-weight='600' text-anchor='middle'>"+arcLabel+"</text>"
     +"<circle cx='"+cx+"' cy='"+cy+"' r='2.5' fill='var(--blue)'/>"
     +"</svg>";
 }
@@ -284,7 +310,7 @@ function genArc1(rng){
     a:l,unit:"см",sol:exact+" ≈ "+fmt(l)+" см",
     hint:"l = π·R·α/180",
     detailed:detSteps([
-      {title:"Анализ задачи",text:"Сектор круга: радиус <b>R = "+r+" см</b>, центральный угол <b>α = "+alpha+"°</b>. Найти длину дуги l.",svg:svgSector("R = "+r,alpha+"°","l = ?")},
+      {title:"Анализ задачи",text:"Сектор круга: радиус <b>R = "+r+" см</b>, центральный угол <b>α = "+alpha+"°</b>. Найти длину дуги l.",svg:svgSector("R = "+r,alpha,alpha+"°","l = ?")},
       {title:"Формула длины дуги",text:"<b>l = π·R·α / 180°</b> — доля длины полной окружности (2πR), соответствующая углу α."},
       {title:"Подстановка",text:"l = π·"+r+"·"+alpha+" / 180 = π·"+(r*alpha/180)+" ≈ <b>"+fmt(l)+"</b> см."}
     ], exact+" ≈ "+fmt(l)+" см")
@@ -302,7 +328,7 @@ function genArc2(rng){
     a:alpha,unit:"°",sol:exact+" ≈ "+fmt(alpha)+"°",
     hint:"α = 180·l/(π·R)",
     detailed:detSteps([
-      {title:"Анализ задачи",text:"Даны радиус <b>R = "+r+" см</b> и длина дуги <b>l ≈ "+fmt(l)+" см</b>. Найти центральный угол α.",svg:svgSector("R = "+r,"α = ?","l ≈ "+fmt(l))},
+      {title:"Анализ задачи",text:"Даны радиус <b>R = "+r+" см</b> и длина дуги <b>l ≈ "+fmt(l)+" см</b>. Найти центральный угол α.",svg:svgSector("R = "+r,alpha,"α = ?","l ≈ "+fmt(l))},
       {title:"Выражаем α",text:"Из формулы <b>l = π·R·α/180</b> выразим α: <b>α = 180·l / (π·R)</b>."},
       {title:"Подстановка",text:"α = 180·"+fmt(l)+" / (π·"+r+") ≈ <b>"+fmt(alpha)+"°</b>."}
     ], exact+" ≈ "+fmt(alpha)+"°")
@@ -320,7 +346,7 @@ function genArc3(rng){
     a:r,unit:"см",sol:exact+" ≈ "+fmt(r)+" см",
     hint:"R = 180·l/(π·α)",
     detailed:detSteps([
-      {title:"Анализ задачи",text:"Даны центральный угол <b>α = "+alpha+"°</b> и длина дуги <b>l ≈ "+fmt(l)+" см</b>. Найти радиус R.",svg:svgSector("R = ?",alpha+"°","l ≈ "+fmt(l))},
+      {title:"Анализ задачи",text:"Даны центральный угол <b>α = "+alpha+"°</b> и длина дуги <b>l ≈ "+fmt(l)+" см</b>. Найти радиус R.",svg:svgSector("R = ?",alpha,alpha+"°","l ≈ "+fmt(l))},
       {title:"Выражаем R",text:"Из формулы <b>l = π·R·α/180</b> выразим R: <b>R = 180·l / (π·α)</b>."},
       {title:"Подстановка",text:"R = 180·"+fmt(l)+" / (π·"+alpha+") ≈ <b>"+fmt(r)+"</b> см."}
     ], exact+" ≈ "+fmt(r)+" см")
