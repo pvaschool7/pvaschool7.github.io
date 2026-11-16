@@ -47,105 +47,120 @@ function detSteps(items, answerLine){
 -------------------------------------------------------------------- */
 
 /* Правильный треугольник + описанная окружность.
-   Центр (120,125), R=68. Вершины на окружности под углами -90°, 150°, 30°. */
+   Центр (160,165), R=90. Вершины на окружности под углами -90°, 150°, 30°.
+   Размер 320×280 — крупный, подписи не накладываются. */
 function svgEqTriCirc(aLabel){
-  var cx=120,cy=125,R=68;
-  var v1x=cx, v1y=cy-R;                             /* верхняя вершина */
-  var v2x=cx+R*Math.cos(150*Math.PI/180), v2y=cy+R*Math.sin(150*Math.PI/180); /* нижняя левая */
-  var v3x=cx+R*Math.cos(30*Math.PI/180),  v3y=cy+R*Math.sin(30*Math.PI/180);  /* нижняя правая */
-  return "<svg width='240' height='210' viewBox='0 0 240 210' xmlns='http://www.w3.org/2000/svg' style='font-family:Golos Text,sans-serif'>"
+  var cx=160,cy=165,R=90;
+  var v1x=cx, v1y=cy-R;
+  var v2x=cx+R*Math.cos(150*Math.PI/180), v2y=cy+R*Math.sin(150*Math.PI/180);
+  var v3x=cx+R*Math.cos(30*Math.PI/180),  v3y=cy+R*Math.sin(30*Math.PI/180);
+  return "<svg width='320' height='280' viewBox='0 0 320 280' xmlns='http://www.w3.org/2000/svg' style='font-family:Golos Text,sans-serif'>"
     +"<circle cx='"+cx+"' cy='"+cy+"' r='"+R+"' fill='rgba(47,111,208,.08)' stroke='var(--blue)' stroke-width='2'/>"
     +"<polygon points='"+v1x+","+v1y+" "+v2x.toFixed(0)+","+v2y.toFixed(0)+" "+v3x.toFixed(0)+","+v3y.toFixed(0)+"' fill='rgba(255,255,255,.85)' stroke='var(--ink)' stroke-width='2.5'/>"
-    +"<line x1='"+cx+"' y1='"+cy+"' x2='"+v1x+"' y2='"+v1y+"' stroke='var(--blue)' stroke-width='1.5' stroke-dasharray='4,3'/>"
-    +"<text x='128' y='95' font-size='13' fill='var(--blue)' font-weight='600'>R</text>"
-    +"<text x='120' y='175' font-size='15' fill='var(--ink)' text-anchor='middle' font-weight='600'>"+aLabel+"</text>"
-    +"<circle cx='"+cx+"' cy='"+cy+"' r='2.5' fill='var(--blue)'/>"
+    +"<line x1='"+cx+"' y1='"+cy+"' x2='"+v1x+"' y2='"+v1y+"' stroke='var(--blue)' stroke-width='1.5' stroke-dasharray='5,4'/>"
+    +"<text x='175' y='125' font-size='17' fill='var(--blue)' font-weight='600'>R</text>"
+    +"<text x='160' y='225' font-size='18' fill='var(--ink)' text-anchor='middle' font-weight='600'>"+aLabel+"</text>"
+    +"<circle cx='"+cx+"' cy='"+cy+"' r='3' fill='var(--blue)'/>"
     +"</svg>";
 }
 
 /* Прямоугольный треугольник + описанная окружность.
-   Катеты вдоль осей: a=120px (горизонт), b=90px (вертикаль).
-   Гипотенуза = диаметр. Центр = середина гипотенузы = (115,140), R=75. */
+   Катеты вдоль осей: a=160px (горизонт), b=120px (вертикаль).
+   Гипотенуза = диаметр. Центр = середина гипотенузы = (150,170), R=100.
+   Размер 320×280. Подпись c — вдоль гипотенузы, смещена внутрь, не на центре. */
 function svgRightTriCirc(aLabel,bLabel){
-  var rx=55,ry=185;         /* вершина прямого угла */
-  var ax=rx+120, ay=ry;     /* конец катета a */
-  var bx=rx, by=ry-90;      /* конец катета b */
-  var cx=(ax+bx)/2, cy=(ay+by)/2;  /* середина гипотенузы = центр */
-  var R=Math.sqrt(120*120+90*90)/2; /* половина гипотенузы = 75 */
-  return "<svg width='250' height='220' viewBox='0 0 250 220' xmlns='http://www.w3.org/2000/svg' style='font-family:Golos Text,sans-serif'>"
+  var rx=70,ry=230;
+  var ax=rx+160, ay=ry;
+  var bx=rx, by=ry-120;
+  var cx=(ax+bx)/2, cy=(ay+by)/2;
+  var R=Math.sqrt(160*160+120*120)/2;
+  /* c — на 30% вдоль гипотенузы от верхнего конца, перпендикуляр внутрь */
+  var cpx=ax+0.3*(bx-ax), cpy=ay+0.3*(by-ay);
+  var dx=bx-ax, dy=by-ay, dl=Math.sqrt(dx*dx+dy*dy);
+  var perpX=-dy/dl*16, perpY=dx/dl*16;
+  return "<svg width='320' height='280' viewBox='0 0 320 280' xmlns='http://www.w3.org/2000/svg' style='font-family:Golos Text,sans-serif'>"
     +"<circle cx='"+cx+"' cy='"+cy+"' r='"+R.toFixed(1)+"' fill='rgba(47,111,208,.08)' stroke='var(--blue)' stroke-width='2'/>"
     +"<polygon points='"+rx+","+ry+" "+ax+","+ay+" "+bx+","+by+"' fill='rgba(255,255,255,.85)' stroke='var(--ink)' stroke-width='2.5'/>"
-    +"<path d='M "+(rx+10)+" "+ry+" L "+(rx+10)+" "+(ry-10)+" L "+rx+" "+(ry-10)+"' fill='none' stroke='var(--ink)' stroke-width='2'/>"
-    +"<text x='"+((rx+ax)/2)+"' y='"+(ry+18)+"' font-size='15' fill='var(--ink)' text-anchor='middle' font-weight='600'>"+aLabel+"</text>"
-    +"<text x='"+(rx-15)+"' y='"+((ry+by)/2)+"' font-size='15' fill='var(--ink)' text-anchor='middle' font-weight='600'>"+bLabel+"</text>"
-    +"<text x='"+((ax+bx)/2+8)+"' y='"+((ay+by)/2-5)+"' font-size='14' fill='var(--red)' font-weight='600' transform='rotate(-37 "+((ax+bx)/2+8)+" "+((ay+by)/2-5)+")'>c</text>"
-    +"<line x1='"+ax+"' y1='"+ay+"' x2='"+bx+"' y2='"+by+"' stroke='var(--red)' stroke-width='1' stroke-dasharray='3,3' opacity='0.5'/>"
-    +"<circle cx='"+cx+"' cy='"+cy+"' r='2.5' fill='var(--blue)'/>"
+    +"<path d='M "+(rx+12)+" "+ry+" L "+(rx+12)+" "+(ry-12)+" L "+rx+" "+(ry-12)+"' fill='none' stroke='var(--ink)' stroke-width='2'/>"
+    +"<text x='"+((rx+ax)/2)+"' y='"+(ry+22)+"' font-size='18' fill='var(--ink)' text-anchor='middle' font-weight='600'>"+aLabel+"</text>"
+    +"<text x='"+(rx-20)+"' y='"+((ry+by)/2)+"' font-size='18' fill='var(--ink)' text-anchor='middle' font-weight='600'>"+bLabel+"</text>"
+    +"<text x='"+(cpx+perpX).toFixed(0)+"' y='"+(cpy+perpY+5).toFixed(0)+"' font-size='17' fill='var(--red)' font-weight='600'>c</text>"
+    +"<line x1='"+ax+"' y1='"+ay+"' x2='"+bx+"' y2='"+by+"' stroke='var(--red)' stroke-width='1' stroke-dasharray='4,3' opacity='0.35'/>"
+    +"<circle cx='"+cx+"' cy='"+cy+"' r='3' fill='var(--blue)'/>"
     +"</svg>";
 }
 
-/* Квадрат + вписанная окружность */
+/* Квадрат + вписанная окружность. Квадрат 150×150, центр (145,145), r=75.
+   Размер 290×290 — крупный, всё разнесено. */
 function svgSquareInscribed(aLabel){
-  return "<svg width='220' height='220' viewBox='0 0 220 220' xmlns='http://www.w3.org/2000/svg' style='font-family:Golos Text,sans-serif'>"
-    +"<rect x='60' y='60' width='100' height='100' fill='rgba(255,255,255,.85)' stroke='var(--ink)' stroke-width='2.5'/>"
-    +"<circle cx='110' cy='110' r='50' fill='rgba(76,175,80,.1)' stroke='var(--green)' stroke-width='2'/>"
-    +"<line x1='110' y1='110' x2='110' y2='160' stroke='var(--green)' stroke-width='1.5' stroke-dasharray='4,3'/>"
-    +"<text x='118' y='140' font-size='13' fill='var(--green)' font-weight='600'>r</text>"
-    +"<text x='110' y='178' font-size='15' fill='var(--ink)' text-anchor='middle' font-weight='600'>"+aLabel+"</text>"
+  var s=150, x=70, y=70;
+  var cx=x+s/2, cy=y+s/2, r=s/2;
+  return "<svg width='290' height='290' viewBox='0 0 290 290' xmlns='http://www.w3.org/2000/svg' style='font-family:Golos Text,sans-serif'>"
+    +"<rect x='"+x+"' y='"+y+"' width='"+s+"' height='"+s+"' fill='rgba(255,255,255,.85)' stroke='var(--ink)' stroke-width='2.5'/>"
+    +"<circle cx='"+cx+"' cy='"+cy+"' r='"+r+"' fill='rgba(76,175,80,.1)' stroke='var(--green)' stroke-width='2'/>"
+    +"<line x1='"+cx+"' y1='"+cy+"' x2='"+cx+"' y2='"+(cy+r)+"' stroke='var(--green)' stroke-width='1.5' stroke-dasharray='5,4'/>"
+    +"<text x='"+(cx+12)+"' y='"+(cy+r/2+6)+"' font-size='17' fill='var(--green)' font-weight='600'>r</text>"
+    +"<text x='"+cx+"' y='"+(y+s+24)+"' font-size='18' fill='var(--ink)' text-anchor='middle' font-weight='600'>"+aLabel+"</text>"
     +"</svg>";
 }
 
 /* Прямоугольник + описанная окружность.
-   Прямоугольник 150×90, центр (130,100). Диагональ = диаметр = √(150²+90²)≈175, R≈88. */
+   Прямоугольник 210×130, центр (175,135). Диагональ = диаметр, R≈123.6.
+   Размер 350×270. Подпись d — вдоль диагонали, на 25%, смещена вверх. */
 function svgRectCirc(aLabel,bLabel){
-  var w=150,h=90,x=55,y=55;
-  var cx=x+w/2, cy=y+h/2;     /* центр прямоугольника = центр окружности */
-  var R=Math.sqrt(w*w+h*h)/2;  /* половина диагонали ≈ 87.5 */
-  return "<svg width='260' height='200' viewBox='0 0 260 200' xmlns='http://www.w3.org/2000/svg' style='font-family:Golos Text,sans-serif'>"
+  var w=210,h=130,x=70,y=70;
+  var cx=x+w/2, cy=y+h/2;
+  var R=Math.sqrt(w*w+h*h)/2;
+  /* d — на 25% вдоль диагонали от левого верхнего угла, перпендикуляр вверх */
+  var dpx=x+0.25*w, dpy=y+0.25*h;
+  var dx=w, dy=h, dl=Math.sqrt(dx*dx+dy*dy);
+  var perpX=-dy/dl*16, perpY=dx/dl*16;
+  return "<svg width='350' height='270' viewBox='0 0 350 270' xmlns='http://www.w3.org/2000/svg' style='font-family:Golos Text,sans-serif'>"
     +"<circle cx='"+cx+"' cy='"+cy+"' r='"+R.toFixed(1)+"' fill='rgba(47,111,208,.08)' stroke='var(--blue)' stroke-width='2'/>"
     +"<rect x='"+x+"' y='"+y+"' width='"+w+"' height='"+h+"' fill='rgba(255,255,255,.85)' stroke='var(--ink)' stroke-width='2.5'/>"
     +"<line x1='"+x+"' y1='"+y+"' x2='"+(x+w)+"' y2='"+(y+h)+"' stroke='var(--red)' stroke-width='1.5' stroke-dasharray='4,3'/>"
-    +"<text x='"+cx+"' y='"+(y+h+18)+"' font-size='15' fill='var(--ink)' text-anchor='middle' font-weight='600'>"+aLabel+"</text>"
-    +"<text x='"+(x-15)+"' y='"+(cy+5)+"' font-size='15' fill='var(--ink)' text-anchor='middle' font-weight='600'>"+bLabel+"</text>"
-    +"<text x='"+(cx+8)+"' y='"+(cy-5)+"' font-size='14' fill='var(--red)' font-weight='600' transform='rotate(31 "+(cx+8)+" "+(cy-5)+")'>d</text>"
-    +"<circle cx='"+cx+"' cy='"+cy+"' r='2.5' fill='var(--blue)'/>"
+    +"<text x='"+cx+"' y='"+(y+h+24)+"' font-size='18' fill='var(--ink)' text-anchor='middle' font-weight='600'>"+aLabel+"</text>"
+    +"<text x='"+(x-20)+"' y='"+(cy+6)+"' font-size='18' fill='var(--ink)' text-anchor='middle' font-weight='600'>"+bLabel+"</text>"
+    +"<text x='"+(dpx-perpX).toFixed(0)+"' y='"+(dpy-perpY+5).toFixed(0)+"' font-size='17' fill='var(--red)' font-weight='600'>d</text>"
+    +"<circle cx='"+cx+"' cy='"+cy+"' r='3' fill='var(--blue)'/>"
     +"</svg>";
 }
 
 /* Правильный треугольник + вписанная окружность.
-   Вершины на R=68 от центра (120,125). Центр вписанной = центроид = (120,125).
-   Вписанный радиус = R/2 = 34. */
+   Центр (160,165), R=90. Вписанный радиус = R/2 = 45.
+   Размер 320×280 — крупный. */
 function svgEqTriInscribed(aLabel){
-  var cx=120,cy=125,R=68;
+  var cx=160,cy=165,R=90;
   var v1x=cx, v1y=cy-R;
   var v2x=cx+R*Math.cos(150*Math.PI/180), v2y=cy+R*Math.sin(150*Math.PI/180);
   var v3x=cx+R*Math.cos(30*Math.PI/180),  v3y=cy+R*Math.sin(30*Math.PI/180);
-  var r=R/2;  /* вписанный радиус = половине описанного для равностороннего */
-  return "<svg width='240' height='210' viewBox='0 0 240 210' xmlns='http://www.w3.org/2000/svg' style='font-family:Golos Text,sans-serif'>"
+  var r=R/2;
+  return "<svg width='320' height='280' viewBox='0 0 320 280' xmlns='http://www.w3.org/2000/svg' style='font-family:Golos Text,sans-serif'>"
     +"<polygon points='"+v1x+","+v1y+" "+v2x.toFixed(0)+","+v2y.toFixed(0)+" "+v3x.toFixed(0)+","+v3y.toFixed(0)+"' fill='rgba(255,255,255,.85)' stroke='var(--ink)' stroke-width='2.5'/>"
     +"<circle cx='"+cx+"' cy='"+cy+"' r='"+r+"' fill='rgba(76,175,80,.1)' stroke='var(--green)' stroke-width='2'/>"
-    +"<line x1='"+cx+"' y1='"+cy+"' x2='"+cx+"' y2='"+(cy+r)+"' stroke='var(--green)' stroke-width='1.5' stroke-dasharray='4,3'/>"
-    +"<text x='128' y='"+(cy+r/2+5)+"' font-size='13' fill='var(--green)' font-weight='600'>r</text>"
-    +"<text x='120' y='175' font-size='15' fill='var(--ink)' text-anchor='middle' font-weight='600'>"+aLabel+"</text>"
+    +"<line x1='"+cx+"' y1='"+cy+"' x2='"+cx+"' y2='"+(cy+r)+"' stroke='var(--green)' stroke-width='1.5' stroke-dasharray='5,4'/>"
+    +"<text x='"+(cx+14)+"' y='"+(cy+r/2+6)+"' font-size='17' fill='var(--green)' font-weight='600'>r</text>"
+    +"<text x='160' y='225' font-size='18' fill='var(--ink)' text-anchor='middle' font-weight='600'>"+aLabel+"</text>"
     +"</svg>";
 }
 
-/* Сектор круга: радиус R, угол alpha° (реальный угол из задачи). */
+/* Сектор круга: радиус R, угол alpha° (реальный угол из задачи).
+   Размер 320×270. R — слева от первой стороны. α — справа от центра.
+   l (дуга) — на биссектрисе, в середине сектора. */
 function svgSector(rLabel,alphaDeg,alphaLabel,arcLabel){
-  var cx=120,cy=150,R=70;
-  var x1=cx, y1=cy-R;                          /* первая сторона: вверх */
-  var ang=(-90+alphaDeg)*Math.PI/180;          /* вторая сторона под углом alpha */
+  var cx=160,cy=200,R=100;
+  var x1=cx, y1=cy-R;
+  var ang=(-90+alphaDeg)*Math.PI/180;
   var x2=cx+R*Math.cos(ang), y2=cy+R*Math.sin(ang);
   var largeArc = alphaDeg>180 ? 1 : 0;
-  /* биссектриса угла — для размещения подписи дуги */
   var bisAng=(-90+alphaDeg/2)*Math.PI/180;
-  var lblX=cx+R*0.55*Math.cos(bisAng), lblY=cy+R*0.55*Math.sin(bisAng);
-  return "<svg width='240' height='200' viewBox='0 0 240 200' xmlns='http://www.w3.org/2000/svg' style='font-family:Golos Text,sans-serif'>"
+  var lblX=cx+R*0.62*Math.cos(bisAng), lblY=cy+R*0.62*Math.sin(bisAng);
+  return "<svg width='320' height='270' viewBox='0 0 320 270' xmlns='http://www.w3.org/2000/svg' style='font-family:Golos Text,sans-serif'>"
     +"<path d='M "+cx+" "+cy+" L "+x1.toFixed(1)+" "+y1.toFixed(1)+" A "+R+" "+R+" 0 "+largeArc+" 1 "+x2.toFixed(1)+" "+y2.toFixed(1)+" Z' fill='rgba(47,111,208,.12)' stroke='var(--blue)' stroke-width='2'/>"
-    +"<text x='"+(cx-15)+"' y='"+(cy-R/2)+"' font-size='14' fill='var(--blue)' font-weight='600'>"+rLabel+"</text>"
-    +"<text x='"+(cx+8)+"' y='"+(cy-5)+"' font-size='14' fill='var(--red)' font-weight='600'>"+alphaLabel+"</text>"
-    +"<text x='"+lblX.toFixed(0)+"' y='"+lblY.toFixed(0)+"' font-size='13' fill='var(--ink)' font-weight='600' text-anchor='middle'>"+arcLabel+"</text>"
-    +"<circle cx='"+cx+"' cy='"+cy+"' r='2.5' fill='var(--blue)'/>"
+    +"<text x='"+(cx-22)+"' y='"+(cy-R/2)+"' font-size='17' fill='var(--blue)' font-weight='600'>"+rLabel+"</text>"
+    +"<text x='"+(cx+24)+"' y='"+(cy+10)+"' font-size='17' fill='var(--red)' font-weight='600'>"+alphaLabel+"</text>"
+    +"<text x='"+lblX.toFixed(0)+"' y='"+lblY.toFixed(0)+"' font-size='16' fill='var(--ink)' font-weight='600' text-anchor='middle'>"+arcLabel+"</text>"
+    +"<circle cx='"+cx+"' cy='"+cy+"' r='3' fill='var(--blue)'/>"
     +"</svg>";
 }
 
