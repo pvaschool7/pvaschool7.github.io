@@ -241,6 +241,7 @@
 <script src="neravenstva.js"></script>
 <script src="uravneniya8.js"></script>
 <script src="buleva-algebra.js"></script>
+<script src="okruzhnosti.js"></script>
 <script>
 (function(){
 "use strict";
@@ -597,7 +598,7 @@ function renderRun(){
   var task=S.data.blocks[sl.bi].tasks[sl.ti];
   var saved=S.ans[sl.g];
   h+="<div class='slide'>"+slideBadge(sl.bi)+"<div class='tz-n'>"+(sl.g+1)+"</div><div class='tz-q'>"+task.q+"</div>";
-  if(task.type==="num"){
+  if(task.type==="num"||task.type==="dec"){
    h+="<div class='tz-answer'><input class='tz-num' id='tzin' type='text' inputmode='text' autocomplete='off' value='"+(saved||"")+"' aria-label='Ответ'>"+(task.unit?"<span class='tz-unit'>"+task.unit+"</span>":"")+"</div>";
   }else if(task.type==="roots"){
    h+="<div class='tz-answer'>"+(task.unit?"<span class='tz-unit'>"+task.unit+"</span>":"")+"<input class='tz-num' id='tzin' type='text' inputmode='text' autocomplete='off' placeholder='"+(task.placeholder||"напр.: 3, −2  или  нет корней").replace(/'/g,"&#39;")+"' value='"+(saved||"")+"' aria-label='Ответ'></div>";
@@ -856,6 +857,7 @@ function finish(){
   b.tasks.forEach(function(task,ti){
    var a=S.ans[g],right=false;
    if(task.type==="num")right=a!==null&&D.checkNum(a,task.a);
+   else if(task.type==="dec")right=a!==null&&a!==""&&D.checkDec&&D.checkDec(a,task.a);
    else if(task.type==="roots")right=a!==null&&a!==""&&D.checkRoots(a,task);
    else if(task.type==="table"){
     if(a&&Array.isArray(a)&&task.answers){
@@ -885,6 +887,8 @@ function finish(){
    if(task.type==="table"){
     /* показываем подробное решение с заполненной таблицей */
     corrText=task.detailed||"";
+   } else if(task.type==="dec"){
+    corrText=task.sol||(task.a+(task.unit?" "+task.unit:""));
    } else {
     corrText=task.type==="num"?(task.a+(task.unit?" "+task.unit.replace(/<[^>]+>/g,""):"")):(task.type==="roots"?(task.sol||""):task.c);
    }
