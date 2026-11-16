@@ -177,6 +177,8 @@
 .rev .dz-det b{font-weight:700}
 .svg-center{text-align:center;margin:10px 0}
 .svg-center svg{max-width:100%;height:auto}
+.tz-graph-wrap{margin:12px auto;max-width:440px;text-align:center}
+.tz-graph-wrap svg{max-width:100%;height:auto;border:1px solid var(--line);border-radius:10px;background:var(--paper)}
 /* ===== SVG-чертёж оси x для темы «Неравенства» ===== */
 .rev .dz-det .tz-axis{display:block;width:100%;max-width:560px;height:auto;margin:10px auto;background:var(--paper);border:1px solid var(--line);border-radius:10px;padding:6px 4px;box-sizing:border-box}
 .rev .dz-det .dz-code{font-family:ui-monospace,Consolas,"Courier New",monospace;background:var(--paper);border:1px solid var(--line);border-radius:6px;padding:1px 7px;white-space:nowrap}
@@ -244,6 +246,7 @@
 <script src="uravneniya8.js"></script>
 <script src="buleva-algebra.js"></script>
 <script src="okruzhnosti.js"></script>
+<script src="proporcii.js"></script>
 <script>
 (function(){
 "use strict";
@@ -565,6 +568,11 @@ function saveCurrent(){
  if(!sl||sl.kind!=="task")return;
  var prev=S.ans[sl.g],val=null;
  var taskType=S.data.blocks[sl.bi].tasks[sl.ti].type;
+ if(taskType==="graph"){
+  /* состояние графика управляется интерактивным обработчиком;
+     S.ans[sl.g] уже обновлён — не переопределяем */
+  return;
+ }
  if(taskType==="mc"){
   var sel=app.querySelector(".tz-opt.sel");
   val=sel?sel.getAttribute("data-v"):null;
@@ -602,6 +610,8 @@ function renderRun(){
   h+="<div class='slide'>"+slideBadge(sl.bi)+"<div class='tz-n'>"+(sl.g+1)+"</div><div class='tz-q'>"+task.q+"</div>";
   if(task.type==="num"||task.type==="dec"||task.type==="formula"){
    h+="<div class='tz-answer'><input class='tz-num' id='tzin' type='text' inputmode='text' autocomplete='off' value='"+(saved||"")+"' aria-label='Ответ'>"+(task.unit?"<span class='tz-unit'>"+task.unit+"</span>":"")+"</div>";
+  }else if(task.type==="graph"){
+   /* интерактивный график — SVG уже внутри task.q, обработчики повесим ниже */
   }else if(task.type==="roots"){
    h+="<div class='tz-answer'>"+(task.unit?"<span class='tz-unit'>"+task.unit+"</span>":"")+"<input class='tz-num' id='tzin' type='text' inputmode='text' autocomplete='off' placeholder='"+(task.placeholder||"напр.: 3, −2  или  нет корней").replace(/'/g,"&#39;")+"' value='"+(saved||"")+"' aria-label='Ответ'></div>";
   }else if(task.type==="table"){
@@ -645,6 +655,26 @@ function renderRun(){
   (function(idx,last2){tinputs2[idx].addEventListener("keydown",function(e){
    if(e.key==="Enter"){e.preventDefault();(last&&fin?fin:np||fin).click()}
   })})(i,i===tinputs2.length-1);
+ }
+ /* для интерактивного графика: настраиваем клик-обработчики */
+ if(sl.kind==="task"){
+  var gtask=S.data.blocks[sl.bi].tasks[sl.ti];
+  if(gtask.type==="graph"){
+   var gsvg=app.querySelector("#tz-graph-svg");
+   if(gsvg&&D.setupGraphInteraction){
+    var updateBarFn=function(){
+     var tp=app.querySelector(".tz-top");
+     if(tp){
+      var pct=Math.round(100*(S.answered/S.total));
+      var fill=tp.querySelector(".tz-fill");
+      if(fill)fill.style.width=pct+"%";
+      var cnt=tp.querySelector(".cnt");
+      if(cnt)cnt.textContent=(sl.kind==="task"?("Задание "+(sl.g+1)+" из "+S.total):("Блок "+(sl.bi+1)+" из "+S.data.blocks.length))+" · Отвечено: "+S.answered+" из "+S.total;
+     }
+    };
+    D.setupGraphInteraction(gsvg,gtask,sl.g,S,updateBarFn);
+   }
+  }
  }
  if(tinputs2.length>0&&!inp)tinputs2[0].focus();
  if(sl.kind==="div"&&np)np.focus();
@@ -861,6 +891,7 @@ function finish(){
    if(task.type==="num")right=a!==null&&D.checkNum(a,task.a);
    else if(task.type==="dec")right=a!==null&&a!==""&&D.checkDec&&D.checkDec(a,task.a);
    else if(task.type==="formula")right=a!==null&&a!==""&&D.checkFormula&&D.checkFormula(a,task);
+   else if(task.type==="graph")right=a!==null&&a.p1&&a.p2&&D.checkGraph&&D.checkGraph(a,task);
    else if(task.type==="roots")right=a!==null&&a!==""&&D.checkRoots(a,task);
    else if(task.type==="table"){
     if(a&&Array.isArray(a)&&task.answers){
@@ -883,16 +914,25 @@ function finish(){
      for(var ai2=0;ai2<task.answers.length;ai2++){if(a[ai2]&&D.checkNum(a[ai2],task.answers[ai2]))nOkT++}
     }
     myText=nOkT+" из "+task.answers.length+" верно";
+   } else if(task.type==="graph"){
+    if(a&&a.p1&&a.p2){
+     myText="прямая через ("+a.p1.x+"; "+a.p1.y+") и ("+a.p2.x+"; "+a.p2.y+")";
+    } else if(a&&a.p1){
+     myText="одна точка ("+a.p1.x+"; "+a.p1.y+") — прямая не построена";
+    } else {
+     myText="нет ответа";
+    }
    } else {
     myText=a===null||a===""?"нет ответа":(Array.isArray(a)?a.join(", "):a);
    }
    var corrText;
    if(task.type==="table"){
-    /* показываем подробное решение с заполненной таблицей */
     corrText=task.detailed||"";
    } else if(task.type==="dec"){
     corrText=task.sol||(task.a+(task.unit?" "+task.unit:""));
    } else if(task.type==="formula"){
+    corrText=task.atext||task.sol||"";
+   } else if(task.type==="graph"){
     corrText=task.atext||task.sol||"";
    } else {
     corrText=task.type==="num"?(task.a+(task.unit?" "+task.unit.replace(/<[^>]+>/g,""):"")):(task.type==="roots"?(task.sol||""):task.c);
@@ -904,6 +944,10 @@ function finish(){
    });
    if(task.type==="table"){
     review+="<div class='rev'><p>"+st+"<b>Задание "+(g+1)+"</b> · "+myText+"</p><p class='ans'>"+qClean+"</p><p class='ans'>Твой результат: <b>"+myText+"</b></p>"+(right?"":"<p class='ans'>Верная таблица:</p>"+(task.detailed||""))+"</div>";
+   } else if(task.type==="graph"){
+    /* для графика: показываем текст вопроса без интерактивного SVG */
+    var qGraphClean=task.q.replace(/<div class='tz-graph-wrap'[\s\S]*?<\/div>/gi,"").trim();
+    review+="<div class='rev'><p>"+st+"<b>Задание "+(g+1)+"</b></p><p>"+qGraphClean+"</p><p class='ans'>Твой ответ: <b>"+esc(myText)+"</b>"+(right?"":" · Верно: <b>"+esc(corrText)+"</b>")+"</p>"+(task.detailed?"<div class='dz-det'>"+task.detailed+"</div>":"")+"</div>";
    } else {
     review+="<div class='rev'><p>"+st+"<b>Задание "+(g+1)+"</b></p><p>"+task.q+"</p><p class='ans'>Твой ответ: <b>"+esc(myText)+"</b>"+(right?"":" · Верно: <b>"+esc(corrText)+"</b>")+(task.type==="num"&&task.hint?" · <span style='color:var(--mute)'>"+task.hint.replace(/<[^>]+>/g,"")+"</span>":"")+"</p>"+(task.detailed?"<div class='dz-det'>"+task.detailed+"</div>":"")+"</div>";
    }
