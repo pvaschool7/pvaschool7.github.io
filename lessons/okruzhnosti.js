@@ -43,136 +43,121 @@ function detSteps(items, answerLine){
 }
 
 /* =====================================================================
+/* =====================================================================
    SVG-ЧЕРТЕЖИ
-   Все подписи вынесены в боковую панель справа от чертежа.
-   Подписи не накладываются ни на фигуры, ни друг на друга.
-   Формат: [чертёж | боковая панель с данными]
+   Подписи размещены около элементов чертежа с зазором 18-25px,
+   чтобы не накладываться ни на линии, ни друг на друга.
 -------------------------------------------------------------------- */
 
-/* Боковая панель с подписями. labels: [{text, color, dot?}] */
-function labelSidebar(lx, labels, h){
-  var s="";
-  /* вертикальная разделительная линия */
-  s+="<line x1='"+(lx-8)+"' y1='10' x2='"+(lx-8)+"' y2='"+(h-10)+"' stroke='var(--line)' stroke-width='1' stroke-dasharray='3,3'/>";
-  var startY=Math.max(30, (h-labels.length*34)/2);
-  for(var i=0;i<labels.length;i++){
-    var y=startY+i*34;
-    var lbl=labels[i];
-    /* цветной маркер */
-    if(lbl.dot){
-      s+="<circle cx='"+lx+"' cy='"+(y-5)+"' r='5' fill='"+lbl.color+"' opacity='0.8'/>";
-    }
-    s+="<text x='"+(lx+12)+"' y='"+y+"' font-size='16' fill='"+lbl.color+"' font-weight='600'>"+lbl.text+"</text>";
-  }
-  return s;
-}
-
-/* Правильный треугольник + описанная окружность.
-   Чертёж 320×280 + панель = 450×280. */
+/* Правильный треугольник + описанная окружность. 340x310.
+   R — справа от пунктирной линии (зазор 18px). a — снизу (зазор 22px). */
 function svgEqTriCirc(aLabel){
   var cx=160,cy=165,R=90;
   var v1x=cx, v1y=cy-R;
   var v2x=cx+R*Math.cos(150*Math.PI/180), v2y=cy+R*Math.sin(150*Math.PI/180);
   var v3x=cx+R*Math.cos(30*Math.PI/180),  v3y=cy+R*Math.sin(30*Math.PI/180);
-  return "<svg width='450' height='280' viewBox='0 0 450 280' xmlns='http://www.w3.org/2000/svg' style='font-family:Golos Text,sans-serif'>"
+  return "<svg width='340' height='310' viewBox='0 0 340 310' xmlns='http://www.w3.org/2000/svg' style='font-family:Golos Text,sans-serif'>"
     +"<circle cx='"+cx+"' cy='"+cy+"' r='"+R+"' fill='rgba(47,111,208,.08)' stroke='var(--blue)' stroke-width='2'/>"
     +"<polygon points='"+v1x+","+v1y+" "+v2x.toFixed(0)+","+v2y.toFixed(0)+" "+v3x.toFixed(0)+","+v3y.toFixed(0)+"' fill='rgba(255,255,255,.85)' stroke='var(--ink)' stroke-width='2.5'/>"
     +"<line x1='"+cx+"' y1='"+cy+"' x2='"+v1x+"' y2='"+v1y+"' stroke='var(--blue)' stroke-width='1.5' stroke-dasharray='5,4'/>"
     +"<circle cx='"+cx+"' cy='"+cy+"' r='3' fill='var(--blue)'/>"
-    +labelSidebar(350,[
-      {text:"R — радиус", color:"var(--blue)", dot:true},
-      {text:aLabel, color:"var(--ink)", dot:true}
-    ],280)
+    +"<text x='183' y='125' font-size='17' fill='var(--blue)' font-weight='600'>R</text>"
+    +"<text x='160' y='248' font-size='17' fill='var(--ink)' text-anchor='middle' font-weight='600'>"+aLabel+"</text>"
     +"</svg>";
 }
 
-/* Прямоугольный треугольник + описанная окружность. 450×280. */
+/* Прямоугольный треугольник + описанная окружность. 340x310.
+   a — снизу (зазор 24px). b — слева (зазор 22px). c — снаружи гипотенузы (зазор 18px). */
 function svgRightTriCirc(aLabel,bLabel){
-  var rx=70,ry=230;
-  var ax=rx+160, ay=ry;
-  var bx=rx, by=ry-120;
+  var rx=80,ry=240;
+  var ax=rx+150, ay=ry;
+  var bx=rx, by=ry-110;
   var cx=(ax+bx)/2, cy=(ay+by)/2;
-  var R=Math.sqrt(160*160+120*120)/2;
-  return "<svg width='450' height='280' viewBox='0 0 450 280' xmlns='http://www.w3.org/2000/svg' style='font-family:Golos Text,sans-serif'>"
+  var R=Math.sqrt(150*150+110*110)/2;
+  var cpx=ax+0.35*(bx-ax), cpy=ay+0.35*(by-ay);
+  var dx=bx-ax, dy=by-ay, dl=Math.sqrt(dx*dx+dy*dy);
+  var perpX=dy/dl*18, perpY=-dx/dl*18;
+  return "<svg width='340' height='310' viewBox='0 0 340 310' xmlns='http://www.w3.org/2000/svg' style='font-family:Golos Text,sans-serif'>"
     +"<circle cx='"+cx+"' cy='"+cy+"' r='"+R.toFixed(1)+"' fill='rgba(47,111,208,.08)' stroke='var(--blue)' stroke-width='2'/>"
     +"<polygon points='"+rx+","+ry+" "+ax+","+ay+" "+bx+","+by+"' fill='rgba(255,255,255,.85)' stroke='var(--ink)' stroke-width='2.5'/>"
     +"<path d='M "+(rx+12)+" "+ry+" L "+(rx+12)+" "+(ry-12)+" L "+rx+" "+(ry-12)+"' fill='none' stroke='var(--ink)' stroke-width='2'/>"
-    +"<line x1='"+ax+"' y1='"+ay+"' x2='"+bx+"' y2='"+by+"' stroke='var(--red)' stroke-width='1.5' stroke-dasharray='4,3' opacity='0.4'/>"
+    +"<line x1='"+ax+"' y1='"+ay+"' x2='"+bx+"' y2='"+by+"' stroke='var(--red)' stroke-width='1.5' stroke-dasharray='4,3' opacity='0.3'/>"
     +"<circle cx='"+cx+"' cy='"+cy+"' r='3' fill='var(--blue)'/>"
-    +labelSidebar(350,[
-      {text:aLabel, color:"var(--ink)", dot:true},
-      {text:bLabel, color:"var(--ink)", dot:true},
-      {text:"c — гипотенуза", color:"var(--red)", dot:true}
-    ],280)
+    +"<text x='"+((rx+ax)/2)+"' y='"+(ry+24)+"' font-size='17' fill='var(--ink)' text-anchor='middle' font-weight='600'>"+aLabel+"</text>"
+    +"<text x='"+(rx-22)+"' y='"+((ry+by)/2)+"' font-size='17' fill='var(--ink)' text-anchor='middle' font-weight='600'>"+bLabel+"</text>"
+    +"<text x='"+(cpx+perpX).toFixed(0)+"' y='"+(cpy+perpY+5).toFixed(0)+"' font-size='17' fill='var(--red)' font-weight='600'>c</text>"
     +"</svg>";
 }
 
-/* Квадрат + вписанная окружность. 420×290. */
+/* Квадрат + вписанная окружность. 300x310.
+   a — снизу (зазор 26px). r — справа от пунктира (зазор 16px). */
 function svgSquareInscribed(aLabel){
-  var s=150, x=70, y=70;
+  var s=160, x=70, y=70;
   var cx=x+s/2, cy=y+s/2, r=s/2;
-  return "<svg width='420' height='290' viewBox='0 0 420 290' xmlns='http://www.w3.org/2000/svg' style='font-family:Golos Text,sans-serif'>"
+  return "<svg width='300' height='310' viewBox='0 0 300 310' xmlns='http://www.w3.org/2000/svg' style='font-family:Golos Text,sans-serif'>"
     +"<rect x='"+x+"' y='"+y+"' width='"+s+"' height='"+s+"' fill='rgba(255,255,255,.85)' stroke='var(--ink)' stroke-width='2.5'/>"
     +"<circle cx='"+cx+"' cy='"+cy+"' r='"+r+"' fill='rgba(76,175,80,.1)' stroke='var(--green)' stroke-width='2'/>"
     +"<line x1='"+cx+"' y1='"+cy+"' x2='"+cx+"' y2='"+(cy+r)+"' stroke='var(--green)' stroke-width='1.5' stroke-dasharray='5,4'/>"
-    +labelSidebar(320,[
-      {text:aLabel, color:"var(--ink)", dot:true},
-      {text:"r — радиус", color:"var(--green)", dot:true}
-    ],290)
+    +"<text x='"+(cx+14)+"' y='"+(cy+r/2+6)+"' font-size='17' fill='var(--green)' font-weight='600'>r</text>"
+    +"<text x='"+cx+"' y='"+(y+s+26)+"' font-size='17' fill='var(--ink)' text-anchor='middle' font-weight='600'>"+aLabel+"</text>"
     +"</svg>";
 }
 
-/* Прямоугольник + описанная окружность. 480×270. */
+/* Прямоугольник + описанная окружность. 380x300.
+   a — снизу (зазор 26px). b — слева (зазор 24px). d — снаружи диагонали (зазор 18px). */
 function svgRectCirc(aLabel,bLabel){
-  var w=210,h=130,x=70,y=70;
+  var w=190,h=110,x=80,y=80;
   var cx=x+w/2, cy=y+h/2;
   var R=Math.sqrt(w*w+h*h)/2;
-  return "<svg width='480' height='270' viewBox='0 0 480 270' xmlns='http://www.w3.org/2000/svg' style='font-family:Golos Text,sans-serif'>"
+  var dpx=x+0.25*w, dpy=y+0.25*h;
+  var dx=w, dy=h, dl=Math.sqrt(dx*dx+dy*dy);
+  var perpX=-dy/dl*18, perpY=dx/dl*18;
+  return "<svg width='380' height='300' viewBox='0 0 380 300' xmlns='http://www.w3.org/2000/svg' style='font-family:Golos Text,sans-serif'>"
     +"<circle cx='"+cx+"' cy='"+cy+"' r='"+R.toFixed(1)+"' fill='rgba(47,111,208,.08)' stroke='var(--blue)' stroke-width='2'/>"
     +"<rect x='"+x+"' y='"+y+"' width='"+w+"' height='"+h+"' fill='rgba(255,255,255,.85)' stroke='var(--ink)' stroke-width='2.5'/>"
     +"<line x1='"+x+"' y1='"+y+"' x2='"+(x+w)+"' y2='"+(y+h)+"' stroke='var(--red)' stroke-width='1.5' stroke-dasharray='4,3'/>"
     +"<circle cx='"+cx+"' cy='"+cy+"' r='3' fill='var(--blue)'/>"
-    +labelSidebar(380,[
-      {text:aLabel, color:"var(--ink)", dot:true},
-      {text:bLabel, color:"var(--ink)", dot:true},
-      {text:"d — диагональ", color:"var(--red)", dot:true}
-    ],270)
+    +"<text x='"+cx+"' y='"+(y+h+26)+"' font-size='17' fill='var(--ink)' text-anchor='middle' font-weight='600'>"+aLabel+"</text>"
+    +"<text x='"+(x-24)+"' y='"+(cy+6)+"' font-size='17' fill='var(--ink)' text-anchor='middle' font-weight='600'>"+bLabel+"</text>"
+    +"<text x='"+(dpx+perpX).toFixed(0)+"' y='"+(dpy+perpY+5).toFixed(0)+"' font-size='17' fill='var(--red)' font-weight='600'>d</text>"
     +"</svg>";
 }
 
-/* Правильный треугольник + вписанная окружность. 450×280. */
+/* Правильный треугольник + вписанная окружность. 340x310.
+   a — снизу (зазор 22px). r — справа от пунктира (зазор 16px). */
 function svgEqTriInscribed(aLabel){
   var cx=160,cy=165,R=90;
   var v1x=cx, v1y=cy-R;
   var v2x=cx+R*Math.cos(150*Math.PI/180), v2y=cy+R*Math.sin(150*Math.PI/180);
   var v3x=cx+R*Math.cos(30*Math.PI/180),  v3y=cy+R*Math.sin(30*Math.PI/180);
   var r=R/2;
-  return "<svg width='450' height='280' viewBox='0 0 450 280' xmlns='http://www.w3.org/2000/svg' style='font-family:Golos Text,sans-serif'>"
+  return "<svg width='340' height='310' viewBox='0 0 340 310' xmlns='http://www.w3.org/2000/svg' style='font-family:Golos Text,sans-serif'>"
     +"<polygon points='"+v1x+","+v1y+" "+v2x.toFixed(0)+","+v2y.toFixed(0)+" "+v3x.toFixed(0)+","+v3y.toFixed(0)+"' fill='rgba(255,255,255,.85)' stroke='var(--ink)' stroke-width='2.5'/>"
     +"<circle cx='"+cx+"' cy='"+cy+"' r='"+r+"' fill='rgba(76,175,80,.1)' stroke='var(--green)' stroke-width='2'/>"
     +"<line x1='"+cx+"' y1='"+cy+"' x2='"+cx+"' y2='"+(cy+r)+"' stroke='var(--green)' stroke-width='1.5' stroke-dasharray='5,4'/>"
-    +labelSidebar(350,[
-      {text:aLabel, color:"var(--ink)", dot:true},
-      {text:"r — радиус", color:"var(--green)", dot:true}
-    ],280)
+    +"<text x='"+(cx+16)+"' y='"+(cy+r/2+6)+"' font-size='17' fill='var(--green)' font-weight='600'>r</text>"
+    +"<text x='160' y='248' font-size='17' fill='var(--ink)' text-anchor='middle' font-weight='600'>"+aLabel+"</text>"
     +"</svg>";
 }
 
-/* Сектор круга: радиус R, угол alpha°. 450×270. */
+/* Сектор круга: радиус R, угол alpha°. 340x290.
+   R — слева от первой стороны (зазор 22px).
+   alpha — справа от центра (зазор 24px).
+   l — снаружи дуги, на биссектрисе (зазор 18px от дуги). */
 function svgSector(rLabel,alphaDeg,alphaLabel,arcLabel){
-  var cx=160,cy=200,R=100;
+  var cx=160,cy=190,R=90;
   var x1=cx, y1=cy-R;
   var ang=(-90+alphaDeg)*Math.PI/180;
   var x2=cx+R*Math.cos(ang), y2=cy+R*Math.sin(ang);
   var largeArc = alphaDeg>180 ? 1 : 0;
-  return "<svg width='450' height='270' viewBox='0 0 450 270' xmlns='http://www.w3.org/2000/svg' style='font-family:Golos Text,sans-serif'>"
+  var bisAng=(-90+alphaDeg/2)*Math.PI/180;
+  var lblX=cx+(R+18)*Math.cos(bisAng), lblY=cy+(R+18)*Math.sin(bisAng);
+  return "<svg width='340' height='290' viewBox='0 0 340 290' xmlns='http://www.w3.org/2000/svg' style='font-family:Golos Text,sans-serif'>"
     +"<path d='M "+cx+" "+cy+" L "+x1.toFixed(1)+" "+y1.toFixed(1)+" A "+R+" "+R+" 0 "+largeArc+" 1 "+x2.toFixed(1)+" "+y2.toFixed(1)+" Z' fill='rgba(47,111,208,.12)' stroke='var(--blue)' stroke-width='2'/>"
     +"<circle cx='"+cx+"' cy='"+cy+"' r='3' fill='var(--blue)'/>"
-    +labelSidebar(350,[
-      {text:rLabel, color:"var(--blue)", dot:true},
-      {text:alphaLabel, color:"var(--red)", dot:true},
-      {text:arcLabel, color:"var(--ink)", dot:true}
-    ],270)
+    +"<text x='"+(cx-22)+"' y='"+(cy-R/2)+"' font-size='17' fill='var(--blue)' font-weight='600'>"+rLabel+"</text>"
+    +"<text x='"+(cx+24)+"' y='"+(cy+18)+"' font-size='17' fill='var(--red)' font-weight='600'>"+alphaLabel+"</text>"
+    +"<text x='"+lblX.toFixed(0)+"' y='"+lblY.toFixed(0)+"' font-size='16' fill='var(--ink)' font-weight='600' text-anchor='middle'>"+arcLabel+"</text>"
     +"</svg>";
 }
 
