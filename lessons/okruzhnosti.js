@@ -19,7 +19,7 @@ function fmt(n){
 }
 
 var ROUND_NOTE=" <span style='color:var(--mute);font-size:14px'>(π≈3,14; √2≈1,41; √3≈1,73; ответ — десятичная дробь, округлите до сотых)</span>";
-var FORMULA_NOTE=" <span style='color:var(--mute);font-size:14px'>(ответ — формула; используйте a, b, c, h, r, alpha; π или pi; √(…) или sqrt(…); ^ для степени; × — звёздочка *)</span>";
+var FORMULA_NOTE=" <span style='color:var(--mute);font-size:14px'>(ответ — формула; используйте a, b, c, h, r, alpha; π или pi; √<span style='text-decoration:overline;text-decoration-thickness:1.5px'>…</span> или sqrt(…); ^ для степени; × — звёздочка *)</span>";
 
 function mkDec(opts){
   return {type:"dec",q:opts.q,a:opts.a,unit:opts.unit||"",sol:opts.sol,hint:opts.hint||"",detailed:opts.detailed||""};
@@ -183,20 +183,20 @@ function genCircEquilateral(rng){
   });
 }
 
-/* 2. Длина описанной окружности: прямоугольный треугольник, катеты a, b → C = π·√(a²+b²) */
+/* 2. Длина описанной окружности: прямоугольный треугольник, катеты a, b → C = π·√<span style='text-decoration:overline;text-decoration-thickness:1.5px'>a²+b²</span> */
 function genCircRightTri(rng){
   var a=ri(rng,3,10),b=ri(rng,3,10);
   if(a===b)b=a+1;
   var c=Math.sqrt(a*a+b*b);
   var C=Math.PI*c;
-  var exact="π·√("+a+"²+"+b+"²) = π·"+fmt(c);
+  var exact="π·√<span style='text-decoration:overline;text-decoration-thickness:1.5px'>"+a+"²+"+b+"²</span> = π·"+fmt(c);
   return mkDec({
     q:"Найдите длину окружности, описанной около прямоугольного треугольника с катетами a = <b>"+a+"</b> см и b = <b>"+b+"</b> см."+ROUND_NOTE,
     a:C,unit:"см",sol:exact+" ≈ "+fmt(C)+" см",
-    hint:"R = c/2, где c = √(a²+b²); C = πc",
+    hint:"R = c/2, где c = √<span style='text-decoration:overline;text-decoration-thickness:1.5px'>a²+b²</span>; C = πc",
     detailed:detSteps([
       {title:"Анализ задачи",text:"Прямоугольный треугольник с катетами <b>a = "+a+" см</b> и <b>b = "+b+" см</b>. Центр описанной окружности — середина гипотенузы (прямой угол опирается на диаметр).",svg:svgRightTriCirc("a = "+a,"b = "+b)},
-      {title:"Гипотенуза",text:"<b>c = √(a² + b²)</b> = √("+a*a+" + "+b*b+") = √"+(a*a+b*b)+" ≈ "+fmt(c)+" см."},
+      {title:"Гипотенуза",text:"<b>c = √<span style='text-decoration:overline;text-decoration-thickness:1.5px'>a² + b²</span></b> = √<span style='text-decoration:overline;text-decoration-thickness:1.5px'>"+a*a+" + "+b*b+"</span> = √"+(a*a+b*b)+" ≈ "+fmt(c)+" см."},
       {title:"Радиус",text:"<b>R = c/2</b> (половина гипотенузы) = "+fmt(c/2)+" см."},
       {title:"Длина окружности",text:"<b>C = 2πR = πc</b> = π·"+fmt(c)+" ≈ <b>"+fmt(C)+"</b> см."}
     ], exact+" ≈ "+fmt(C)+" см")
@@ -233,10 +233,10 @@ function genAreaRect(rng){
   return mkDec({
     q:"Найдите площадь круга, описанного около прямоугольника со сторонами a = <b>"+a+"</b> см и b = <b>"+b+"</b> см."+ROUND_NOTE,
     a:S,unit:"см²",sol:exact+" ≈ "+fmt(S)+" см²",
-    hint:"d = √(a²+b²); R = d/2; S = π(a²+b²)/4",
+    hint:"d = √<span style='text-decoration:overline;text-decoration-thickness:1.5px'>a²+b²</span>; R = d/2; S = π(a²+b²)/4",
     detailed:detSteps([
       {title:"Анализ задачи",text:"Прямоугольник со сторонами <b>a = "+a+" см</b> и <b>b = "+b+" см</b>. Центр описанной окружности — точка пересечения диагоналей; радиус R = d/2.",svg:svgRectCirc("a = "+a,"b = "+b)},
-      {title:"Диагональ",text:"<b>d = √(a² + b²)</b> = √("+a*a+" + "+b*b+") = √"+d2+" ≈ "+fmt(d)+" см."},
+      {title:"Диагональ",text:"<b>d = √<span style='text-decoration:overline;text-decoration-thickness:1.5px'>a² + b²</span></b> = √<span style='text-decoration:overline;text-decoration-thickness:1.5px'>"+a*a+" + "+b*b+"</span> = √"+d2+" ≈ "+fmt(d)+" см."},
       {title:"Радиус",text:"<b>R = d/2</b> = "+fmt(R)+" см."},
       {title:"Площадь круга",text:"<b>S = πR² = π·d²/4 = π(a²+b²)/4</b> = π·"+d2+"/4 ≈ <b>"+fmt(S)+"</b> см²."}
     ], exact+" ≈ "+fmt(S)+" см²")
@@ -269,19 +269,19 @@ function genBlock1(rng){
    БЛОК 2: ЗАДАЧИ ОБЩЕГО ВИДА (тип "formula")
 -------------------------------------------------------------------- */
 
-/* 6. Общий вид: C = π·√(a²+b²) */
+/* 6. Общий вид: C = π·√<span style='text-decoration:overline;text-decoration-thickness:1.5px'>a²+b²</span> */
 function genFormula1(rng){
-  var exact="π·√(a²+b²)";
+  var exact="π·√<span style='text-decoration:overline;text-decoration-thickness:1.5px'>a²+b²</span>";
   return mkFormula({
     q:"Найдите длину окружности, описанной около прямоугольного треугольника с катетами <b>a</b> и <b>b</b>. Ответ запишите формулой."+FORMULA_NOTE,
     fn:function(a,b,c,h,r,alpha){return Math.PI*Math.sqrt(a*a+b*b);},
     atext:exact,sol:exact,
-    hint:"R = c/2, c = √(a²+b²); C = πc",
+    hint:"R = c/2, c = √<span style='text-decoration:overline;text-decoration-thickness:1.5px'>a²+b²</span>; C = πc",
     detailed:detSteps([
       {title:"Анализ задачи",text:"Прямоугольный треугольник с катетами <b>a</b> и <b>b</b>. Центр описанной окружности — середина гипотенузы.",svg:svgRightTriCirc("a","b")},
-      {title:"Гипотенуза",text:"По теореме Пифагора: <b>c = √(a² + b²)</b>."},
+      {title:"Гипотенуза",text:"По теореме Пифагора: <b>c = √<span style='text-decoration:overline;text-decoration-thickness:1.5px'>a² + b²</span></b>."},
       {title:"Радиус",text:"<b>R = c/2</b> (половина гипотенузы)."},
-      {title:"Длина окружности",text:"<b>C = 2πR = πc = π·√(a²+b²)</b>."}
+      {title:"Длина окружности",text:"<b>C = 2πR = πc = π·√<span style='text-decoration:overline;text-decoration-thickness:1.5px'>a²+b²</span></b>."}
     ], exact)
   });
 }
@@ -293,10 +293,10 @@ function genFormula2(rng){
     q:"Найдите площадь круга, описанного около прямоугольника со сторонами <b>a</b> и <b>b</b>. Ответ запишите формулой."+FORMULA_NOTE,
     fn:function(a,b,c,h,r,alpha){return Math.PI*(a*a+b*b)/4;},
     atext:exact,sol:exact,
-    hint:"d = √(a²+b²); R = d/2; S = π(a²+b²)/4",
+    hint:"d = √<span style='text-decoration:overline;text-decoration-thickness:1.5px'>a²+b²</span>; R = d/2; S = π(a²+b²)/4",
     detailed:detSteps([
-      {title:"Анализ задачи",text:"Прямоугольник со сторонами <b>a</b> и <b>b</b>. Диагональ d = √(a²+b²) является диаметром описанной окружности.",svg:svgRectCirc("a","b")},
-      {title:"Диагональ",text:"<b>d = √(a² + b²)</b>."},
+      {title:"Анализ задачи",text:"Прямоугольник со сторонами <b>a</b> и <b>b</b>. Диагональ d = √<span style='text-decoration:overline;text-decoration-thickness:1.5px'>a²+b²</span> является диаметром описанной окружности.",svg:svgRectCirc("a","b")},
+      {title:"Диагональ",text:"<b>d = √<span style='text-decoration:overline;text-decoration-thickness:1.5px'>a² + b²</span></b>."},
       {title:"Радиус",text:"<b>R = d/2</b>."},
       {title:"Площадь круга",text:"<b>S = πR² = π·d²/4 = π(a²+b²)/4</b>."}
     ], exact)

@@ -78,60 +78,141 @@ function detSteps(items,answerLine){
   return h;
 }
 
-/* ---------- SVG-график функции на отрезке ----------
-   Рисует график y=f(x) на [a;b], отмечает критические точки,
-   подписывает max и min. Размер 400×320. */
+/* ---------- SVG-график функции + метод интервалов производной ----------
+   Верхняя часть — график y=f(x) с осями, кривой, точками max/min.
+   Нижняя часть — числовая прямая (метод интервалов) со знаками f'(x),
+   стрелками возрастания/убывания, проекциями точек экстремума.
+   Размер 400×460. */
 function graphSVG(f,a,b,ex,fHtml){
-  var W=400,H=320,padL=50,padR=20,padT=25,padB=45;
-  var plotW=W-padL-padR,plotH=H-padT-padB;
-  /* y-диапазон с запасом */
-  var yLo=ex.min,yHi=ex.max;
-  var yRange=yHi-yLo;
+  var W=400,H=460,padL=50,padR=20,padT=20,padB=20;
+  /* верхний график: y=20..290, метод интервалов: y=310..440 */
+  var graphTop=padT, graphBot=290;
+  var graphH=graphBot-graphTop;
+  var numLineY=380; /* y числовой прямой */
+  var plotW=W-padL-padR;
+  /* y-диапазон */
+  var yLo=ex.min,yHi=ex.max,yRange=yHi-yLo;
   if(yRange<0.01)yRange=1;
   yLo-=yRange*0.15; yHi+=yRange*0.15;
   var xRange=b-a;
-  /* функции масштабирования */
   function sx(x){return padL+(x-a)/xRange*plotW;}
-  function sy(y){return padT+plotH-(y-yLo)/(yHi-yLo)*plotH;}
-  var h="<svg width='"+W+"' height='"+H+"' viewBox='0 0 "+W+" "+H+"' xmlns='http://www.w3.org/2000/svg' style='font-family:Golos Text,sans-serif;max-width:100%;height:auto'>";
-  /* оси */
-  h+="<line x1='"+padL+"' y1='"+(padT+plotH)+"' x2='"+(padL+plotW)+"' y2='"+(padT+plotH)+"' stroke='var(--ink)' stroke-width='2'/>";
-  h+="<line x1='"+padL+"' y1='"+padT+"' x2='"+padL+"' y2='"+(padT+plotH)+"' stroke='var(--ink)' stroke-width='2'/>";
-  /* подписи концов отрезка на оси x */
-  h+="<text x='"+padL+"' y='"+(padT+plotH+16)+"' font-size='12' fill='var(--mute)' text-anchor='middle'>"+fmt(a)+"</text>";
-  h+="<text x='"+(padL+plotW)+"' y='"+(padT+plotH+16)+"' font-size='12' fill='var(--mute)' text-anchor='middle'>"+fmt(b)+"</text>";
-  h+="<text x='"+(padL-8)+"' y='"+(padT+plotH+16)+"' font-size='11' fill='var(--mute)' text-anchor='end'>x</text>";
-  /* подписи y на оси */
-  h+="<text x='"+(padL-8)+"' y='"+sy(yHi).toFixed(0)+"' font-size='11' fill='var(--mute)' text-anchor='end'>"+fmt(yHi)+"</text>";
-  h+="<text x='"+(padL-8)+"' y='"+sy(yLo).toFixed(0)+"' font-size='11' fill='var(--mute)' text-anchor='end'>"+fmt(yLo)+"</text>";
-  /* кривая функции — 100 точек */
-  var N=100;
-  var pts=[];
-  for(var i=0;i<=N;i++){
-    var x=a+i/N*xRange;
-    var y=f(x);
-    if(isFinite(y))pts.push(sx(x).toFixed(1)+","+sy(y).toFixed(1));
-  }
-  if(pts.length>1){
-    h+="<polyline points='"+pts.join(" ")+"' fill='none' stroke='var(--blue)' stroke-width='2.5'/>";
-  }
-  /* критические точки (внутри отрезка) */
+  function sy(y){return graphTop+graphH-(y-yLo)/(yHi-yLo)*graphH;}
+
+  /* численная производная */
+  function df(x){var e=1e-5;return(f(x+e)-f(x-e))/(2*e);}
+
+  /* все точки на числовой прямой: концы + внутренние критические */
+  var allPts=[a];
   for(var ci=1;ci<ex.crits.length-1;ci++){
     var cx=ex.crits[ci];
-    if(cx>a+0.01&&cx<b-0.01){
-      var cy=f(cx);
-      h+="<circle cx='"+sx(cx).toFixed(1)+"' cy='"+sy(cy).toFixed(1)+"' r='4' fill='var(--yellow)' stroke='var(--ink)' stroke-width='1.5'/>";
+    if(cx>a+0.01&&cx<b-0.01)allPts.push(cx);
+  }
+  allPts.push(b);
+  allPts.sort(function(p,q){return p-q;});
+
+  /* знаки производной в интервалах */
+  var signs=[];
+  for(var si=0;si<allPts.length-1;si++){
+    var mid=(allPts[si]+allPts[si+1])/2;
+    signs.push(df(mid)>0?"+":"−");
+  }
+
+  var h="<svg width='"+W+"' height='"+H+"' viewBox='0 0 "+W+" "+H+"' xmlns='http://www.w3.org/2000/svg' style='font-family:Golos Text,sans-serif;max-width:100%;height:auto'>";
+
+  /* === ВЕРХ: график функции === */
+  /* оси */
+  h+="<line x1='"+padL+"' y1='"+graphBot+"' x2='"+(padL+plotW)+"' y2='"+graphBot+"' stroke='var(--ink)' stroke-width='2'/>";
+  h+="<line x1='"+padL+"' y1='"+graphTop+"' x2='"+padL+"' y2='"+graphBot+"' stroke='var(--ink)' stroke-width='2'/>";
+  /* подписи оси x */
+  h+="<text x='"+padL+"' y='"+(graphBot+14)+"' font-size='11' fill='var(--mute)' text-anchor='middle'>"+fmt(a)+"</text>";
+  h+="<text x='"+(padL+plotW)+"' y='"+(graphBot+14)+"' font-size='11' fill='var(--mute)' text-anchor='middle'>"+fmt(b)+"</text>";
+  h+="<text x='"+(padL-6)+"' y='"+(graphBot+14)+"' font-size='10' fill='var(--mute)' text-anchor='end'>x</text>";
+  /* подписи оси y */
+  h+="<text x='"+(padL-6)+"' y='"+sy(yHi).toFixed(0)+"' font-size='10' fill='var(--mute)' text-anchor='end'>"+fmt(yHi)+"</text>";
+  h+="<text x='"+(padL-6)+"' y='"+sy(yLo).toFixed(0)+"' font-size='10' fill='var(--mute)' text-anchor='end'>"+fmt(yLo)+"</text>";
+  /* кривая */
+  var N=100,pts=[];
+  for(var i=0;i<=N;i++){
+    var x=a+i/N*xRange,y=f(x);
+    if(isFinite(y))pts.push(sx(x).toFixed(1)+","+sy(y).toFixed(1));
+  }
+  if(pts.length>1)h+="<polyline points='"+pts.join(" ")+"' fill='none' stroke='var(--blue)' stroke-width='2.5'/>";
+  /* max/min точки */
+  h+="<circle cx='"+sx(ex.maxX).toFixed(1)+"' cy='"+sy(ex.max).toFixed(1)+"' r='5' fill='var(--red)' stroke='var(--card)' stroke-width='2'/>";
+  h+="<text x='"+(sx(ex.maxX)+7).toFixed(0)+"' y='"+(sy(ex.max)-7).toFixed(0)+"' font-size='12' fill='var(--red)' font-weight='600'>max="+fmt(ex.max)+"</text>";
+  h+="<circle cx='"+sx(ex.minX).toFixed(1)+"' cy='"+sy(ex.min).toFixed(1)+"' r='5' fill='var(--green)' stroke='var(--card)' stroke-width='2'/>";
+  h+="<text x='"+(sx(ex.minX)+7).toFixed(0)+"' y='"+(sy(ex.min)+14).toFixed(0)+"' font-size='12' fill='var(--green)' font-weight='600'>min="+fmt(ex.min)+"</text>";
+  /* концы отрезка */
+  h+="<circle cx='"+sx(a).toFixed(1)+"' cy='"+sy(f(a)).toFixed(1)+"' r='3' fill='var(--ink)'/>";
+  h+="<circle cx='"+sx(b).toFixed(1)+"' cy='"+sy(f(b)).toFixed(1)+"' r='3' fill='var(--ink)'/>";
+  /* заголовок */
+  h+="<text x='"+(padL+plotW/2)+"' y='14' font-size='12' fill='var(--mute)' text-anchor='middle'>y = f(x)</text>";
+
+  /* === ПРОЕКЦИИ: пунктир от точек экстремума вниз к числовой прямой === */
+  for(var pi=1;pi<allPts.length-1;pi++){
+    var px=ex.crits[pi]; /* внутренняя критическая */
+    if(px>a+0.01&&px<b-0.01){
+      var py=f(px);
+      h+="<line x1='"+sx(px).toFixed(1)+"' y1='"+sy(py).toFixed(1)+"' x2='"+sx(px).toFixed(1)+"' y2='"+numLineY+"' stroke='var(--mute)' stroke-width='1' stroke-dasharray='3,3' opacity='0.6'/>";
     }
   }
-  /* max — красная точка */
-  h+="<circle cx='"+sx(ex.maxX).toFixed(1)+"' cy='"+sy(ex.max).toFixed(1)+"' r='6' fill='var(--red)' stroke='var(--card)' stroke-width='2'/>";
-  h+="<text x='"+(sx(ex.maxX)+8).toFixed(0)+"' y='"+(sy(ex.max)-8).toFixed(0)+"' font-size='13' fill='var(--red)' font-weight='600'>max="+fmt(ex.max)+"</text>";
-  /* min — зелёная точка */
-  h+="<circle cx='"+sx(ex.minX).toFixed(1)+"' cy='"+sy(ex.min).toFixed(1)+"' r='6' fill='var(--green)' stroke='var(--card)' stroke-width='2'/>";
-  h+="<text x='"+(sx(ex.minX)+8).toFixed(0)+"' y='"+(sy(ex.min)+16).toFixed(0)+"' font-size='13' fill='var(--green)' font-weight='600'>min="+fmt(ex.min)+"</text>";
-  /* концы отрезка — точки */
-  h+="<circle cx='"+sx(a).toFixed(1)+"' cy='"+sy(f(a)).toFixed(1)+"' r='4' fill='var(--ink)'/>";
-  h+="<circle cx='"+sx(b).toFixed(1)+"' cy='"+sy(f(b)).toFixed(1)+"' r='4' fill='var(--ink)'/>";
+  /* проекция для max и min если они на концах */
+  if(ex.maxX===a||ex.maxX===b){
+    h+="<line x1='"+sx(ex.maxX).toFixed(1)+"' y1='"+sy(ex.max).toFixed(1)+"' x2='"+sx(ex.maxX).toFixed(1)+"' y2='"+numLineY+"' stroke='var(--mute)' stroke-width='1' stroke-dasharray='3,3' opacity='0.6'/>";
+  }
+  if(ex.minX===a||ex.minX===b){
+    h+="<line x1='"+sx(ex.minX).toFixed(1)+"' y1='"+sy(ex.min).toFixed(1)+"' x2='"+sx(ex.minX).toFixed(1)+"' y2='"+numLineY+"' stroke='var(--mute)' stroke-width='1' stroke-dasharray='3,3' opacity='0.6'/>";
+  }
+
+  /* === НИЗ: метод интервалов (числовая прямая производной) === */
+  h+="<text x='"+(padL+plotW/2)+"' y='330' font-size='12' fill='var(--mute)' text-anchor='middle'>Метод интервалов: знаки f′(x)</text>";
+  /* числовая прямая */
+  h+="<line x1='"+(padL-10)+"' y1='"+numLineY+"' x2='"+(padL+plotW+10)+"' y2='"+numLineY+"' stroke='var(--ink)' stroke-width='1.5'/>";
+  /* стрелка справа */
+  h+="<polygon points='"+(padL+plotW+10)+","+numLineY+" "+(padL+plotW+4)+","+(numLineY-3)+" "+(padL+plotW+4)+","+(numLineY+3)+"' fill='var(--ink)'/>";
+
+  /* точки на числовой прямой */
+  for(var ti=0;ti<allPts.length;ti++){
+    var tx=allPts[ti];
+    var px=sx(tx);
+    /* кружок */
+    var isInternal = ti>0&&ti<allPts.length-1;
+    var dotColor = isInternal?"var(--yellow)":"var(--ink)";
+    h+="<circle cx='"+px.toFixed(1)+"' cy='"+numLineY+"' r='4' fill='"+dotColor+"' stroke='var(--ink)' stroke-width='1.5'/>";
+    /* подпись x-значения */
+    h+="<text x='"+px.toFixed(1)+"' y='"+(numLineY+18)+"' font-size='11' fill='var(--ink)' text-anchor='middle' font-weight='600'>"+fmt(tx)+"</text>";
+  }
+
+  /* знаки f'(x) и стрелки в интервалах */
+  for(var ii=0;ii<signs.length;ii++){
+    var midX=(sx(allPts[ii])+sx(allPts[ii+1]))/2;
+    var sign=signs[ii];
+    /* знак +/− */
+    h+="<text x='"+midX.toFixed(1)+"' y='"+(numLineY-10)+"' font-size='15' fill='var(--blue)' text-anchor='middle' font-weight='700'>"+sign+"</text>";
+    /* стрелка ↑ или ↓ */
+    if(sign==="+"){
+      /* возрастание — стрелка вверх-вправо */
+      h+="<text x='"+midX.toFixed(1)+"' y='"+(numLineY+32)+"' font-size='14' fill='var(--green)' text-anchor='middle' font-weight='700'>↗</text>";
+    } else {
+      /* убывание — стрелка вниз-вправо */
+      h+="<text x='"+midX.toFixed(1)+"' y='"+(numLineY+32)+"' font-size='14' fill='var(--red)' text-anchor='middle' font-weight='700'>↘</text>";
+    }
+  }
+
+  /* метки max/min на числовой прямой */
+  for(var mi=1;mi<allPts.length-1;mi++){
+    var mx=allPts[mi];
+    var mv=f(mx);
+    var px=sx(mx);
+    if(Math.abs(mv-ex.max)<1e-6){
+      h+="<rect x='"+(px-14)+"' y='"+(numLineY-30)+"' width='28' height='16' rx='3' fill='var(--red)' opacity='0.15' stroke='var(--red)' stroke-width='1'/>";
+      h+="<text x='"+px.toFixed(1)+"' y='"+(numLineY-18)+"' font-size='10' fill='var(--red)' text-anchor='middle' font-weight='700'>max</text>";
+    } else if(Math.abs(mv-ex.min)<1e-6){
+      h+="<rect x='"+(px-14)+"' y='"+(numLineY-30)+"' width='28' height='16' rx='3' fill='var(--green)' opacity='0.15' stroke='var(--green)' stroke-width='1'/>";
+      h+="<text x='"+px.toFixed(1)+"' y='"+(numLineY-18)+"' font-size='10' fill='var(--green)' text-anchor='middle' font-weight='700'>min</text>";
+    }
+  }
+
   h+="</svg>";
   return h;
 }
@@ -273,7 +354,7 @@ function gen5_7a(rng){
     q:"Найдите наибольшее и наименьшее значения функции y = ∛x на отрезке ["+lo+"; "+hi+"]."+ROUND_NOTE,
     max:ex.max,min:ex.min,sol:"max = "+fmt(ex.max)+", min = "+fmt(ex.min),
     hint:"Функция монотонно возрастает — экстремумы на концах",
-    detailed:buildSolution(f,lo,hi,ex,"∛x","f'(x) = 1/(3∛x²) > 0 — монотонно возрастает","нет (функция монотонна)")
+    detailed:buildSolution(f,lo,hi,ex,"∛x","f'(x) = 1/(3∛<span style='text-decoration:overline;text-decoration-thickness:1.5px'>x²</span>) > 0 — монотонно возрастает","нет (функция монотонна)")
   });
 }
 function gen5_7b(rng){
@@ -284,7 +365,7 @@ function gen5_7b(rng){
     q:"Найдите наибольшее и наименьшее значения функции y = ⁵√x на отрезке ["+lo+"; "+hi+"]."+ROUND_NOTE,
     max:ex.max,min:ex.min,sol:"max = "+fmt(ex.max)+", min = "+fmt(ex.min),
     hint:"Функция монотонно возрастает — экстремумы на концах",
-    detailed:buildSolution(f,lo,hi,ex,"⁵√x","f'(x) = 1/(5·⁵√x⁴) > 0 — монотонно возрастает","нет (функция монотонна)")
+    detailed:buildSolution(f,lo,hi,ex,"⁵√x","f'(x) = 1/(5·⁵√<span style='text-decoration:overline;text-decoration-thickness:1.5px'>x⁴</span>) > 0 — монотонно возрастает","нет (функция монотонна)")
   });
 }
 function gen5_7v(rng){
