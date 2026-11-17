@@ -1,7 +1,7 @@
 /* =====================================================================
    Тренажёр · 7–9 класс · Математика · Прямая пропорциональность
    Интерактивное построение графика y = kx мышкой или тачскрином.
-   50 вариантов. До 3 попыток. Точка (0;0) — по умолчанию.
+   50 вариантов. До 3 попыток. Ученик сам выбирает две точки и проводит прямую.
    Ученик может кликать на координатной плоскости ИЛИ вводить x,y в таблицу.
    ===================================================================== */
 (function(global){
@@ -40,20 +40,25 @@ function graphSVG(){
   h+="<g id='tz-graph-layer'></g>";
   h+="<rect id='tz-graph-click' x='0' y='0' width='"+S+"' height='"+S+"' fill='transparent'/>";
   h+="</svg>";
-  /* таблица */
+  /* таблица — две пустые строки для двух точек */
   h+="<table class='tz-graph-table' style='border-collapse:collapse;margin:10px auto;font-size:16px;font-family:Golos Text,sans-serif'>";
   h+="<tr><th style='border:1.5px solid var(--line);padding:6px 18px;background:var(--paper)'>x</th>"
     +"<th style='border:1.5px solid var(--line);padding:6px 18px;background:var(--paper)'>y</th></tr>";
-  h+="<tr><td style='border:1.5px solid var(--line);padding:6px 18px;text-align:center;color:var(--mute)'>0</td>"
-    +"<td style='border:1.5px solid var(--line);padding:6px 18px;text-align:center;color:var(--mute)'>0</td></tr>";
+  /* строка 1 — первая точка */
   h+="<tr><td style='border:1.5px solid var(--line);padding:4px 10px;text-align:center'>"
-    +"<input id='tz-graph-x' type='text' inputmode='decimal' style='width:60px;text-align:center;font-size:16px;border:2px solid var(--blue);border-radius:6px;padding:3px' placeholder='x'></td>"
+    +"<input id='tz-graph-x1' type='text' inputmode='decimal' style='width:60px;text-align:center;font-size:16px;border:2px solid var(--blue);border-radius:6px;padding:3px' placeholder='x₁'></td>"
     +"<td style='border:1.5px solid var(--line);padding:4px 10px;text-align:center'>"
-    +"<input id='tz-graph-y' type='text' inputmode='decimal' style='width:60px;text-align:center;font-size:16px;border:2px solid var(--blue);border-radius:6px;padding:3px' placeholder='y'></td></tr>";
+    +"<input id='tz-graph-y1' type='text' inputmode='decimal' style='width:60px;text-align:center;font-size:16px;border:2px solid var(--blue);border-radius:6px;padding:3px' placeholder='y₁'></td></tr>";
+  /* строка 2 — вторая точка */
+  h+="<tr><td style='border:1.5px solid var(--line);padding:4px 10px;text-align:center'>"
+    +"<input id='tz-graph-x2' type='text' inputmode='decimal' style='width:60px;text-align:center;font-size:16px;border:2px solid var(--blue);border-radius:6px;padding:3px' placeholder='x₂'></td>"
+    +"<td style='border:1.5px solid var(--line);padding:4px 10px;text-align:center'>"
+    +"<input id='tz-graph-y2' type='text' inputmode='decimal' style='width:60px;text-align:center;font-size:16px;border:2px solid var(--blue);border-radius:6px;padding:3px' placeholder='y₂'></td></tr>";
   h+="</table>";
-  h+="<p style='font-size:14px;color:var(--mute);margin:4px 0 0'>Точка (0;0) уже поставлена. Введите x и y второй точки в таблицу или кликните на плоскости.</p>";
+  h+="<p style='font-size:14px;color:var(--mute);margin:4px 0 0'>Выберите две точки на координатной плоскости или введите их координаты в таблицу. Подумайте, через какие точки проходит прямая y = kx. Затем нажмите «Провести прямую».</p>";
   /* кнопки */
-  h+="<div style='display:flex;gap:10px;justify-content:center;margin-top:8px'>";
+  h+="<div style='display:flex;gap:10px;justify-content:center;margin-top:8px;flex-wrap:wrap'>";
+  h+="<button class='btn sm' type='button' id='tz-graph-draw' style='background:var(--green);color:var(--on-accent)'>Провести прямую</button>";
   h+="<button class='btn sm' type='button' id='tz-graph-check' style='background:var(--blue);color:var(--on-accent)'>Проверить</button>";
   h+="<button class='btn ghost sm' type='button' id='tz-graph-reset'>Сбросить</button>";
   h+="</div>";
@@ -63,20 +68,26 @@ function graphSVG(){
   return h;
 }
 
-/* ---------- настройка интерактивного графика ---------- */
+/* ---------- настройка интерактивного графика ----------
+   Две точки — обе выбирает ученик. Прямая рисуется только после
+   нажатия кнопки «Провести прямую». Точки можно ставить кликом
+   на координатной плоскости или вводом в таблицу. */
 function setupGraphInteraction(svg, task, g, state, updateBar){
   if(!svg)return;
   var layer=svg.querySelector("#tz-graph-layer");
   var clickTarget=svg.querySelector("#tz-graph-click");
+  var drawBtn=document.getElementById("tz-graph-draw");
   var checkBtn=document.getElementById("tz-graph-check");
   var resetBtn=document.getElementById("tz-graph-reset");
-  var xInput=document.getElementById("tz-graph-x");
-  var yInput=document.getElementById("tz-graph-y");
+  var x1Input=document.getElementById("tz-graph-x1");
+  var y1Input=document.getElementById("tz-graph-y1");
+  var x2Input=document.getElementById("tz-graph-x2");
+  var y2Input=document.getElementById("tz-graph-y2");
   var msgEl=document.getElementById("tz-graph-msg");
   var O=200, sc=40, SIZE=400;
-  /* p1 = (0,0) — по умолчанию */
-  var p1={x:0,y:0};
-  var p2=null;
+  /* обе точки — null, ученик выбирает сам */
+  var p1=null, p2=null;
+  var lineDrawn=false;
   var attempts=0;
   var maxAttempts=3;
   var answered=false;
@@ -85,11 +96,16 @@ function setupGraphInteraction(svg, task, g, state, updateBar){
   if(state&&state.ans&&state.ans[g]&&state.ans[g].p1){
     p1=state.ans[g].p1;
     p2=state.ans[g].p2;
+    lineDrawn=!!state.ans[g].lineDrawn;
     attempts=state.ans[g].attempts||0;
     answered=!!state.ans[g].answered;
+    if(p1){
+      if(x1Input)x1Input.value=fmt(p1.x);
+      if(y1Input)y1Input.value=fmt(p1.y);
+    }
     if(p2){
-      if(xInput)xInput.value=fmt(p2.x);
-      if(yInput)yInput.value=fmt(p2.y);
+      if(x2Input)x2Input.value=fmt(p2.x);
+      if(y2Input)y2Input.value=fmt(p2.y);
     }
     updateGraph();
   }
@@ -100,8 +116,8 @@ function setupGraphInteraction(svg, task, g, state, updateBar){
   function updateGraph(){
     if(!layer)return;
     var html="";
-    /* линия */
-    if(p2){
+    /* линия — только если ученик нажал «Провести прямую» */
+    if(lineDrawn&&p1&&p2){
       var a=m2p(p1.x,p1.y), b=m2p(p2.x,p2.y);
       var dx=b.px-a.px, dy=b.py-a.py;
       if(Math.abs(dx)>0.01||Math.abs(dy)>0.01){
@@ -114,15 +130,16 @@ function setupGraphInteraction(svg, task, g, state, updateBar){
         }
       }
     }
-    /* точка (0,0) — всегда */
-    var p0=m2p(p1.x,p1.y);
-    html+="<circle cx='"+p0.px.toFixed(1)+"' cy='"+p0.py.toFixed(1)+"' r='7' fill='var(--blue)' stroke='var(--card)' stroke-width='2.5'/>";
-    html+="<text x='"+(p0.px+10)+"' y='"+(p0.py-8)+"' font-size='11' fill='var(--blue)' font-weight='600'>(0; 0)</text>";
-    /* вторая точка */
+    /* точки */
+    if(p1){
+      var pp1=m2p(p1.x,p1.y);
+      html+="<circle cx='"+pp1.px.toFixed(1)+"' cy='"+pp1.py.toFixed(1)+"' r='7' fill='var(--blue)' stroke='var(--card)' stroke-width='2.5'/>";
+      html+="<text x='"+(pp1.px+10)+"' y='"+(pp1.py-8)+"' font-size='11' fill='var(--blue)' font-weight='600'>("+fmt(p1.x)+"; "+fmt(p1.y)+")</text>";
+    }
     if(p2){
-      var pp=m2p(p2.x,p2.y);
-      html+="<circle cx='"+pp.px.toFixed(1)+"' cy='"+pp.py.toFixed(1)+"' r='7' fill='var(--blue)' stroke='var(--card)' stroke-width='2.5'/>";
-      html+="<text x='"+(pp.px+10)+"' y='"+(pp.py-8)+"' font-size='11' fill='var(--blue)' font-weight='600'>("+fmt(p2.x)+"; "+fmt(p2.y)+")</text>";
+      var pp2=m2p(p2.x,p2.y);
+      html+="<circle cx='"+pp2.px.toFixed(1)+"' cy='"+pp2.py.toFixed(1)+"' r='7' fill='var(--blue)' stroke='var(--card)' stroke-width='2.5'/>";
+      html+="<text x='"+(pp2.px+10)+"' y='"+(pp2.py-8)+"' font-size='11' fill='var(--blue)' font-weight='600'>("+fmt(p2.x)+"; "+fmt(p2.y)+")</text>";
     }
     layer.innerHTML=html;
   }
@@ -132,8 +149,8 @@ function setupGraphInteraction(svg, task, g, state, updateBar){
     var wasAnswered=prev&&prev.answered;
     var nowAnswered=answered;
     if(state&&state.ans){
-      state.ans[g]={p1:p1, p2:p2, attempts:attempts, answered:answered, correct:answered&&(function(){
-        if(!p2)return false;
+      state.ans[g]={p1:p1, p2:p2, lineDrawn:lineDrawn, attempts:attempts, answered:answered, correct:answered&&(function(){
+        if(!p1||!p2)return false;
         var dx=p2.x-p1.x;
         if(Math.abs(dx)<0.01)return false;
         var k=(p2.y-p1.y)/dx;
@@ -147,17 +164,30 @@ function setupGraphInteraction(svg, task, g, state, updateBar){
     if(updateBar)updateBar();
   }
 
-  function setPoint2(mx,my){
-    /* округление до 0.5 */
+  function roundPoint(mx,my){
     mx=Math.round(mx*2)/2;
     my=Math.round(my*2)/2;
     if(mx<-5)mx=-5;if(mx>5)mx=5;
     if(my<-5)my=-5;if(my>5)my=5;
-    p2={x:mx,y:my};
-    if(xInput)xInput.value=fmt(mx);
-    if(yInput)yInput.value=fmt(my);
-    updateGraph();
+    return{x:mx,y:my};
+  }
+
+  function setPoint(idx,mx,my){
+    if(answered)return;
+    var pt=roundPoint(mx,my);
+    if(idx===1){
+      p1=pt;
+      if(x1Input)x1Input.value=fmt(pt.x);
+      if(y1Input)y1Input.value=fmt(pt.y);
+    } else {
+      p2=pt;
+      if(x2Input)x2Input.value=fmt(pt.x);
+      if(y2Input)y2Input.value=fmt(pt.y);
+    }
+    /* если точки изменились — снимаем линию */
+    lineDrawn=false;
     if(msgEl)msgEl.textContent="";
+    updateGraph();
   }
 
   function handlePoint(clientX,clientY){
@@ -166,19 +196,53 @@ function setupGraphInteraction(svg, task, g, state, updateBar){
     var px=(clientX-rect.left)*(SIZE/rect.width);
     var py=(clientY-rect.top)*(SIZE/rect.height);
     var m=p2m(px,py);
-    setPoint2(m.x,m.y);
+    /* первая точка не поставлена → ставим p1; иначе p2; если обе есть → начинаем заново с p1 */
+    if(!p1){
+      setPoint(1,m.x,m.y);
+    } else if(!p2){
+      setPoint(2,m.x,m.y);
+    } else {
+      /* начинаем заново */
+      p1=null;p2=null;lineDrawn=false;
+      if(x1Input)x1Input.value="";if(y1Input)y1Input.value="";
+      if(x2Input)x2Input.value="";if(y2Input)y2Input.value="";
+      if(msgEl)msgEl.textContent="";
+      setPoint(1,m.x,m.y);
+    }
+  }
+
+  function handleDraw(){
+    if(answered)return;
+    if(!p1||!p2){
+      if(msgEl)msgEl.textContent="Сначала выберите две точки.";
+      if(msgEl)msgEl.style.color="var(--red)";
+      return;
+    }
+    lineDrawn=true;
+    if(msgEl)msgEl.textContent="";
+    updateGraph();
   }
 
   function handleCheck(){
     if(answered)return;
-    /* читаем из таблицы, если клика не было */
-    if(!p2&&xInput&&yInput){
-      var xv=parseFloat(String(xInput.value).replace(",","."));
-      var yv=parseFloat(String(yInput.value).replace(",","."));
-      if(isFinite(xv)&&isFinite(yv))setPoint2(xv,yv);
+    /* читаем из таблицы, если точки не все поставлены */
+    if(!p1&&x1Input&&y1Input){
+      var xv1=parseFloat(String(x1Input.value).replace(",","."));
+      var yv1=parseFloat(String(y1Input.value).replace(",","."));
+      if(isFinite(xv1)&&isFinite(yv1))setPoint(1,xv1,yv1);
     }
-    if(!p2){
-      if(msgEl)msgEl.textContent="Введите координаты второй точки или кликните на плоскости.";
+    if(!p2&&x2Input&&y2Input){
+      var xv2=parseFloat(String(x2Input.value).replace(",","."));
+      var yv2=parseFloat(String(y2Input.value).replace(",","."));
+      if(isFinite(xv2)&&isFinite(yv2))setPoint(2,xv2,yv2);
+    }
+    if(!p1||!p2){
+      if(msgEl)msgEl.textContent="Выберите две точки и нажмите «Провести прямую».";
+      if(msgEl)msgEl.style.color="var(--red)";
+      return;
+    }
+    if(!lineDrawn){
+      if(msgEl)msgEl.textContent="Сначала нажмите «Провести прямую».";
       if(msgEl)msgEl.style.color="var(--red)";
       return;
     }
@@ -196,25 +260,28 @@ function setupGraphInteraction(svg, task, g, state, updateBar){
       if(msgEl)msgEl.textContent="✓ Верно! Прямая y="+task.kStr+" построена правильно.";
       if(msgEl)msgEl.style.color="var(--green)";
       if(checkBtn)checkBtn.disabled=true;
+      if(drawBtn)drawBtn.disabled=true;
     } else {
       if(attempts>=maxAttempts){
         answered=true;
         if(msgEl)msgEl.textContent="✗ Попытки закончились. Верный ответ: y="+task.kStr+".";
         if(msgEl)msgEl.style.color="var(--red)";
         if(checkBtn)checkBtn.disabled=true;
+        if(drawBtn)drawBtn.disabled=true;
       } else {
         if(msgEl)msgEl.textContent="✗ Неверно (попытка "+attempts+" из "+maxAttempts+"). Попробуйте ещё раз.";
         if(msgEl)msgEl.style.color="var(--red)";
-        p2=null;
-        if(xInput)xInput.value="";
-        if(yInput)yInput.value="";
+        /* сброс: точки и линия */
+        p1=null;p2=null;lineDrawn=false;
+        if(x1Input)x1Input.value="";if(y1Input)y1Input.value="";
+        if(x2Input)x2Input.value="";if(y2Input)y2Input.value="";
         updateGraph();
       }
     }
     saveAns();
   }
 
-  /* события */
+  /* события клика / тача */
   if(clickTarget){
     clickTarget.addEventListener("click",function(e){handlePoint(e.clientX,e.clientY);});
     clickTarget.addEventListener("touchstart",function(e){
@@ -222,34 +289,38 @@ function setupGraphInteraction(svg, task, g, state, updateBar){
       if(e.touches&&e.touches[0])handlePoint(e.touches[0].clientX,e.touches[0].clientY);
     },{passive:false});
   }
+  if(drawBtn)drawBtn.addEventListener("click",handleDraw);
   if(checkBtn)checkBtn.addEventListener("click",handleCheck);
   if(resetBtn){
     resetBtn.addEventListener("click",function(){
       if(answered)return;
-      p2=null;
-      if(xInput)xInput.value="";
-      if(yInput)yInput.value="";
+      p1=null;p2=null;lineDrawn=false;
+      if(x1Input)x1Input.value="";if(y1Input)y1Input.value="";
+      if(x2Input)x2Input.value="";if(y2Input)y2Input.value="";
       if(msgEl)msgEl.textContent="";
       updateGraph();
     });
   }
   /* ввод в таблицу → точка на графике */
-  if(xInput&&yInput){
+  function bindInput(xi,yi,idx){
+    if(!xi||!yi)return;
     var onInput=function(){
-      var xv=parseFloat(String(xInput.value).replace(",","."));
-      var yv=parseFloat(String(yInput.value).replace(",","."));
+      var xv=parseFloat(String(xi.value).replace(",","."));
+      var yv=parseFloat(String(yi.value).replace(",","."));
       if(isFinite(xv)&&isFinite(yv)){
-        setPoint2(xv,yv);
-      } else {
-        p2=null;
+        setPoint(idx,xv,yv);
+      } else if(!xi.value&&!yi.value){
+        if(idx===1)p1=null;else p2=null;
+        lineDrawn=false;
         updateGraph();
       }
     };
-    xInput.addEventListener("input",onInput);
-    yInput.addEventListener("input",onInput);
-    /* Enter в таблице → проверка */
-    yInput.addEventListener("keydown",function(e){if(e.key==="Enter"){e.preventDefault();handleCheck();}});
+    xi.addEventListener("input",onInput);
+    yi.addEventListener("input",onInput);
+    yi.addEventListener("keydown",function(e){if(e.key==="Enter"){e.preventDefault();handleCheck();}});
   }
+  bindInput(x1Input,y1Input,1);
+  bindInput(x2Input,y2Input,2);
 }
 
 /* ---------- проверка графика ---------- */
@@ -277,9 +348,9 @@ function genProporcii(rng){
   else kStr=k+"x";
 
   var q="<p>Постройте график прямой пропорциональности <b>y = "+kStr+"</b>.</p>"
-    +"<p class='task-intro' style='font-size:15px;color:var(--mute)'>Точка O(0;0) уже поставлена. "
-    +"Введите координаты второй точки в таблицу или кликните на координатной плоскости. "
-    +"Затем нажмите «Проверить». У вас до 3 попыток.</p>"
+    +"<p class='task-intro' style='font-size:15px;color:var(--mute)'>Подумайте, через какие две точки проходит график. "
+    +"Введите координаты в таблицу или кликните на координатной плоскости. "
+    +"Затем нажмите «Провести прямую» и «Проверить». У вас до 3 попыток.</p>"
     +graphSVG();
 
   /* подробное решение */
@@ -321,7 +392,7 @@ function genProporcii(rng){
     tol:0.3,
     atext:"y = "+kStr+" (через O(0;0), k = "+k+")",
     sol:"y = "+kStr,
-    hint:"Прямая y = kx проходит через (0;0). Выберите x = 2 → y = "+k+"·2 = "+(k*2),
+    hint:"Прямая y = kx проходит через начало координат. Выберите x = 2 → y = "+k+"·2 = "+(k*2),
     detailed:detH
   }];
 }
@@ -353,10 +424,9 @@ function register(){
     title:"Прямая пропорциональность",
     variants:50,
     desc:"Интерактивный тренажёр по прямой пропорциональности y = kx. "
-      +"Ученик строит график: точка O(0;0) уже поставлена, вторую точку "
-      +"можно ввести в таблицу или кликнуть на координатной плоскости. "
-      +"До 3 попыток. 50 вариантов. После выполнения — правильный график "
-      +"с подробным решением.",
+      +"Ученик сам выбирает две точки (кликом или через таблицу) и "
+      +"проводит прямую кнопкой. До 3 попыток. 50 вариантов. "
+      +"После выполнения — правильный график с подробным решением.",
     blocks:[{name:"Построение графика y = kx",gen:genProporcii,count:1}]
   });
 }
