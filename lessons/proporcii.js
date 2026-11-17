@@ -55,10 +55,9 @@ function graphSVG(){
     +"<td style='border:1.5px solid var(--line);padding:4px 10px;text-align:center'>"
     +"<input id='tz-graph-y2' type='text' inputmode='decimal' style='width:60px;text-align:center;font-size:16px;border:2px solid var(--blue);border-radius:6px;padding:3px' placeholder='y₂'></td></tr>";
   h+="</table>";
-  h+="<p style='font-size:14px;color:var(--mute);margin:4px 0 0'>Выберите две точки на координатной плоскости или введите их координаты в таблицу. Подумайте, через какие точки проходит прямая y = kx. Затем нажмите «Провести прямую».</p>";
+  h+="<p style='font-size:14px;color:var(--mute);margin:4px 0 0'>Зажмите мышку (или палец) на координатной плоскости и проведите прямую — от одной точки до другой. Подумайте, через какие точки проходит график y = kx.</p>";
   /* кнопки */
   h+="<div style='display:flex;gap:10px;justify-content:center;margin-top:8px;flex-wrap:wrap'>";
-  h+="<button class='btn sm' type='button' id='tz-graph-draw' style='background:var(--green);color:var(--on-accent)'>Провести прямую</button>";
   h+="<button class='btn sm' type='button' id='tz-graph-check' style='background:var(--blue);color:var(--on-accent)'>Проверить</button>";
   h+="<button class='btn ghost sm' type='button' id='tz-graph-reset'>Сбросить</button>";
   h+="</div>";
@@ -69,14 +68,14 @@ function graphSVG(){
 }
 
 /* ---------- настройка интерактивного графика ----------
-   Две точки — обе выбирает ученик. Прямая рисуется только после
-   нажатия кнопки «Провести прямую». Точки можно ставить кликом
-   на координатной плоскости или вводом в таблицу. */
+   Ученик САМ рисует прямую перетаскиванием (drag) мышкой или пальцем.
+   Зажимает на координатной плоскости → ведёт → отпускает.
+   Начало и конец перетаскивания = две точки прямой.
+   Координаты точек на графике НЕ показываются (только в таблице). */
 function setupGraphInteraction(svg, task, g, state, updateBar){
   if(!svg)return;
   var layer=svg.querySelector("#tz-graph-layer");
   var clickTarget=svg.querySelector("#tz-graph-click");
-  var drawBtn=document.getElementById("tz-graph-draw");
   var checkBtn=document.getElementById("tz-graph-check");
   var resetBtn=document.getElementById("tz-graph-reset");
   var x1Input=document.getElementById("tz-graph-x1");
@@ -85,194 +84,213 @@ function setupGraphInteraction(svg, task, g, state, updateBar){
   var y2Input=document.getElementById("tz-graph-y2");
   var msgEl=document.getElementById("tz-graph-msg");
   var O=200, sc=40, SIZE=400;
-  /* обе точки — null, ученик выбирает сам */
   var p1=null, p2=null;
-  var lineDrawn=false;
-  var attempts=0;
-  var maxAttempts=3;
-  var answered=false;
+  var attempts=0, maxAttempts=3, answered=false;
+  var dragging=false, dragStart=null;
 
   /* восстановление */
   if(state&&state.ans&&state.ans[g]&&state.ans[g].p1){
     p1=state.ans[g].p1;
     p2=state.ans[g].p2;
-    lineDrawn=!!state.ans[g].lineDrawn;
     attempts=state.ans[g].attempts||0;
     answered=!!state.ans[g].answered;
-    if(p1){
-      if(x1Input)x1Input.value=fmt(p1.x);
-      if(y1Input)y1Input.value=fmt(p1.y);
-    }
-    if(p2){
-      if(x2Input)x2Input.value=fmt(p2.x);
-      if(y2Input)y2Input.value=fmt(p2.y);
-    }
+    if(p1){if(x1Input)x1Input.value=fmt(p1.x);if(y1Input)y1Input.value=fmt(p1.y);}
+    if(p2){if(x2Input)x2Input.value=fmt(p2.x);if(y2Input)y2Input.value=fmt(p2.y);}
     updateGraph();
   }
 
   function p2m(px,py){return{x:(px-O)/sc, y:(O-py)/sc};}
   function m2p(mx,my){return{px:O+mx*sc, py:O-my*sc};}
 
+  function roundPoint(mx,my){
+    mx=Math.round(mx*2)/2; my=Math.round(my*2)/2;
+    if(mx<-5)mx=-5;if(mx>5)mx=5;
+    if(my<-5)my=-5;if(my>5)my=5;
+    return{x:mx,y:my};
+  }
+
+  function extendLine(a,b){
+    /* продлеваем отрезок a-b до границ холста */
+    var dx=b.px-a.px, dy=b.py-a.py;
+    if(Math.abs(dx)<0.01&&Math.abs(dy)<0.01)return null;
+    var ts=[],t1=-a.px/dx,t2=(SIZE-a.px)/dx,t3=-a.py/dy,t4=(SIZE-a.py)/dy;
+    if(isFinite(t1))ts.push(t1);if(isFinite(t2))ts.push(t2);
+    if(isFinite(t3))ts.push(t3);if(isFinite(t4))ts.push(t4);
+    ts.sort(function(a,b){return a-b;});
+    if(ts.length<2)return null;
+    return{x1:(a.px+dx*ts[0]).toFixed(1),y1:(a.py+dy*ts[0]).toFixed(1),
+            x2:(a.px+dx*ts[ts.length-1]).toFixed(1),y2:(a.py+dy*ts[ts.length-1]).toFixed(1)};
+  }
+
   function updateGraph(){
     if(!layer)return;
     var html="";
-    /* линия — только если ученик нажал «Провести прямую» */
-    if(lineDrawn&&p1&&p2){
+    if(p1&&p2){
       var a=m2p(p1.x,p1.y), b=m2p(p2.x,p2.y);
-      var dx=b.px-a.px, dy=b.py-a.py;
-      if(Math.abs(dx)>0.01||Math.abs(dy)>0.01){
-        var ts=[],t1=-a.px/dx,t2=(SIZE-a.px)/dx,t3=-a.py/dy,t4=(SIZE-a.py)/dy;
-        if(isFinite(t1))ts.push(t1);if(isFinite(t2))ts.push(t2);
-        if(isFinite(t3))ts.push(t3);if(isFinite(t4))ts.push(t4);
-        ts.sort(function(a,b){return a-b;});
-        if(ts.length>=2){
-          html+="<line x1='"+(a.px+dx*ts[0]).toFixed(1)+"' y1='"+(a.py+dy*ts[0]).toFixed(1)+"' x2='"+(a.px+dx*ts[ts.length-1]).toFixed(1)+"' y2='"+(a.py+dy*ts[ts.length-1]).toFixed(1)+"' stroke='var(--blue)' stroke-width='2.5' opacity='0.8'/>";
-        }
+      var ext=extendLine(a,b);
+      if(ext){
+        html+="<line x1='"+ext.x1+"' y1='"+ext.y1+"' x2='"+ext.x2+"' y2='"+ext.y2+"' stroke='var(--blue)' stroke-width='2.5' opacity='0.8'/>";
       }
+      /* концы прямой — маленькие точки без координат */
+      html+="<circle cx='"+a.px.toFixed(1)+"' cy='"+a.py.toFixed(1)+"' r='5' fill='var(--blue)'/>";
+      html+="<circle cx='"+b.px.toFixed(1)+"' cy='"+b.py.toFixed(1)+"' r='5' fill='var(--blue)'/>";
     }
-    /* точки */
-    if(p1){
-      var pp1=m2p(p1.x,p1.y);
-      html+="<circle cx='"+pp1.px.toFixed(1)+"' cy='"+pp1.py.toFixed(1)+"' r='7' fill='var(--blue)' stroke='var(--card)' stroke-width='2.5'/>";
-      html+="<text x='"+(pp1.px+10)+"' y='"+(pp1.py-8)+"' font-size='11' fill='var(--blue)' font-weight='600'>("+fmt(p1.x)+"; "+fmt(p1.y)+")</text>";
+    layer.innerHTML=html;
+  }
+
+  /* превью линии во время перетаскивания */
+  function updatePreview(curPx,curPy){
+    if(!layer||!dragStart)return;
+    var a={px:dragStart.px,py:dragStart.py};
+    var b={px:curPx,py:curPy};
+    var ext=extendLine(a,b);
+    var html="";
+    if(ext){
+      html+="<line x1='"+ext.x1+"' y1='"+ext.y1+"' x2='"+ext.x2+"' y2='"+ext.y2+"' stroke='var(--blue)' stroke-width='2' opacity='0.5' stroke-dasharray='6,4'/>";
     }
-    if(p2){
-      var pp2=m2p(p2.x,p2.y);
-      html+="<circle cx='"+pp2.px.toFixed(1)+"' cy='"+pp2.py.toFixed(1)+"' r='7' fill='var(--blue)' stroke='var(--card)' stroke-width='2.5'/>";
-      html+="<text x='"+(pp2.px+10)+"' y='"+(pp2.py-8)+"' font-size='11' fill='var(--blue)' font-weight='600'>("+fmt(p2.x)+"; "+fmt(p2.y)+")</text>";
-    }
+    html+="<circle cx='"+a.px.toFixed(1)+"' cy='"+a.py.toFixed(1)+"' r='5' fill='var(--blue)'/>";
+    html+="<circle cx='"+b.px.toFixed(1)+"' cy='"+b.py.toFixed(1)+"' r='5' fill='var(--blue)'/>";
     layer.innerHTML=html;
   }
 
   function saveAns(){
     var prev=state&&state.ans?state.ans[g]:null;
     var wasAnswered=prev&&prev.answered;
-    var nowAnswered=answered;
     if(state&&state.ans){
-      state.ans[g]={p1:p1, p2:p2, lineDrawn:lineDrawn, attempts:attempts, answered:answered, correct:answered&&(function(){
+      state.ans[g]={p1:p1,p2:p2,attempts:attempts,answered:answered,correct:answered&&(function(){
         if(!p1||!p2)return false;
         var dx=p2.x-p1.x;
         if(Math.abs(dx)<0.01)return false;
         var k=(p2.y-p1.y)/dx;
         var b=p1.y-k*p1.x;
-        var tol=task.tol||0.3;
-        return Math.abs(k-task.k)<=tol&&Math.abs(b)<=tol;
+        return Math.abs(k-task.k)<=(task.tol||0.3)&&Math.abs(b)<=(task.tol||0.3);
       })()};
-      if(!wasAnswered&&nowAnswered)state.answered++;
-      if(wasAnswered&&!nowAnswered&&state.answered>0)state.answered--;
+      if(!wasAnswered&&answered)state.answered++;
+      if(wasAnswered&&!answered&&state.answered>0)state.answered--;
     }
     if(updateBar)updateBar();
   }
 
-  function roundPoint(mx,my){
-    mx=Math.round(mx*2)/2;
-    my=Math.round(my*2)/2;
-    if(mx<-5)mx=-5;if(mx>5)mx=5;
-    if(my<-5)my=-5;if(my>5)my=5;
-    return{x:mx,y:my};
-  }
-
-  function setPoint(idx,mx,my){
-    if(answered)return;
-    var pt=roundPoint(mx,my);
-    if(idx===1){
-      p1=pt;
-      if(x1Input)x1Input.value=fmt(pt.x);
-      if(y1Input)y1Input.value=fmt(pt.y);
-    } else {
-      p2=pt;
-      if(x2Input)x2Input.value=fmt(pt.x);
-      if(y2Input)y2Input.value=fmt(pt.y);
-    }
-    /* если точки изменились — снимаем линию */
-    lineDrawn=false;
-    if(msgEl)msgEl.textContent="";
-    updateGraph();
-  }
-
-  function handlePoint(clientX,clientY){
-    if(answered)return;
+  function getSVGCoords(clientX,clientY){
     var rect=svg.getBoundingClientRect();
-    var px=(clientX-rect.left)*(SIZE/rect.width);
-    var py=(clientY-rect.top)*(SIZE/rect.height);
-    var m=p2m(px,py);
-    /* первая точка не поставлена → ставим p1; иначе p2; если обе есть → начинаем заново с p1 */
-    if(!p1){
-      setPoint(1,m.x,m.y);
-    } else if(!p2){
-      setPoint(2,m.x,m.y);
-    } else {
-      /* начинаем заново */
-      p1=null;p2=null;lineDrawn=false;
-      if(x1Input)x1Input.value="";if(y1Input)y1Input.value="";
-      if(x2Input)x2Input.value="";if(y2Input)y2Input.value="";
-      if(msgEl)msgEl.textContent="";
-      setPoint(1,m.x,m.y);
-    }
+    return{
+      px:(clientX-rect.left)*(SIZE/rect.width),
+      py:(clientY-rect.top)*(SIZE/rect.height)
+    };
   }
 
-  function handleDraw(){
-    if(answered)return;
-    if(!p1||!p2){
-      if(msgEl)msgEl.textContent="Сначала выберите две точки.";
-      if(msgEl)msgEl.style.color="var(--red)";
-      return;
-    }
-    lineDrawn=true;
-    if(msgEl)msgEl.textContent="";
-    updateGraph();
+  /* ---- DRAG: мышка ---- */
+  if(clickTarget){
+    clickTarget.addEventListener("mousedown",function(e){
+      if(answered)return;
+      var c=getSVGCoords(e.clientX,e.clientY);
+      var m=p2m(c.px,c.py);
+      dragStart={px:c.px,py:c.py,x:m.x,y:m.y};
+      dragging=true;
+      if(msgEl)msgEl.textContent="";
+      e.preventDefault();
+    });
+    clickTarget.addEventListener("mousemove",function(e){
+      if(!dragging)return;
+      var c=getSVGCoords(e.clientX,e.clientY);
+      updatePreview(c.px,c.py);
+    });
+    clickTarget.addEventListener("mouseup",function(e){
+      if(!dragging)return;
+      dragging=false;
+      var c=getSVGCoords(e.clientX,e.clientY);
+      var m=p2m(c.px,c.py);
+      var start=roundPoint(dragStart.x,dragStart.y);
+      var end=roundPoint(m.x,m.y);
+      p1=start; p2=end;
+      if(x1Input)x1Input.value=fmt(start.x);
+      if(y1Input)y1Input.value=fmt(start.y);
+      if(x2Input)x2Input.value=fmt(end.x);
+      if(y2Input)y2Input.value=fmt(end.y);
+      updateGraph();
+    });
+    clickTarget.addEventListener("mouseleave",function(){
+      if(dragging){dragging=false;updateGraph();}
+    });
+
+    /* ---- DRAG: тачскрин ---- */
+    clickTarget.addEventListener("touchstart",function(e){
+      if(answered)return;
+      if(e.touches&&e.touches[0]){
+        var c=getSVGCoords(e.touches[0].clientX,e.touches[0].clientY);
+        var m=p2m(c.px,c.py);
+        dragStart={px:c.px,py:c.py,x:m.x,y:m.y};
+        dragging=true;
+        if(msgEl)msgEl.textContent="";
+        e.preventDefault();
+      }
+    },{passive:false});
+    clickTarget.addEventListener("touchmove",function(e){
+      if(!dragging)return;
+      if(e.touches&&e.touches[0]){
+        var c=getSVGCoords(e.touches[0].clientX,e.touches[0].clientY);
+        updatePreview(c.px,c.py);
+        e.preventDefault();
+      }
+    },{passive:false});
+    clickTarget.addEventListener("touchend",function(e){
+      if(!dragging)return;
+      dragging=false;
+      if(e.changedTouches&&e.changedTouches[0]){
+        var c=getSVGCoords(e.changedTouches[0].clientX,e.changedTouches[0].clientY);
+        var m=p2m(c.px,c.py);
+        var start=roundPoint(dragStart.x,dragStart.y);
+        var end=roundPoint(m.x,m.y);
+        p1=start; p2=end;
+        if(x1Input)x1Input.value=fmt(start.x);
+        if(y1Input)y1Input.value=fmt(start.y);
+        if(x2Input)x2Input.value=fmt(end.x);
+        if(y2Input)y2Input.value=fmt(end.y);
+        updateGraph();
+      }
+    });
   }
 
   function handleCheck(){
     if(answered)return;
-    /* читаем из таблицы, если точки не все поставлены */
+    /* если линия не проведена — пробуем из таблицы */
     if(!p1&&x1Input&&y1Input){
       var xv1=parseFloat(String(x1Input.value).replace(",","."));
       var yv1=parseFloat(String(y1Input.value).replace(",","."));
-      if(isFinite(xv1)&&isFinite(yv1))setPoint(1,xv1,yv1);
+      if(isFinite(xv1)&&isFinite(yv1))p1={x:xv1,y:yv1};
     }
     if(!p2&&x2Input&&y2Input){
       var xv2=parseFloat(String(x2Input.value).replace(",","."));
       var yv2=parseFloat(String(y2Input.value).replace(",","."));
-      if(isFinite(xv2)&&isFinite(yv2))setPoint(2,xv2,yv2);
+      if(isFinite(xv2)&&isFinite(yv2))p2={x:xv2,y:yv2};
     }
     if(!p1||!p2){
-      if(msgEl)msgEl.textContent="Выберите две точки и нажмите «Провести прямую».";
-      if(msgEl)msgEl.style.color="var(--red)";
-      return;
-    }
-    if(!lineDrawn){
-      if(msgEl)msgEl.textContent="Сначала нажмите «Провести прямую».";
+      if(msgEl)msgEl.textContent="Проведите прямую на координатной плоскости — зажмите и ведите.";
       if(msgEl)msgEl.style.color="var(--red)";
       return;
     }
     attempts++;
-    var dx=p2.x-p1.x;
-    var correct=false;
+    var dx=p2.x-p1.x, correct=false;
     if(Math.abs(dx)>=0.01){
       var k=(p2.y-p1.y)/dx;
       var b=p1.y-k*p1.x;
-      var tol=task.tol||0.3;
-      correct=Math.abs(k-task.k)<=tol&&Math.abs(b)<=tol;
+      correct=Math.abs(k-task.k)<=(task.tol||0.3)&&Math.abs(b)<=(task.tol||0.3);
     }
     if(correct){
       answered=true;
       if(msgEl)msgEl.textContent="✓ Верно! Прямая y="+task.kStr+" построена правильно.";
       if(msgEl)msgEl.style.color="var(--green)";
       if(checkBtn)checkBtn.disabled=true;
-      if(drawBtn)drawBtn.disabled=true;
     } else {
       if(attempts>=maxAttempts){
         answered=true;
         if(msgEl)msgEl.textContent="✗ Попытки закончились. Верный ответ: y="+task.kStr+".";
         if(msgEl)msgEl.style.color="var(--red)";
         if(checkBtn)checkBtn.disabled=true;
-        if(drawBtn)drawBtn.disabled=true;
       } else {
         if(msgEl)msgEl.textContent="✗ Неверно (попытка "+attempts+" из "+maxAttempts+"). Попробуйте ещё раз.";
         if(msgEl)msgEl.style.color="var(--red)";
-        /* сброс: точки и линия */
-        p1=null;p2=null;lineDrawn=false;
+        p1=null;p2=null;
         if(x1Input)x1Input.value="";if(y1Input)y1Input.value="";
         if(x2Input)x2Input.value="";if(y2Input)y2Input.value="";
         updateGraph();
@@ -281,37 +299,31 @@ function setupGraphInteraction(svg, task, g, state, updateBar){
     saveAns();
   }
 
-  /* события клика / тача */
-  if(clickTarget){
-    clickTarget.addEventListener("click",function(e){handlePoint(e.clientX,e.clientY);});
-    clickTarget.addEventListener("touchstart",function(e){
-      e.preventDefault();
-      if(e.touches&&e.touches[0])handlePoint(e.touches[0].clientX,e.touches[0].clientY);
-    },{passive:false});
-  }
-  if(drawBtn)drawBtn.addEventListener("click",handleDraw);
   if(checkBtn)checkBtn.addEventListener("click",handleCheck);
   if(resetBtn){
     resetBtn.addEventListener("click",function(){
       if(answered)return;
-      p1=null;p2=null;lineDrawn=false;
+      p1=null;p2=null;dragging=false;
       if(x1Input)x1Input.value="";if(y1Input)y1Input.value="";
       if(x2Input)x2Input.value="";if(y2Input)y2Input.value="";
       if(msgEl)msgEl.textContent="";
       updateGraph();
     });
   }
-  /* ввод в таблицу → точка на графике */
+  /* ввод в таблицу → линия */
   function bindInput(xi,yi,idx){
     if(!xi||!yi)return;
     var onInput=function(){
       var xv=parseFloat(String(xi.value).replace(",","."));
       var yv=parseFloat(String(yi.value).replace(",","."));
       if(isFinite(xv)&&isFinite(yv)){
-        setPoint(idx,xv,yv);
+        var pt=roundPoint(xv,yv);
+        if(idx===1)p1=pt;else p2=pt;
+        if(idx===1){if(x1Input)x1Input.value=fmt(pt.x);if(y1Input)y1Input.value=fmt(pt.y);}
+        else{if(x2Input)x2Input.value=fmt(pt.x);if(y2Input)y2Input.value=fmt(pt.y);}
+        updateGraph();
       } else if(!xi.value&&!yi.value){
         if(idx===1)p1=null;else p2=null;
-        lineDrawn=false;
         updateGraph();
       }
     };
