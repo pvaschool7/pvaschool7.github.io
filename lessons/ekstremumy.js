@@ -78,6 +78,121 @@ function detSteps(items,answerLine){
   return h;
 }
 
+/* ---------- SVG-график функции на отрезке ----------
+   Рисует график y=f(x) на [a;b], отмечает критические точки,
+   подписывает max и min. Размер 400×320. */
+function graphSVG(f,a,b,ex,fHtml){
+  var W=400,H=320,padL=50,padR=20,padT=25,padB=45;
+  var plotW=W-padL-padR,plotH=H-padT-padB;
+  /* y-диапазон с запасом */
+  var yLo=ex.min,yHi=ex.max;
+  var yRange=yHi-yLo;
+  if(yRange<0.01)yRange=1;
+  yLo-=yRange*0.15; yHi+=yRange*0.15;
+  var xRange=b-a;
+  /* функции масштабирования */
+  function sx(x){return padL+(x-a)/xRange*plotW;}
+  function sy(y){return padT+plotH-(y-yLo)/(yHi-yLo)*plotH;}
+  var h="<svg width='"+W+"' height='"+H+"' viewBox='0 0 "+W+" "+H+"' xmlns='http://www.w3.org/2000/svg' style='font-family:Golos Text,sans-serif;max-width:100%;height:auto'>";
+  /* оси */
+  h+="<line x1='"+padL+"' y1='"+(padT+plotH)+"' x2='"+(padL+plotW)+"' y2='"+(padT+plotH)+"' stroke='var(--ink)' stroke-width='2'/>";
+  h+="<line x1='"+padL+"' y1='"+padT+"' x2='"+padL+"' y2='"+(padT+plotH)+"' stroke='var(--ink)' stroke-width='2'/>";
+  /* подписи концов отрезка на оси x */
+  h+="<text x='"+padL+"' y='"+(padT+plotH+16)+"' font-size='12' fill='var(--mute)' text-anchor='middle'>"+fmt(a)+"</text>";
+  h+="<text x='"+(padL+plotW)+"' y='"+(padT+plotH+16)+"' font-size='12' fill='var(--mute)' text-anchor='middle'>"+fmt(b)+"</text>";
+  h+="<text x='"+(padL-8)+"' y='"+(padT+plotH+16)+"' font-size='11' fill='var(--mute)' text-anchor='end'>x</text>";
+  /* подписи y на оси */
+  h+="<text x='"+(padL-8)+"' y='"+sy(yHi).toFixed(0)+"' font-size='11' fill='var(--mute)' text-anchor='end'>"+fmt(yHi)+"</text>";
+  h+="<text x='"+(padL-8)+"' y='"+sy(yLo).toFixed(0)+"' font-size='11' fill='var(--mute)' text-anchor='end'>"+fmt(yLo)+"</text>";
+  /* кривая функции — 100 точек */
+  var N=100;
+  var pts=[];
+  for(var i=0;i<=N;i++){
+    var x=a+i/N*xRange;
+    var y=f(x);
+    if(isFinite(y))pts.push(sx(x).toFixed(1)+","+sy(y).toFixed(1));
+  }
+  if(pts.length>1){
+    h+="<polyline points='"+pts.join(" ")+"' fill='none' stroke='var(--blue)' stroke-width='2.5'/>";
+  }
+  /* критические точки (внутри отрезка) */
+  for(var ci=1;ci<ex.crits.length-1;ci++){
+    var cx=ex.crits[ci];
+    if(cx>a+0.01&&cx<b-0.01){
+      var cy=f(cx);
+      h+="<circle cx='"+sx(cx).toFixed(1)+"' cy='"+sy(cy).toFixed(1)+"' r='4' fill='var(--yellow)' stroke='var(--ink)' stroke-width='1.5'/>";
+    }
+  }
+  /* max — красная точка */
+  h+="<circle cx='"+sx(ex.maxX).toFixed(1)+"' cy='"+sy(ex.max).toFixed(1)+"' r='6' fill='var(--red)' stroke='var(--card)' stroke-width='2'/>";
+  h+="<text x='"+(sx(ex.maxX)+8).toFixed(0)+"' y='"+(sy(ex.max)-8).toFixed(0)+"' font-size='13' fill='var(--red)' font-weight='600'>max="+fmt(ex.max)+"</text>";
+  /* min — зелёная точка */
+  h+="<circle cx='"+sx(ex.minX).toFixed(1)+"' cy='"+sy(ex.min).toFixed(1)+"' r='6' fill='var(--green)' stroke='var(--card)' stroke-width='2'/>";
+  h+="<text x='"+(sx(ex.minX)+8).toFixed(0)+"' y='"+(sy(ex.min)+16).toFixed(0)+"' font-size='13' fill='var(--green)' font-weight='600'>min="+fmt(ex.min)+"</text>";
+  /* концы отрезка — точки */
+  h+="<circle cx='"+sx(a).toFixed(1)+"' cy='"+sy(f(a)).toFixed(1)+"' r='4' fill='var(--ink)'/>";
+  h+="<circle cx='"+sx(b).toFixed(1)+"' cy='"+sy(f(b)).toFixed(1)+"' r='4' fill='var(--ink)'/>";
+  h+="</svg>";
+  return h;
+}
+
+/* ---------- полное решение с графиком и таблицей значений ---------- */
+function buildSolution(f,lo,hi,ex,fHtml,derivStr,critStr){
+  /* таблица значений в кандидатах */
+  var vals=[];
+  for(var i=0;i<ex.crits.length;i++){
+    var x=ex.crits[i];
+    var v=f(x);
+    var isMax=Math.abs(v-ex.max)<1e-6;
+    var isMin=Math.abs(v-ex.min)<1e-6;
+    vals.push({x:x,v:v,isMax:isMax,isMin:isMin});
+  }
+  var tableH="<table style='border-collapse:collapse;margin:8px auto;font-size:15px;font-family:Golos Text,sans-serif'>";
+  tableH+="<tr><th style='border:1.5px solid var(--line);padding:4px 16px;background:var(--paper)'>x</th>"
+    +"<th style='border:1.5px solid var(--line);padding:4px 16px;background:var(--paper)'>f(x)</th>"
+    +"<th style='border:1.5px solid var(--line);padding:4px 16px;background:var(--paper)'>тип</th></tr>";
+  for(var j=0;j<vals.length;j++){
+    var v=vals[j];
+    var type=v.isMax?"<b style='color:var(--red)'>max</b>":v.isMin?"<b style='color:var(--green)'>min</b>":"";
+    tableH+="<tr><td style='border:1px solid var(--line);padding:3px 16px;text-align:center'>"+fmt(v.x)+"</td>"
+      +"<td style='border:1px solid var(--line);padding:3px 16px;text-align:center'>"+fmt(v.v)+"</td>"
+      +"<td style='border:1px solid var(--line);padding:3px 16px;text-align:center'>"+type+"</td></tr>";
+  }
+  tableH+="</table>";
+
+  /* комментарий о знаках производной */
+  var signComment="";
+  var innerCrits=ex.crits.slice(1,-1); /* внутренние критические точки */
+  if(innerCrits.length>0){
+    signComment="<p>В точке x = "+fmt(innerCrits[0])+" производная меняет знак ";
+    var leftVal=f(innerCrits[0]-0.1),rightVal=f(innerCrits[0]+0.1);
+    if(leftVal<rightVal){
+      signComment+="с «−» на «+» → это точка <b style='color:var(--green)'>минимума</b>.";
+    } else {
+      signComment+="с «+» на «−» → это точка <b style='color:var(--red)'>максимума</b>.";
+    }
+    signComment+=" Значение: f("+fmt(innerCrits[0])+") = "+fmt(f(innerCrits[0]))+".</p>";
+  } else {
+    signComment="<p>Критических точек внутри отрезка нет — функция монотонна. "
+      +"Экстремумы достигаются на концах отрезка.</p>";
+  }
+
+  var detH="";
+  detH+="<p><b>1. Функция и отрезок.</b> y = "+fHtml+", x ∈ ["+fmt(lo)+"; "+fmt(hi)+"].</p>";
+  detH+="<p><b>2. Производная.</b> "+derivStr+".</p>";
+  detH+="<p><b>3. Критические точки.</b> "+critStr+". Проверяем, какие попадают в отрезок ["+fmt(lo)+"; "+fmt(hi)+"].</p>";
+  detH+=signComment;
+  detH+="<p><b>4. Таблица значений.</b> Вычисляем f(x) во всех критических точках и на концах:</p>";
+  detH+=tableH;
+  detH+="<p><b>5. График функции.</b></p>";
+  detH+="<div class='svg-center' style='margin:8px auto;max-width:420px'>"+graphSVG(f,lo,hi,ex,fHtml)+"</div>";
+  detH+="<p><b>6. Вывод.</b> Наибольшее значение функции на отрезке: "
+    +"<b style='color:var(--red)'>max = "+fmt(ex.max)+"</b> (достигается при x = "+fmt(ex.maxX)+"). "
+    +"Наименьшее значение: <b style='color:var(--green)'>min = "+fmt(ex.min)+"</b> "
+    +"(при x = "+fmt(ex.minX)+").</p>";
+  return detH;
+}
+
 /* =====================================================================
    БЛОК 1 (5.6): Многочлены — 4 задания
 -------------------------------------------------------------------- */
@@ -96,12 +211,7 @@ function gen5_6a(rng){
     max:ex.max,min:ex.min,
     sol:"max = "+fmt(ex.max)+", min = "+fmt(ex.min),
     hint:"Найдите f'(x), приравняйте к нулю, проверьте концы и критические точки",
-    detailed:detSteps([
-      {title:"Функция и отрезок",text:"y = "+fHtml+", x ∈ ["+lo+"; "+hi+"]"},
-      {title:"Производная",text:dStr},
-      {title:"Критические точки",text:critStr+" — проверяем, какие попадают в ["+lo+"; "+hi+"]"},
-      {title:"Значения функции",text:"Вычисляем f(x) в критических точках и на концах отрезка, выбираем наибольшее и наименьшее"}
-    ],"max = "+fmt(ex.max)+", min = "+fmt(ex.min))
+    detailed:buildSolution(f,lo,hi,ex,fHtml,dStr,critStr)
   });
 }
 function gen5_6b(rng){
@@ -116,11 +226,7 @@ function gen5_6b(rng){
     max:ex.max,min:ex.min,
     sol:"max = "+fmt(ex.max)+", min = "+fmt(ex.min),
     hint:"f'(x) = 3ax² + b — квадратное уравнение",
-    detailed:detSteps([
-      {title:"Функция и отрезок",text:"y = "+fHtml+", x ∈ ["+lo+"; "+hi+"]"},
-      {title:"Производная",text:"f'(x) = "+(3*a)+"x² + "+b+" = 0 → x = ±"+fmt(Math.sqrt(-b/(3*a)))},
-      {title:"Значения функции",text:"Проверяем концы и критические точки в отрезке"}
-    ],"max = "+fmt(ex.max)+", min = "+fmt(ex.min))
+    detailed:buildSolution(f,lo,hi,ex,fHtml,"f'(x) = "+(3*a)+"x² + "+b+" = 0 → x = ±"+fmt(Math.sqrt(-b/(3*a))),"x = ±"+fmt(Math.sqrt(-b/(3*a))))
   });
 }
 function gen5_6v(rng){
@@ -136,12 +242,7 @@ function gen5_6v(rng){
     max:ex.max,min:ex.min,
     sol:"max = "+fmt(ex.max)+", min = "+fmt(ex.min),
     hint:"f'(x) = 4ax³ + 3bx² = x²(4ax + 3b)",
-    detailed:detSteps([
-      {title:"Функция и отрезок",text:"y = "+fHtml+", x ∈ ["+lo+"; "+hi+"]"},
-      {title:"Производная",text:"f'(x) = "+(4*a)+"x³ + "+(3*b)+"x² = x²("+(4*a)+"x + "+(3*b)+")"},
-      {title:"Критические точки",text:"x = 0, x = "+fmtFrac(-3*b/(4*a))},
-      {title:"Значения функции",text:"Проверяем концы и критические точки в отрезке"}
-    ],"max = "+fmt(ex.max)+", min = "+fmt(ex.min))
+    detailed:buildSolution(f,lo,hi,ex,fHtml,"f'(x) = "+(4*a)+"x³ + "+(3*b)+"x² = x²("+(4*a)+"x + "+(3*b)+")","x = 0, x = "+fmtFrac(-3*b/(4*a)))
   });
 }
 function gen5_6g(rng){
@@ -156,12 +257,7 @@ function gen5_6g(rng){
     max:ex.max,min:ex.min,
     sol:"max = "+fmt(ex.max)+", min = "+fmt(ex.min),
     hint:"f'(x) = 4x³ − "+(2*A)+"x = 2x(2x² − "+A+")",
-    detailed:detSteps([
-      {title:"Функция и отрезок",text:"y = "+fHtml+", x ∈ ["+lo+"; "+hi+"]"},
-      {title:"Производная",text:"f'(x) = 4x³ − "+(2*A)+"x = 2x(2x² − "+A+")"},
-      {title:"Критические точки",text:"x = 0, x = ±"+fmt(sq)},
-      {title:"Значения функции",text:"Проверяем концы и критические точки в отрезке"}
-    ],"max = "+fmt(ex.max)+", min = "+fmt(ex.min))
+    detailed:buildSolution(f,lo,hi,ex,fHtml,"f'(x) = 4x³ − "+(2*A)+"x = 2x(2x² − "+A+")","x = 0, x = ±"+fmt(sq))
   });
 }
 function genBlock1(rng){return [gen5_6a(rng),gen5_6b(rng),gen5_6v(rng),gen5_6g(rng)];}
@@ -177,11 +273,7 @@ function gen5_7a(rng){
     q:"Найдите наибольшее и наименьшее значения функции y = ∛x на отрезке ["+lo+"; "+hi+"]."+ROUND_NOTE,
     max:ex.max,min:ex.min,sol:"max = "+fmt(ex.max)+", min = "+fmt(ex.min),
     hint:"Функция монотонно возрастает — экстремумы на концах",
-    detailed:detSteps([
-      {title:"Функция и отрезок",text:"y = ∛x, x ∈ ["+lo+"; "+hi+"]"},
-      {title:"Производная",text:"f'(x) = 1/(3∛x²) > 0 — функция возрастает"},
-      {title:"Экстремумы",text:"max = f("+hi+") = ∛"+hi+" = "+fmt(ex.max)+", min = f("+lo+") = ∛"+lo+" = "+fmt(ex.min)}
-    ],"max = "+fmt(ex.max)+", min = "+fmt(ex.min))
+    detailed:buildSolution(f,lo,hi,ex,"∛x","f'(x) = 1/(3∛x²) > 0 — монотонно возрастает","нет (функция монотонна)")
   });
 }
 function gen5_7b(rng){
@@ -192,11 +284,7 @@ function gen5_7b(rng){
     q:"Найдите наибольшее и наименьшее значения функции y = ⁵√x на отрезке ["+lo+"; "+hi+"]."+ROUND_NOTE,
     max:ex.max,min:ex.min,sol:"max = "+fmt(ex.max)+", min = "+fmt(ex.min),
     hint:"Функция монотонно возрастает — экстремумы на концах",
-    detailed:detSteps([
-      {title:"Функция и отрезок",text:"y = ⁵√x, x ∈ ["+lo+"; "+hi+"]"},
-      {title:"Производная",text:"f'(x) = 1/(5·⁵√x⁴) > 0 — функция возрастает"},
-      {title:"Экстремумы",text:"max = f("+hi+") = ⁵√"+hi+" = "+fmt(ex.max)+", min = f("+lo+") = ⁵√"+lo+" = "+fmt(ex.min)}
-    ],"max = "+fmt(ex.max)+", min = "+fmt(ex.min))
+    detailed:buildSolution(f,lo,hi,ex,"⁵√x","f'(x) = 1/(5·⁵√x⁴) > 0 — монотонно возрастает","нет (функция монотонна)")
   });
 }
 function gen5_7v(rng){
@@ -208,11 +296,7 @@ function gen5_7v(rng){
     q:"Найдите наибольшее и наименьшее значения функции y = "+A+"√x − x на промежутке (0; "+hi+"]."+ROUND_NOTE,
     max:ex.max,min:ex.min,sol:"max = "+fmt(ex.max)+", min = "+fmt(ex.min),
     hint:"f'(x) = "+A+"/(2√x) − 1 = 0 → x = "+fmt(crit),
-    detailed:detSteps([
-      {title:"Функция и промежуток",text:"y = "+A+"√x − x, x ∈ (0; "+hi+"]"},
-      {title:"Производная",text:"f'(x) = "+A+"/(2√x) − 1 = 0 → √x = "+A+"/2 → x = "+fmt(crit)},
-      {title:"Значения",text:(crit<hi?"f("+fmt(crit)+") = "+fmt(f(crit))+" — максимум; ":"")+"f("+hi+") = "+fmt(f(hi))+" — проверяем конец"}
-    ],"max = "+fmt(ex.max)+", min = "+fmt(ex.min))
+    detailed:buildSolution(f,1e-9,hi,ex,A+"√x − x","f'(x) = "+A+"/(2√x) − 1 = 0 → x = "+fmt(crit),"x = "+fmt(crit))
   });
 }
 function gen5_7g(rng){
@@ -224,11 +308,7 @@ function gen5_7g(rng){
     q:"Найдите наибольшее и наименьшее значения функции y = "+A+"√x − x на промежутке (0; "+hi+"]."+ROUND_NOTE,
     max:ex.max,min:ex.min,sol:"max = "+fmt(ex.max)+", min = "+fmt(ex.min),
     hint:"f'(x) = "+A+"/(2√x) − 1 = 0 → x = "+fmt(crit),
-    detailed:detSteps([
-      {title:"Функция и промежуток",text:"y = "+A+"√x − x, x ∈ (0; "+hi+"]"},
-      {title:"Производная",text:"f'(x) = "+A+"/(2√x) − 1 = 0 → x = "+fmt(crit)},
-      {title:"Значения",text:"f("+fmt(crit)+") = "+fmt(f(crit))+" — максимум; f("+hi+") = "+fmt(f(hi))+" — конец"}
-    ],"max = "+fmt(ex.max)+", min = "+fmt(ex.min))
+    detailed:buildSolution(f,1e-9,hi,ex,A+"√x − x","f'(x) = "+A+"/(2√x) − 1 = 0 → x = "+fmt(crit),"x = "+fmt(crit))
   });
 }
 function genBlock2(rng){return [gen5_7a(rng),gen5_7b(rng),gen5_7v(rng),gen5_7g(rng)];}
@@ -244,11 +324,7 @@ function gen5_8a(rng){
     q:"Найдите наибольшее и наименьшее значения функции y = eˣ − x на отрезке ["+lo+"; "+hi+"]."+ROUND_NOTE,
     max:ex.max,min:ex.min,sol:"max = "+fmt(ex.max)+", min = "+fmt(ex.min),
     hint:"f'(x) = eˣ − 1 = 0 → x = 0",
-    detailed:detSteps([
-      {title:"Функция и отрезок",text:"y = eˣ − x, x ∈ ["+lo+"; "+hi+"]"},
-      {title:"Производная",text:"f'(x) = eˣ − 1 = 0 → x = 0"},
-      {title:"Значения",text:"f(0) = 1 − 0 = 1; f("+lo+") = e^"+lo+" − "+lo+" ≈ "+fmt(f(lo))+"; f("+hi+") = e^"+hi+" − "+hi+" ≈ "+fmt(f(hi))}
-    ],"max = "+fmt(ex.max)+", min = "+fmt(ex.min))
+    detailed:buildSolution(f,lo,hi,ex,"eˣ − x","f'(x) = eˣ − 1 = 0 → x = 0","x = 0")
   });
 }
 function gen5_8b(rng){
@@ -259,11 +335,7 @@ function gen5_8b(rng){
     q:"Найдите наибольшее и наименьшее значения функции y = eˣ − xe на отрезке ["+lo+"; "+hi+"]."+ROUND_NOTE,
     max:ex.max,min:ex.min,sol:"max = "+fmt(ex.max)+", min = "+fmt(ex.min),
     hint:"f'(x) = eˣ − e = 0 → x = 1",
-    detailed:detSteps([
-      {title:"Функция и отрезок",text:"y = eˣ − xe, x ∈ ["+lo+"; "+hi+"]"},
-      {title:"Производная",text:"f'(x) = eˣ − e = 0 → x = 1"},
-      {title:"Значения",text:"f(1) = e − e = 0; f("+lo+") ≈ "+fmt(f(lo))+"; f("+hi+") ≈ "+fmt(f(hi))}
-    ],"max = "+fmt(ex.max)+", min = "+fmt(ex.min))
+    detailed:buildSolution(f,lo,hi,ex,"eˣ − xe","f'(x) = eˣ − e = 0 → x = 1","x = 1")
   });
 }
 function gen5_8v(rng){
@@ -273,11 +345,7 @@ function gen5_8v(rng){
     q:"Найдите наибольшее и наименьшее значения функции y = sin 2x − x на отрезке [−π; π]."+ROUND_NOTE,
     max:ex.max,min:ex.min,sol:"max = "+fmt(ex.max)+", min = "+fmt(ex.min),
     hint:"f'(x) = 2cos 2x − 1 = 0 → cos 2x = ½ → 2x = ±π/3",
-    detailed:detSteps([
-      {title:"Функция и отрезок",text:"y = sin 2x − x, x ∈ [−π; π]"},
-      {title:"Производная",text:"f'(x) = 2cos 2x − 1 = 0 → cos 2x = ½ → x = ±π/6"},
-      {title:"Значения",text:"f(π/6) ≈ "+fmt(f(Math.PI/6))+"; f(−π/6) ≈ "+fmt(f(-Math.PI/6))+"; f(±π) ≈ "+fmt(f(Math.PI))}
-    ],"max = "+fmt(ex.max)+", min = "+fmt(ex.min))
+    detailed:buildSolution(f,-Math.PI,Math.PI,ex,"sin 2x − x","f'(x) = 2cos 2x − 1 = 0 → cos 2x = ½ → x = ±π/6","x = ±π/6")
   });
 }
 function gen5_8g(rng){
@@ -287,11 +355,7 @@ function gen5_8g(rng){
     q:"Найдите наибольшее и наименьшее значения функции y = cos 2x + x на отрезке [−π; π]."+ROUND_NOTE,
     max:ex.max,min:ex.min,sol:"max = "+fmt(ex.max)+", min = "+fmt(ex.min),
     hint:"f'(x) = −2sin 2x + 1 = 0 → sin 2x = ½",
-    detailed:detSteps([
-      {title:"Функция и отрезок",text:"y = cos 2x + x, x ∈ [−π; π]"},
-      {title:"Производная",text:"f'(x) = −2sin 2x + 1 = 0 → sin 2x = ½ → x = π/12, x = 5π/12"},
-      {title:"Значения",text:"Проверяем критические точки и концы"}
-    ],"max = "+fmt(ex.max)+", min = "+fmt(ex.min))
+    detailed:buildSolution(f,-Math.PI,Math.PI,ex,"cos 2x + x","f'(x) = −2sin 2x + 1 = 0 → sin 2x = ½","x = π/12, x = 5π/12")
   });
 }
 function genBlock3(rng){return [gen5_8a(rng),gen5_8b(rng),gen5_8v(rng),gen5_8g(rng)];}
@@ -307,11 +371,7 @@ function gen5_10a(rng){
     q:"Найдите наибольшее и наименьшее значения функции y = x³ − 3x² на отрезке ["+lo+"; "+hi+"]."+ROUND_NOTE,
     max:ex.max,min:ex.min,sol:"max = "+fmt(ex.max)+", min = "+fmt(ex.min),
     hint:"f'(x) = 3x² − 6x = 3x(x − 2)",
-    detailed:detSteps([
-      {title:"Функция и отрезок",text:"y = x³ − 3x², x ∈ ["+lo+"; "+hi+"]"},
-      {title:"Производная",text:"f'(x) = 3x² − 6x = 3x(x − 2) = 0 → x = 0, x = 2"},
-      {title:"Значения",text:"f(0) = 0; f(2) = 8 − 12 = −4; f("+lo+") = "+fmt(f(lo))+"; f("+hi+") = "+fmt(f(hi))}
-    ],"max = "+fmt(ex.max)+", min = "+fmt(ex.min))
+    detailed:buildSolution(f,lo,hi,ex,"x³ − 3x²","f'(x) = 3x² − 6x = 3x(x − 2) = 0","x = 0, x = 2")
   });
 }
 function gen5_10b(rng){
@@ -322,11 +382,7 @@ function gen5_10b(rng){
     q:"Найдите наибольшее и наименьшее значения функции y = x³ + 3x на отрезке ["+lo+"; "+hi+"]."+ROUND_NOTE,
     max:ex.max,min:ex.min,sol:"max = "+fmt(ex.max)+", min = "+fmt(ex.min),
     hint:"f'(x) = 3x² + 3 > 0 — монотонно возрастает",
-    detailed:detSteps([
-      {title:"Функция и отрезок",text:"y = x³ + 3x, x ∈ ["+lo+"; "+hi+"]"},
-      {title:"Производная",text:"f'(x) = 3x² + 3 > 0 — функция возрастает"},
-      {title:"Экстремумы на концах",text:"max = f("+hi+") = "+fmt(ex.max)+", min = f("+lo+") = "+fmt(ex.min)}
-    ],"max = "+fmt(ex.max)+", min = "+fmt(ex.min))
+    detailed:buildSolution(f,lo,hi,ex,"x³ + 3x","f'(x) = 3x² + 3 > 0 — монотонно возрастает","нет (монотонна)")
   });
 }
 function gen5_10v(rng){
@@ -337,11 +393,7 @@ function gen5_10v(rng){
     q:"Найдите наибольшее и наименьшее значения функции y = 2x³ − 6x² + 9 на отрезке ["+lo+"; "+hi+"]."+ROUND_NOTE,
     max:ex.max,min:ex.min,sol:"max = "+fmt(ex.max)+", min = "+fmt(ex.min),
     hint:"f'(x) = 6x² − 12x = 6x(x − 2)",
-    detailed:detSteps([
-      {title:"Функция и отрезок",text:"y = 2x³ − 6x² + 9, x ∈ ["+lo+"; "+hi+"]"},
-      {title:"Производная",text:"f'(x) = 6x² − 12x = 6x(x − 2) = 0 → x = 0, x = 2"},
-      {title:"Значения",text:"f(0) = 9; f(2) = 16 − 24 + 9 = 1; f("+lo+") = "+fmt(f(lo))+"; f("+hi+") = "+fmt(f(hi))}
-    ],"max = "+fmt(ex.max)+", min = "+fmt(ex.min))
+    detailed:buildSolution(f,lo,hi,ex,"2x³ − 6x² + 9","f'(x) = 6x² − 12x = 6x(x − 2) = 0","x = 0, x = 2")
   });
 }
 function gen5_10g(rng){
@@ -352,11 +404,7 @@ function gen5_10g(rng){
     q:"Найдите наибольшее и наименьшее значения функции y = x³ − 3x на отрезке ["+lo+"; "+hi+"]."+ROUND_NOTE,
     max:ex.max,min:ex.min,sol:"max = "+fmt(ex.max)+", min = "+fmt(ex.min),
     hint:"f'(x) = 3x² − 3 = 3(x² − 1)",
-    detailed:detSteps([
-      {title:"Функция и отрезок",text:"y = x³ − 3x, x ∈ ["+lo+"; "+hi+"]"},
-      {title:"Производная",text:"f'(x) = 3x² − 3 = 3(x² − 1) = 0 → x = ±1"},
-      {title:"Значения",text:"f(1) = −2; f(−1) = 2; f("+lo+") = "+fmt(f(lo))+"; f("+hi+") = "+fmt(f(hi))}
-    ],"max = "+fmt(ex.max)+", min = "+fmt(ex.min))
+    detailed:buildSolution(f,lo,hi,ex,"x³ − 3x","f'(x) = 3x² − 3 = 3(x² − 1) = 0","x = ±1")
   });
 }
 function genBlock4(rng){return [gen5_10a(rng),gen5_10b(rng),gen5_10v(rng),gen5_10g(rng)];}
@@ -372,11 +420,7 @@ function gen5_11a(rng){
     q:"Найдите наибольшее и наименьшее значения функции y = 2x³ − x² на отрезке ["+lo+"; "+hi+"]."+ROUND_NOTE,
     max:ex.max,min:ex.min,sol:"max = "+fmt(ex.max)+", min = "+fmt(ex.min),
     hint:"f'(x) = 6x² − 2x = 2x(3x − 1)",
-    detailed:detSteps([
-      {title:"Функция и отрезок",text:"y = 2x³ − x², x ∈ ["+lo+"; "+hi+"]"},
-      {title:"Производная",text:"f'(x) = 6x² − 2x = 2x(3x − 1) = 0 → x = 0, x = 1/3"},
-      {title:"Значения",text:"f(0) = 0; f(1/3) = "+fmt(f(1/3))+"; f("+lo+") = "+fmt(f(lo))+"; f("+hi+") = "+fmt(f(hi))}
-    ],"max = "+fmt(ex.max)+", min = "+fmt(ex.min))
+    detailed:buildSolution(f,lo,hi,ex,"2x³ − x²","f'(x) = 6x² − 2x = 2x(3x − 1) = 0","x = 0, x = 1/3")
   });
 }
 function gen5_11b(rng){
@@ -387,11 +431,7 @@ function gen5_11b(rng){
     q:"Найдите наибольшее и наименьшее значения функции y = 2x³ + x на отрезке ["+lo+"; "+hi+"]."+ROUND_NOTE,
     max:ex.max,min:ex.min,sol:"max = "+fmt(ex.max)+", min = "+fmt(ex.min),
     hint:"f'(x) = 6x² + 1 > 0 — монотонно возрастает",
-    detailed:detSteps([
-      {title:"Функция и отрезок",text:"y = 2x³ + x, x ∈ ["+lo+"; "+hi+"]"},
-      {title:"Производная",text:"f'(x) = 6x² + 1 > 0 — функция возрастает"},
-      {title:"Экстремумы на концах",text:"max = f("+hi+") = "+fmt(ex.max)+", min = f("+lo+") = "+fmt(ex.min)}
-    ],"max = "+fmt(ex.max)+", min = "+fmt(ex.min))
+    detailed:buildSolution(f,lo,hi,ex,"2x³ + x","f'(x) = 6x² + 1 > 0 — монотонно возрастает","нет (монотонна)")
   });
 }
 function gen5_11v(rng){
@@ -402,11 +442,7 @@ function gen5_11v(rng){
     q:"Найдите наибольшее и наименьшее значения функции y = 2x³ + 6x² + 8 на отрезке ["+lo+"; "+hi+"]."+ROUND_NOTE,
     max:ex.max,min:ex.min,sol:"max = "+fmt(ex.max)+", min = "+fmt(ex.min),
     hint:"f'(x) = 6x² + 12x = 6x(x + 2)",
-    detailed:detSteps([
-      {title:"Функция и отрезок",text:"y = 2x³ + 6x² + 8, x ∈ ["+lo+"; "+hi+"]"},
-      {title:"Производная",text:"f'(x) = 6x² + 12x = 6x(x + 2) = 0 → x = 0, x = −2"},
-      {title:"Значения",text:"f(0) = 8; f(−2) = "+fmt(f(-2))+"; f("+lo+") = "+fmt(f(lo))+"; f("+hi+") = "+fmt(f(hi))}
-    ],"max = "+fmt(ex.max)+", min = "+fmt(ex.min))
+    detailed:buildSolution(f,lo,hi,ex,"2x³ + 6x² + 8","f'(x) = 6x² + 12x = 6x(x + 2) = 0","x = 0, x = −2")
   });
 }
 function gen5_11g(rng){
@@ -417,11 +453,7 @@ function gen5_11g(rng){
     q:"Найдите наибольшее и наименьшее значения функции y = x³ + 6x на отрезке ["+lo+"; "+hi+"]."+ROUND_NOTE,
     max:ex.max,min:ex.min,sol:"max = "+fmt(ex.max)+", min = "+fmt(ex.min),
     hint:"f'(x) = 3x² + 6 > 0 — монотонно возрастает",
-    detailed:detSteps([
-      {title:"Функция и отрезок",text:"y = x³ + 6x, x ∈ ["+lo+"; "+hi+"]"},
-      {title:"Производная",text:"f'(x) = 3x² + 6 > 0 — функция возрастает"},
-      {title:"Экстремумы на концах",text:"max = f("+hi+") = "+fmt(ex.max)+", min = f("+lo+") = "+fmt(ex.min)}
-    ],"max = "+fmt(ex.max)+", min = "+fmt(ex.min))
+    detailed:buildSolution(f,lo,hi,ex,"x³ + 6x","f'(x) = 3x² + 6 > 0 — монотонно возрастает","нет (монотонна)")
   });
 }
 function genBlock5(rng){return [gen5_11a(rng),gen5_11b(rng),gen5_11v(rng),gen5_11g(rng)];}
