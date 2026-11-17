@@ -348,8 +348,8 @@ function checkGraph(ans, task){
   return Math.abs(k-task.k)<=tol&&Math.abs(b)<=tol;
 }
 
-/* ---------- генератор задания ---------- */
-function genProporcii(rng){
+/* ---------- генератор задания 1: построение графика (интерактив) ---------- */
+function genProporcii_build(rng){
   var ks=[1,2,3,0.5,-1,-2,-0.5];
   var k=pick(rng,ks);
   var kStr;
@@ -361,11 +361,9 @@ function genProporcii(rng){
 
   var q="<p>Постройте график прямой пропорциональности <b>y = "+kStr+"</b>.</p>"
     +"<p class='task-intro' style='font-size:15px;color:var(--mute)'>Подумайте, через какие две точки проходит график. "
-    +"Введите координаты в таблицу или кликните на координатной плоскости. "
-    +"Затем нажмите «Провести прямую» и «Проверить». У вас до 3 попыток.</p>"
+    +"Зажмите мышку (или палец) на координатной плоскости и проведите прямую.</p>"
     +graphSVG();
 
-  /* подробное решение */
   var x1=-4,y1=k*x1,x2=4,y2=k*x2;
   var O=200,sc=40;
   var px1=O+x1*sc,py1=O-y1*sc,px2=O+x2*sc,py2=O-y2*sc;
@@ -396,17 +394,116 @@ function genProporcii(rng){
   detH+="</svg></div>";
   detH+="<p>Например: x = −4 → y = "+k+"·(−4) = "+fmt(y1)+"; x = 4 → y = "+k+"·4 = "+fmt(y2)+". Прямая проходит через O(0; 0).</p>";
 
-  return [{
-    type:"graph",
-    q:q,
-    k:k,
-    kStr:kStr,
-    tol:0.3,
-    atext:"y = "+kStr+" (через O(0;0), k = "+k+")",
-    sol:"y = "+kStr,
+  return {
+    type:"graph",q:q,k:k,kStr:kStr,tol:0.3,
+    atext:"y = "+kStr,sol:"y = "+kStr,
     hint:"Прямая y = kx проходит через начало координат. Выберите x = 2 → y = "+k+"·2 = "+(k*2),
     detailed:detH
-  }];
+  };
+}
+
+/* ---------- генератор задания 2: найти k по точке (dec) ---------- */
+function genProporcii_findk(rng){
+  var ks=[1,2,3,0.5,-1,-2,-0.5,4,-3,1.5,-1.5];
+  var k=pick(rng,ks);
+  var xs=[-4,-3,-2,2,3,4];
+  var x=pick(rng,xs);
+  var y=k*x;
+  var kStr=(k===1?"x":k===-1?"−x":k===0.5?"0,5x":k===-0.5?"−0,5x":k+"x");
+  var detH="<p>Прямая пропорциональность y = kx проходит через точку ("+fmt(x)+"; "+fmt(y)+").</p>";
+  detH+="<p>Подставляем в формулу: "+fmt(y)+" = k · "+fmt(x)+" → k = "+fmt(y)+" / "+fmt(x)+" = <b>"+fmt(k)+"</b>.</p>";
+  detH+="<p>Ответ: y = "+kStr+".</p>";
+  return {
+    type:"dec",
+    q:"График прямой пропорциональности y = kx проходит через точку ("+fmt(x)+"; "+fmt(y)+"). Найдите коэффициент k. <span style='color:var(--mute);font-size:14px'>(ответ — десятичная дробь)</span>",
+    a:k,unit:"",sol:"k = "+fmt(k),atext:"k = "+fmt(k),
+    hint:"Подставьте координаты точки в формулу y = kx и найдите k",
+    detailed:detH
+  };
+}
+
+/* ---------- генератор задания 3: найти y по x (dec) ---------- */
+function genProporcii_findy(rng){
+  var ks=[1,2,3,0.5,-1,-2,-0.5,4,-3];
+  var k=pick(rng,ks);
+  var kStr=(k===1?"x":k===-1?"−x":k===0.5?"0,5x":k===-0.5?"−0,5x":k+"x");
+  var x=ri(rng,-5,5);
+  if(x===0)x=2;
+  var y=k*x;
+  var detH="<p>Дана функция y = "+kStr+". Подставляем x = "+fmt(x)+":</p>";
+  detH+="<p>y = "+fmt(k)+" · "+fmt(x)+" = <b>"+fmt(y)+"</b>.</p>";
+  return {
+    type:"dec",
+    q:"Функция задана формулой y = "+kStr+". Найдите значение y при x = "+fmt(x)+". <span style='color:var(--mute);font-size:14px'>(ответ — число)</span>",
+    a:y,unit:"",sol:"y = "+fmt(y),atext:"y = "+fmt(y),
+    hint:"Подставьте x в формулу y = kx",
+    detailed:detH
+  };
+}
+
+/* ---------- генератор задания 4: найти x по y (dec) ---------- */
+function genProporcii_findx(rng){
+  var ks=[2,3,0.5,-2,-3,-0.5,4,1.5];
+  var k=pick(rng,ks);
+  var kStr=(k===0.5?"0,5x":k===-0.5?"−0,5x":k+"x");
+  /* выбираем y так, чтобы x = y/k был целым или полуцелым */
+  var x=ri(rng,-4,4);
+  if(x===0)x=2;
+  var y=k*x;
+  var detH="<p>Дана функция y = "+kStr+". Нужно найти x при y = "+fmt(y)+".</p>";
+  detH+="<p>"+fmt(y)+" = "+fmt(k)+" · x → x = "+fmt(y)+" / "+fmt(k)+" = <b>"+fmt(x)+"</b>.</p>";
+  return {
+    type:"dec",
+    q:"Функция задана формулой y = "+kStr+". При каком значении x значение функции равно "+fmt(y)+"? <span style='color:var(--mute);font-size:14px'>(ответ — число)</span>",
+    a:x,unit:"",sol:"x = "+fmt(x),atext:"x = "+fmt(x),
+    hint:"Выразите x из формулы y = kx: x = y / k",
+    detailed:detH
+  };
+}
+
+/* ---------- генератор задания 5: принадлежность точки (mc) ---------- */
+function genProporcii_belong(rng){
+  var ks=[1,2,3,0.5,-1,-2,-0.5];
+  var k=pick(rng,ks);
+  var kStr=(k===1?"x":k===-1?"−x":k===0.5?"0,5x":k===-0.5?"−0,5x":k+"x");
+  var x=ri(rng,-4,4);
+  if(x===0)x=2;
+  /* 50% — точка принадлежит, 50% — нет */
+  var belongs=rng()<0.5;
+  var y;
+  if(belongs){
+    y=k*x;
+  } else {
+    y=k*x+pick(rng,[-3,-2,-1,1,2,3]);
+    /* убедимся что y ≠ k*x */
+    if(y===k*x)y+=1;
+  }
+  var correct=belongs?"Да":"Нет";
+  var detH="<p>Функция y = "+kStr+". Проверяем точку ("+fmt(x)+"; "+fmt(y)+").</p>";
+  detH+="<p>Подставляем x = "+fmt(x)+": y должно быть = "+fmt(k)+" · "+fmt(x)+" = <b>"+fmt(k*x)+"</b>.</p>";
+  if(belongs){
+    detH+="<p>Заданное y = "+fmt(y)+" совпадает с вычисленным → точка <b>принадлежит</b> графику.</p>";
+  } else {
+    detH+="<p>Заданное y = "+fmt(y)+" ≠ "+fmt(k*x)+" → точка <b>не принадлежит</b> графику.</p>";
+  }
+  return {
+    type:"mc",
+    q:"Принадлежит ли точка ("+fmt(x)+"; "+fmt(y)+") графику функции y = "+kStr+"?",
+    c:correct,opts:["Да","Нет"],
+    hint:"Подставьте x в формулу y = kx и сравните с заданным y",
+    detailed:detH
+  };
+}
+
+/* ---------- генератор варианта: 5 заданий ---------- */
+function genProporcii(rng){
+  return [
+    genProporcii_build(rng),
+    genProporcii_findk(rng),
+    genProporcii_findy(rng),
+    genProporcii_findx(rng),
+    genProporcii_belong(rng)
+  ];
 }
 
 /* ---------- регистрация темы ---------- */
@@ -434,12 +531,14 @@ function register(){
     subject:"Математика",
     grade:"7 класс",
     title:"Прямая пропорциональность",
-    variants:50,
-    desc:"Интерактивный тренажёр по прямой пропорциональности y = kx. "
-      +"Ученик сам выбирает две точки (кликом или через таблицу) и "
-      +"проводит прямую кнопкой. До 3 попыток. 50 вариантов. "
-      +"После выполнения — правильный график с подробным решением.",
-    blocks:[{name:"Построение графика y = kx",gen:genProporcii,count:1}]
+    variants:40,
+    desc:"Тренажёр по прямой пропорциональности y = kx. "
+      +"5 заданий: построение графика (перетаскиванием), "
+      +"нахождение коэффициента k, вычисление значения функции, "
+      +"нахождение аргумента, проверка принадлежности точки. "
+      +"40 вариантов. До 3 попыток на построение графика. "
+      +"После выполнения — подробное решение.",
+    blocks:[{name:"Прямая пропорциональность y = kx",gen:genProporcii,count:5}]
   });
 }
 
