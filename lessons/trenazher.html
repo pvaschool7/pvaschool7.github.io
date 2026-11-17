@@ -248,6 +248,7 @@
 <script src="buleva-algebra.js"></script>
 <script src="okruzhnosti.js"></script>
 <script src="proporcii.js"></script>
+<script src="ekstremumy.js"></script>
 <script>
 (function(){
 "use strict";
@@ -609,7 +610,7 @@ function renderRun(){
   var task=S.data.blocks[sl.bi].tasks[sl.ti];
   var saved=S.ans[sl.g];
   h+="<div class='slide'>"+slideBadge(sl.bi)+"<div class='tz-n'>"+(sl.g+1)+"</div><div class='tz-q'>"+task.q+"</div>";
-  if(task.type==="num"||task.type==="dec"||task.type==="formula"){
+  if(task.type==="num"||task.type==="dec"||task.type==="formula"||task.type==="maxmin"){
    h+="<div class='tz-answer'><input class='tz-num' id='tzin' type='text' inputmode='text' autocomplete='off' value='"+(saved||"")+"' aria-label='Ответ'>"+(task.unit?"<span class='tz-unit'>"+task.unit+"</span>":"")+"</div>";
   }else if(task.type==="graph"){
    /* интерактивный график — SVG уже внутри task.q, обработчики повесим ниже */
@@ -891,6 +892,7 @@ function finish(){
    var a=S.ans[g],right=false;
    if(task.type==="num")right=a!==null&&D.checkNum(a,task.a);
    else if(task.type==="dec")right=a!==null&&a!==""&&D.checkDec&&D.checkDec(a,task.a);
+   else if(task.type==="maxmin")right=a!==null&&a!==""&&D.checkMaxmin&&D.checkMaxmin(a,task);
    else if(task.type==="formula")right=a!==null&&a!==""&&D.checkFormula&&D.checkFormula(a,task);
    else if(task.type==="graph")right=a!==null&&a.p1&&a.p2&&D.checkGraph&&D.checkGraph(a,task);
    else if(task.type==="roots")right=a!==null&&a!==""&&D.checkRoots(a,task);
@@ -931,6 +933,8 @@ function finish(){
     corrText=task.detailed||"";
    } else if(task.type==="dec"){
     corrText=task.sol||(task.a+(task.unit?" "+task.unit:""));
+   } else if(task.type==="maxmin"){
+    corrText=task.sol||"";
    } else if(task.type==="formula"){
     corrText=task.atext||task.sol||"";
    } else if(task.type==="graph"){
