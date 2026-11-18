@@ -275,7 +275,8 @@ function setupGraphInteraction(svg, task, g, state, updateBar){
     if(Math.abs(dx)>=0.01){
       var k=(p2.y-p1.y)/dx;
       var b=p1.y-k*p1.x;
-      correct=Math.abs(k-task.k)<=(task.tol||0.3)&&Math.abs(b)<=(task.tol||0.3);
+      var expectedB=task.b||0;
+      correct=Math.abs(k-task.k)<=(task.tol||0.3)&&Math.abs(b-expectedB)<=(task.tol||0.3);
     }
     if(correct){
       answered=true;
@@ -346,7 +347,8 @@ function checkGraph(ans, task){
   var k=(ans.p2.y-ans.p1.y)/dx;
   var tol=task.tol||0.3;
   var b=ans.p1.y-k*ans.p1.x;
-  return Math.abs(k-task.k)<=tol&&Math.abs(b)<=tol;
+  var expectedB=task.b||0;
+  return Math.abs(k-task.k)<=tol&&Math.abs(b-expectedB)<=tol;
 }
 
 /* ---------- генератор задания 1: построение графика (интерактив) ---------- */
@@ -496,33 +498,109 @@ function genProporcii_belong(rng){
   };
 }
 
-/* ---------- генератор варианта: 5 заданий на построение, без повторов k ---------- */
+/* ---------- генератор линейной функции y = kx + b (интерактив) ---------- */
+function genLinear_build(rng,k,b,kStr,fullStr){
+  var q="<p>Постройте график линейной функции <b>y = "+fullStr+"</b>.</p>"
+    +"<p class='task-intro' style='font-size:15px;color:var(--mute)'>Подумайте, через какие две точки проходит график. "
+    +"Зажмите мышку (или палец) на координатной плоскости и проведите прямую.</p>"
+    +graphSVG();
+
+  var x1=-4,y1=k*x1+b,x2=4,y2=k*x2+b;
+  var O=200,sc=40;
+  var px1=O+x1*sc,py1=O-y1*sc,px2=O+x2*sc,py2=O-y2*sc;
+  var dx=px2-px1,dy=py2-py1;
+  var t1=-px1/dx,t2=(400-px1)/dx;
+  var ex1=px1+dx*t1,ey1=py1+dy*t1,ex2=px1+dx*t2,ey2=py1+dy*t2;
+  var detH="<p>Линейная функция <b>y = "+fullStr+"</b> — прямая с угловым коэффициентом <b>k = "+fmt(k)+"</b> и свободным членом <b>b = "+fmt(b)+"</b>.</p>";
+  detH+="<div class='svg-center' style='margin:10px auto;max-width:420px'>";
+  detH+="<svg width='400' height='400' viewBox='0 0 400 400' xmlns='http://www.w3.org/2000/svg' style='font-family:Golos Text,sans-serif'>";
+  detH+="<g stroke='var(--line)' stroke-width='1' opacity='0.5'>";
+  for(var i=-5;i<=5;i++){if(i===0)continue;
+    detH+="<line x1='"+(O+i*sc)+"' y1='0' x2='"+(O+i*sc)+"' y2='400'/>";
+    detH+="<line x1='0' y1='"+(O+i*sc)+"' x2='400' y2='"+(O+i*sc)+"'/>";
+  }
+  detH+="</g>";
+  detH+="<line x1='0' y1='"+O+"' x2='400' y2='"+O+"' stroke='var(--ink)' stroke-width='2'/>";
+  detH+="<line x1='"+O+"' y1='0' x2='"+O+"' y2='400' stroke='var(--ink)' stroke-width='2'/>";
+  for(var j=-5;j<=5;j++){if(j===0)continue;
+    detH+="<text x='"+(O+j*sc)+"' y='"+(O+14)+"' font-size='11' fill='var(--mute)' text-anchor='middle'>"+j+"</text>";
+    detH+="<text x='"+(O-12)+"' y='"+(O-j*sc+4)+"' font-size='11' fill='var(--mute)' text-anchor='end'>"+j+"</text>";
+  }
+  detH+="<text x='"+(O-8)+"' y='"+(O+14)+"' font-size='11' fill='var(--mute)'>O</text>";
+  detH+="<line x1='"+ex1.toFixed(1)+"' y1='"+ey1.toFixed(1)+"' x2='"+ex2.toFixed(1)+"' y2='"+ey2.toFixed(1)+"' stroke='var(--green)' stroke-width='3'/>";
+  detH+="<circle cx='"+px1+"' cy='"+py1+"' r='5' fill='var(--green)'/>";
+  detH+="<circle cx='"+px2+"' cy='"+py2+"' r='5' fill='var(--green)'/>";
+  detH+="<text x='"+(px1+8)+"' y='"+(py1-6)+"' font-size='12' fill='var(--green)' font-weight='600'>(−4; "+fmt(y1)+")</text>";
+  detH+="<text x='"+(px2-60)+"' y='"+(py2-6)+"' font-size='12' fill='var(--green)' font-weight='600'>(4; "+fmt(y2)+")</text>";
+  detH+="</svg></div>";
+  detH+="<p>Например: x = −4 → y = "+fmt(k)+"·(−4) + ("+fmt(b)+") = "+fmt(y1)+"; x = 4 → y = "+fmt(k)+"·4 + ("+fmt(b)+") = "+fmt(y2)+".</p>";
+
+  return {
+    type:"graph",q:q,k:k,b:b,kStr:fullStr,tol:0.3,
+    atext:"y = "+fullStr,sol:"y = "+fullStr,
+    hint:"Найдите две точки. Например: x = 0 → y = "+fmt(b)+"; x = 2 → y = "+fmt(k*2+b),
+    detailed:detH
+  };
+}
+
+/* вспомогательная: формат функции */
+function makeKStr(k){
+  if(k===1)return "x";
+  if(k===-1)return "−x";
+  if(k===0.5)return "0,5x";
+  if(k===-0.5)return "−0,5x";
+  return k+"x";
+}
+function makeFullStr(k,b){
+  var ks=makeKStr(k);
+  if(b>0)return ks+" + "+b;
+  if(b<0)return ks+" − "+Math.abs(b);
+  return ks;
+}
+
+/* ---------- генератор варианта: 5 прямой пропорц. + 5 линейных ---------- */
 function genProporcii(rng){
-  var ks=shuf(rng,[1,2,3,0.5,-1,-2,-0.5]);
   var tasks=[];
+  /* 5 заданий: прямая пропорциональность y = kx, без повторов k */
+  var ks1=shuf(rng,[1,2,3,0.5,-1,-2,-0.5]);
   for(var i=0;i<5;i++){
-    tasks.push(genProporcii_build(rng));
-    /* перезаписываем k, чтобы гарантировать уникальность */
-    var k=ks[i];
-    var kStr;
-    if(k===1)kStr="x";
-    else if(k===-1)kStr="−x";
-    else if(k===0.5)kStr="0,5x";
-    else if(k===-0.5)kStr="−0,5x";
-    else kStr=k+"x";
-    tasks[tasks.length-1].k=k;
-    tasks[tasks.length-1].kStr=kStr;
-    tasks[tasks.length-1].q=tasks[tasks.length-1].q.replace(/y = <b>[^<]+<\/b>/,"y = <b>"+kStr+"</b>");
-    tasks[tasks.length-1].atext="y = "+kStr;
-    tasks[tasks.length-1].sol="y = "+kStr;
-    tasks[tasks.length-1].hint="Прямая y = kx проходит через начало координат. Выберите x = 2 → y = "+k+"·2 = "+(k*2);
-    /* перестроить detailed под новый k */
-    tasks[tasks.length-1].detailed=buildDetailHtml(k,kStr);
+    var k=ks1[i];
+    var kStr=makeKStr(k);
+    var t=genProporcii_build(rng);
+    t.k=k; t.b=0; t.kStr=kStr;
+    t.q=t.q.replace(/<b>y = [^<]+<\/b>/,"<b>y = "+kStr+"</b>");
+    t.atext="y = "+kStr; t.sol="y = "+kStr;
+    t.hint="Прямая y = kx проходит через начало координат. Выберите x = 2 → y = "+fmt(k*2);
+    t.detailed=buildDetailHtml(k,kStr);
+    tasks.push(t);
+  }
+  /* 5 заданий: линейная функция y = kx + b, без повторов пары (k,b) */
+  var ks2=shuf(rng,[1,2,-1,-2,0.5,-0.5,3,-3]);
+  var bs=shuf(rng,[1,-1,2,-2,3,-3,4,-4]);
+  var used={};
+  var added=0;
+  for(var j=0;j<ks2.length&&added<5;j++){
+    var lk=ks2[j],lb=bs[j];
+    var key=lk+"_"+lb;
+    if(used[key])continue;
+    used[key]=true;
+    var fullStr=makeFullStr(lk,lb);
+    tasks.push(genLinear_build(rng,lk,lb,makeKStr(lk),fullStr));
+    added++;
+  }
+  /* если не набралось 5 — добиваем */
+  while(added<5){
+    var lk2=pick(rng,ks2),lb2=pick(rng,bs);
+    var key2=lk2+"_"+lb2;
+    if(used[key2]){lb2+=1;key2=lk2+"_"+lb2;}
+    used[key2]=true;
+    tasks.push(genLinear_build(rng,lk2,lb2,makeKStr(lk2),makeFullStr(lk2,lb2)));
+    added++;
   }
   return tasks;
 }
 
-/* вспомогательная: HTML подробного решения для заданного k */
+/* вспомогательная: HTML подробного решения для заданного k (прямая пропорц.) */
 function buildDetailHtml(k,kStr){
   var x1=-4,y1=k*x1,x2=4,y2=k*x2;
   var O=200,sc=40;
@@ -582,12 +660,11 @@ function register(){
     grade:"7 класс",
     title:"Прямая пропорциональность",
     variants:40,
-    desc:"Тренажёр по прямой пропорциональности y = kx. "
-      +"5 заданий на построение графика — ученик сам проводит прямую "
-      +"перетаскиванием мышки или пальца. 40 вариантов. "
-      +"До 3 попыток на каждое задание. "
-      +"После выполнения — правильный график с подробным решением.",
-    blocks:[{name:"Прямая пропорциональность y = kx",gen:genProporcii,count:5}]
+    desc:"Тренажёр по прямой пропорциональности и линейной функции. "
+      +"10 заданий: 5 на построение y = kx и 5 на построение y = kx + b. "
+      +"Ученик сам проводит прямую перетаскиванием. "
+      +"40 вариантов. До 3 попыток. После — подробное решение.",
+    blocks:[{name:"Прямая пропорциональность и линейная функция",gen:genProporcii,count:10}]
   });
 }
 
