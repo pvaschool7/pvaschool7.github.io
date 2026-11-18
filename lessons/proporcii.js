@@ -9,6 +9,7 @@
 
 function ri(rng,a,b){return a+Math.floor(rng()*(b-a+1));}
 function pick(rng,arr){return arr[Math.floor(rng()*arr.length)];}
+function shuf(rng,arr){var a=arr.slice(),i,j,t;for(i=a.length-1;i>0;i--){j=Math.floor(rng()*(i+1));t=a[i];a[i]=a[j];a[j]=t;}return a;}
 function fmt(n){
   if(Math.abs(n-Math.round(n))<1e-9)return String(Math.round(n));
   return n.toFixed(1).replace(".",",");
@@ -495,15 +496,64 @@ function genProporcii_belong(rng){
   };
 }
 
-/* ---------- генератор варианта: 5 заданий на построение ---------- */
+/* ---------- генератор варианта: 5 заданий на построение, без повторов k ---------- */
 function genProporcii(rng){
-  return [
-    genProporcii_build(rng),
-    genProporcii_build(rng),
-    genProporcii_build(rng),
-    genProporcii_build(rng),
-    genProporcii_build(rng)
-  ];
+  var ks=shuf(rng,[1,2,3,0.5,-1,-2,-0.5]);
+  var tasks=[];
+  for(var i=0;i<5;i++){
+    tasks.push(genProporcii_build(rng));
+    /* перезаписываем k, чтобы гарантировать уникальность */
+    var k=ks[i];
+    var kStr;
+    if(k===1)kStr="x";
+    else if(k===-1)kStr="−x";
+    else if(k===0.5)kStr="0,5x";
+    else if(k===-0.5)kStr="−0,5x";
+    else kStr=k+"x";
+    tasks[tasks.length-1].k=k;
+    tasks[tasks.length-1].kStr=kStr;
+    tasks[tasks.length-1].q=tasks[tasks.length-1].q.replace(/y = <b>[^<]+<\/b>/,"y = <b>"+kStr+"</b>");
+    tasks[tasks.length-1].atext="y = "+kStr;
+    tasks[tasks.length-1].sol="y = "+kStr;
+    tasks[tasks.length-1].hint="Прямая y = kx проходит через начало координат. Выберите x = 2 → y = "+k+"·2 = "+(k*2);
+    /* перестроить detailed под новый k */
+    tasks[tasks.length-1].detailed=buildDetailHtml(k,kStr);
+  }
+  return tasks;
+}
+
+/* вспомогательная: HTML подробного решения для заданного k */
+function buildDetailHtml(k,kStr){
+  var x1=-4,y1=k*x1,x2=4,y2=k*x2;
+  var O=200,sc=40;
+  var px1=O+x1*sc,py1=O-y1*sc,px2=O+x2*sc,py2=O-y2*sc;
+  var dx=px2-px1,dy=py2-py1;
+  var t1=-px1/dx,t2=(400-px1)/dx;
+  var ex1=px1+dx*t1,ey1=py1+dy*t1,ex2=px1+dx*t2,ey2=py1+dy*t2;
+  var h="<p>Прямая пропорциональность <b>y = "+kStr+"</b> — прямая через <b>O(0; 0)</b> с угловым коэффициентом <b>k = "+k+"</b>.</p>";
+  h+="<div class='svg-center' style='margin:10px auto;max-width:420px'>";
+  h+="<svg width='400' height='400' viewBox='0 0 400 400' xmlns='http://www.w3.org/2000/svg' style='font-family:Golos Text,sans-serif'>";
+  h+="<g stroke='var(--line)' stroke-width='1' opacity='0.5'>";
+  for(var i=-5;i<=5;i++){if(i===0)continue;
+    h+="<line x1='"+(O+i*sc)+"' y1='0' x2='"+(O+i*sc)+"' y2='400'/>";
+    h+="<line x1='0' y1='"+(O+i*sc)+"' x2='400' y2='"+(O+i*sc)+"'/>";
+  }
+  h+="</g>";
+  h+="<line x1='0' y1='"+O+"' x2='400' y2='"+O+"' stroke='var(--ink)' stroke-width='2'/>";
+  h+="<line x1='"+O+"' y1='0' x2='"+O+"' y2='400' stroke='var(--ink)' stroke-width='2'/>";
+  for(var j=-5;j<=5;j++){if(j===0)continue;
+    h+="<text x='"+(O+j*sc)+"' y='"+(O+14)+"' font-size='11' fill='var(--mute)' text-anchor='middle'>"+j+"</text>";
+    h+="<text x='"+(O-12)+"' y='"+(O-j*sc+4)+"' font-size='11' fill='var(--mute)' text-anchor='end'>"+j+"</text>";
+  }
+  h+="<text x='"+(O-8)+"' y='"+(O+14)+"' font-size='11' fill='var(--mute)'>O</text>";
+  h+="<line x1='"+ex1.toFixed(1)+"' y1='"+ey1.toFixed(1)+"' x2='"+ex2.toFixed(1)+"' y2='"+ey2.toFixed(1)+"' stroke='var(--green)' stroke-width='3'/>";
+  h+="<circle cx='"+px1+"' cy='"+py1+"' r='5' fill='var(--green)'/>";
+  h+="<circle cx='"+px2+"' cy='"+py2+"' r='5' fill='var(--green)'/>";
+  h+="<text x='"+(px1+8)+"' y='"+(py1-6)+"' font-size='12' fill='var(--green)' font-weight='600'>(−4; "+fmt(y1)+")</text>";
+  h+="<text x='"+(px2-60)+"' y='"+(py2-6)+"' font-size='12' fill='var(--green)' font-weight='600'>(4; "+fmt(y2)+")</text>";
+  h+="</svg></div>";
+  h+="<p>Например: x = −4 → y = "+k+"·(−4) = "+fmt(y1)+"; x = 4 → y = "+k+"·4 = "+fmt(y2)+". Прямая проходит через O(0; 0).</p>";
+  return h;
 }
 
 /* ---------- регистрация темы ---------- */
