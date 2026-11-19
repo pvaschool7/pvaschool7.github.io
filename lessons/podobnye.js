@@ -229,17 +229,17 @@ function svgAnglePar(ab,bd,ce,ac){
     h+="<text x='"+(sx(pts[i].x)+offs[i][0]).toFixed(0)+"' y='"+(sy(pts[i].y)+offs[i][1]).toFixed(0)+"' font-size='14' fill='var(--ink)' font-weight='700' text-anchor='middle'>"+lbls[i]+"</text>";
   }
   /* Подписи длин отрезков */
-  /* AB — над нижним лучом, вдали от вершины A (где лучи близко) */
-  var abMid={x:A.x+(B.x-A.x)*0.75,y:A.y+(B.y-A.y)*0.75};
-  h+="<text x='"+sx(abMid.x).toFixed(0)+"' y='"+(sy(abMid.y)-14).toFixed(0)+"' font-size='12' fill='var(--mute)' font-weight='600' text-anchor='middle'>AB = "+ab+"</text>";
+  /* AB — ПОД нижним лучом (вдали от верхнего луча и от самой нижней линии) */
+  var abMid={x:A.x+(B.x-A.x)*0.5,y:A.y+(B.y-A.y)*0.5};
+  h+="<text x='"+sx(abMid.x).toFixed(0)+"' y='"+(sy(abMid.y)+24).toFixed(0)+"' font-size='12' fill='var(--mute)' font-weight='600' text-anchor='middle'>AB = "+ab+"</text>";
   /* BD — под нижним лучом, между B и D, с большим смещением вниз */
   var bdMid={x:(B.x+D.x)/2,y:(B.y+D.y)/2};
   h+="<text x='"+sx(bdMid.x).toFixed(0)+"' y='"+(sy(bdMid.y)+22).toFixed(0)+"' font-size='12' fill='var(--mute)' font-weight='600' text-anchor='middle'>BD = "+bd+"</text>";
-  /* AC — слева от верхнего луча (перпендикулярно вверх-влево) */
-  var acMidP=sideLabel(A,C,2.2);
+  /* AC — слева от верхнего луча (перпендикулярно вверх-влево), с увеличенным смещением */
+  var acMidP=sideLabel(A,C,3.0);
   h+="<text x='"+sx(acMidP.x).toFixed(0)+"' y='"+sy(acMidP.y).toFixed(0)+"' font-size='12' fill='var(--red)' font-weight='700' text-anchor='middle'>AC = "+fmt(ac)+"</text>";
-  /* CE — выше верхнего луча, перпендикулярно вверх-влево (вне угла, вдали от DE) */
-  var ceMidP=sideLabel(C,E,2.0);
+  /* CE — выше верхнего луча, перпендикулярно вверх-влево (вне угла, вдали от DE), с увеличенным смещением */
+  var ceMidP=sideLabel(C,E,3.0);
   h+="<text x='"+sx(ceMidP.x).toFixed(0)+"' y='"+sy(ceMidP.y).toFixed(0)+"' font-size='12' fill='var(--mute)' font-weight='600' text-anchor='middle'>CE = "+ce+"</text>";
   h+="</svg>";
   return h;
@@ -356,38 +356,67 @@ function svgSimAreas(s1,s2,k){
 function svgTrapezoidExt(small,large,side1,side2,d1){
   var W=380,H=300,padX=44,padY=36;
   /* M сверху, меньшее основание (BC) ближе к M, большее (AD) — ниже.
-     Боковые стороны: AB (слева), CD (справа). small=BC, large=AD.
-     Полные боковые стороны от M: AM = d1 + ... = side1+d1? нет, side1 — это боковая сторона трапеции, то есть отрезок от вершины малого основания до вершины большого.
-     От M до верхней вершины малого основания: d1 (или d2).
-     От M до нижней вершины большого основания: d1+side1.
+     Боковые стороны: AB (слева) = side1, CD (справа) = side2.
+     BC ∥ AD, BC = small, AD = large. Продления AB и DC пересекаются в M.
+     △MBC ~ △MAD с коэффициентом small/large.
   */
-  /* Расположение: M вверху по центру. BC параллельно AD снизу. */
-  /* Вычислим высоту трапеции по боковой стороне и разности оснований */
-  var halfDiff=(large-small)/2;
-  /* hTrap² = side1² − halfDiff² (приближённо, если боковая сторона наклонная) */
-  var hTrap=Math.sqrt(Math.max(2,side1*side1-halfDiff*halfDiff));
-  /* Полная высота от M до AD: d1*hTrap/side1 + hTrap? */
-  /* На самом деле: малый треугольник над BC подобен большому над AD с коэф small/large.
-     Боковая сторона малого = d1, большого = d1+side1. Их отношение = small/large.
-     Высота малого треугольника = d1*h/side1 (т.к. hTrap боковая сторона отображается на side1) */
-  var hSmall=d1*hTrap/side1;
+  /* Численно решаем уравнение для высоты трапеции hTrap:
+     sqrt(side1² − hTrap²) + sqrt(side2² − hTrap²) = large − small
+     (сумма горизонтальных проекций боковых сторон = разности оснований)
+  */
+  var sumHD=large-small;
+  var hTrap;
+  if(Math.abs(side1-side2)>=sumHD){
+    /* Трапеция вырожденная — рисуем симметричную с усреднённой стороной */
+    var sideAvg=(side1+side2)/2;
+    hTrap=Math.sqrt(Math.max(2,sideAvg*sideAvg-(sumHD/2)*(sumHD/2)));
+  }else{
+    var lo=0,hi=Math.min(side1,side2)-0.001;
+    for(var i=0;i<50;i++){
+      var mid=(lo+hi)/2;
+      var f=Math.sqrt(Math.max(0,side1*side1-mid*mid))+Math.sqrt(Math.max(0,side2*side2-mid*mid))-sumHD;
+      if(f>0)lo=mid; else hi=mid;
+    }
+    hTrap=(lo+hi)/2;
+  }
+  /* Горизонтальные проекции боковых сторон */
+  var hd1=Math.sqrt(Math.max(0,side1*side1-hTrap*hTrap));
+  var hd2=Math.sqrt(Math.max(0,side2*side2-hTrap*hTrap));
+  /* Высота малого треугольника MBC */
+  var hSmall=hTrap*small/(large-small);
   var totalH=hSmall+hTrap;
-  /* Координаты */
+  /* M — точка пересечения продолженных боковых сторон.
+     Размещаем M в (0, totalH). Тогда A и D не симметричны.
+     A.x = −large/(large−small) * hd1, D.x = +large/(large−small) * hd2
+     B.x = −small/(large−small) * hd1, C.x = +small/(large−small) * hd2 */
+  var A={x:-large/(large-small)*hd1,y:0};
+  var D={x: large/(large-small)*hd2,y:0};
+  var B={x:-small/(large-small)*hd1,y:hTrap};
+  var C={x: small/(large-small)*hd2,y:hTrap};
   var M={x:0,y:totalH};
-  var B={x:-small/2,y:hSmall};
-  var C={x:small/2,y:hSmall};
-  var A={x:-large/2,y:0};
-  var D={x:large/2,y:0};
-  var minX=-large/2-1,maxX=large/2+1,minY=-1,maxY=totalH+1;
-  var sx=function(x){return padX+(x-minX)/(maxX-minX)*(W-2*padX);};
-  var sy=function(y){return padY+(maxY-y)/(maxY-minY)*(H-2*padY);};
+  /* Bounding box */
+  var minX=Math.min(A.x,B.x,C.x,D.x,M.x)-1;
+  var maxX=Math.max(A.x,B.x,C.x,D.x,M.x)+1;
+  var minY=-1,maxY=totalH+1;
+  /* Uniform масштабирование (одинаковый масштаб по X и Y) — сохраняет пропорции */
+  var rangeX=maxX-minX, rangeY=maxY-minY;
+  var scale=Math.min((W-2*padX)/rangeX,(H-2*padY)/rangeY);
+  var cx=(minX+maxX)/2, cy=(minY+maxY)/2;
+  /* Центрируем чертёж в canvas */
+  var sx=function(x){return W/2+(x-cx)*scale;};
+  var sy=function(y){return H/2-(y-cy)*scale;};
   var h="<svg width='"+W+"' height='"+H+"' viewBox='0 0 "+W+" "+H+"' xmlns='http://www.w3.org/2000/svg' style='font-family:Golos Text,sans-serif;max-width:100%;height:auto;display:block;margin:0 auto'>";
-  /* Трапеция B-C-D-A */
+  /* Заливка трапеции (без обводки — обводка будет отдельными линиями для боковых сторон) */
   var poly=[B,C,D,A].map(function(p){return sx(p.x).toFixed(1)+","+sy(p.y).toFixed(1);}).join(" ");
-  h+="<polygon points='"+poly+"' fill='rgba(47,111,208,.08)' stroke='var(--ink)' stroke-width='2'/>";
-  /* Продолжения боковых сторон до M */
-  h+="<line x1='"+sx(A.x).toFixed(1)+"' y1='"+sy(A.y).toFixed(1)+"' x2='"+sx(M.x).toFixed(1)+"' y2='"+sy(M.y).toFixed(1)+"' stroke='var(--ink)' stroke-width='2'/>";
-  h+="<line x1='"+sx(D.x).toFixed(1)+"' y1='"+sy(D.y).toFixed(1)+"' x2='"+sx(M.x).toFixed(1)+"' y2='"+sy(M.y).toFixed(1)+"' stroke='var(--ink)' stroke-width='2'/>";
+  h+="<polygon points='"+poly+"' fill='rgba(47,111,208,.08)' stroke='none'/>";
+  /* Верхнее основание BC */
+  h+="<line x1='"+sx(B.x).toFixed(1)+"' y1='"+sy(B.y).toFixed(1)+"' x2='"+sx(C.x).toFixed(1)+"' y2='"+sy(C.y).toFixed(1)+"' stroke='var(--ink)' stroke-width='2' stroke-linecap='round'/>";
+  /* Нижнее основание AD */
+  h+="<line x1='"+sx(A.x).toFixed(1)+"' y1='"+sy(A.y).toFixed(1)+"' x2='"+sx(D.x).toFixed(1)+"' y2='"+sy(D.y).toFixed(1)+"' stroke='var(--ink)' stroke-width='2' stroke-linecap='round'/>";
+  /* Левая боковая сторона с продолжением: A → B → M (одна непрерывная прямая) */
+  h+="<line x1='"+sx(A.x).toFixed(1)+"' y1='"+sy(A.y).toFixed(1)+"' x2='"+sx(M.x).toFixed(1)+"' y2='"+sy(M.y).toFixed(1)+"' stroke='var(--ink)' stroke-width='2' stroke-linecap='round'/>";
+  /* Правая боковая сторона с продолжением: D → C → M (одна непрерывная прямая) */
+  h+="<line x1='"+sx(D.x).toFixed(1)+"' y1='"+sy(D.y).toFixed(1)+"' x2='"+sx(M.x).toFixed(1)+"' y2='"+sy(M.y).toFixed(1)+"' stroke='var(--ink)' stroke-width='2' stroke-linecap='round'/>";
   /* Точка M */
   h+="<circle cx='"+sx(M.x).toFixed(1)+"' cy='"+sy(M.y).toFixed(1)+"' r='3.5' fill='var(--red)'/>";
   h+="<text x='"+(sx(M.x)).toFixed(0)+"' y='"+(sy(M.y)-9).toFixed(0)+"' font-size='14' fill='var(--red)' font-weight='700' text-anchor='middle'>M</text>";
@@ -399,24 +428,29 @@ function svgTrapezoidExt(small,large,side1,side2,d1){
     h+="<circle cx='"+sx(pts[i].x).toFixed(1)+"' cy='"+sy(pts[i].y).toFixed(1)+"' r='3' fill='var(--ink)'/>";
     h+="<text x='"+(sx(pts[i].x)+offs[i][0]).toFixed(0)+"' y='"+(sy(pts[i].y)+offs[i][1]).toFixed(0)+"' font-size='13' fill='var(--ink)' font-weight='700' text-anchor='middle'>"+lbls[i]+"</text>";
   }
-  /* Подписи оснований */
-  h+="<text x='"+sx(0).toFixed(0)+"' y='"+(sy(hSmall)+16).toFixed(0)+"' font-size='12' fill='var(--blue)' font-weight='600' text-anchor='middle'>BC = "+small+"</text>";
-  h+="<text x='"+sx(0).toFixed(0)+"' y='"+(sy(0)+18).toFixed(0)+"' font-size='12' fill='var(--blue)' font-weight='600' text-anchor='middle'>AD = "+large+"</text>";
+  /* Подписи оснований — над/под серединой */
+  var bcMidX=(B.x+C.x)/2;
+  var adMidX=(A.x+D.x)/2;
+  h+="<text x='"+sx(bcMidX).toFixed(0)+"' y='"+(sy(hTrap)+16).toFixed(0)+"' font-size='12' fill='var(--blue)' font-weight='600' text-anchor='middle'>BC = "+small+"</text>";
+  h+="<text x='"+sx(adMidX).toFixed(0)+"' y='"+(sy(0)+18).toFixed(0)+"' font-size='12' fill='var(--blue)' font-weight='600' text-anchor='middle'>AD = "+large+"</text>";
   /* Подпись боковой стороны AB — перпендикулярно AB, слева снаружи */
   var abDir={x:B.x-A.x,y:B.y-A.y},abLen=Math.sqrt(abDir.x*abDir.x+abDir.y*abDir.y)||1;
   var abNx=-abDir.y/abLen,abNy=abDir.x/abLen;
-  /* знак: влево от AB (снаружи трапеции) */
-  var abSign=(abNx*(0-(A.x+B.x)/2)+abNy*(totalH+1-(A.y+B.y)/2))>0?1:-1;
-  var abLab={x:(A.x+B.x)/2+abNx*abSign*1.5,y:(A.y+B.y)/2+abNy*abSign*1.5};
+  var abSign=(abNx*(minX-(A.x+B.x)/2)+abNy*(maxY-(A.y+B.y)/2))>0?1:-1;
+  var abLab={x:(A.x+B.x)/2+abNx*abSign*3.0,y:(A.y+B.y)/2+abNy*abSign*3.0};
   h+="<text x='"+sx(abLab.x).toFixed(0)+"' y='"+sy(abLab.y).toFixed(0)+"' font-size='12' fill='var(--mute)' font-weight='600' text-anchor='middle'>AB = "+side1+"</text>";
   var cdDir={x:D.x-C.x,y:D.y-C.y},cdLen=Math.sqrt(cdDir.x*cdDir.x+cdDir.y*cdDir.y)||1;
   var cdNx=-cdDir.y/cdLen,cdNy=cdDir.x/cdLen;
-  var cdSign=(cdNx*(0-(C.x+D.x)/2)+cdNy*(totalH+1-(C.y+D.y)/2))>0?1:-1;
-  var cdLab={x:(C.x+D.x)/2+cdNx*cdSign*1.5,y:(C.y+D.y)/2+cdNy*cdSign*1.5};
+  var cdSign=(cdNx*(maxX-(C.x+D.x)/2)+cdNy*(maxY-(C.y+D.y)/2))>0?1:-1;
+  var cdLab={x:(C.x+D.x)/2+cdNx*cdSign*3.0,y:(C.y+D.y)/2+cdNy*cdSign*3.0};
   h+="<text x='"+sx(cdLab.x).toFixed(0)+"' y='"+sy(cdLab.y).toFixed(0)+"' font-size='12' fill='var(--mute)' font-weight='600' text-anchor='middle'>CD = "+side2+"</text>";
-  /* Подпись MB (от M до B) — ближе к M, с большим смещением влево */
-  var mbMid={x:M.x+(B.x-M.x)*0.35,y:M.y+(B.y-M.y)*0.35};
-  h+="<text x='"+(sx(mbMid.x)-26).toFixed(0)+"' y='"+sy(mbMid.y).toFixed(0)+"' font-size='12' fill='var(--green)' font-weight='700' text-anchor='middle'>MB = "+fmt(d1)+"</text>";
+  /* Подпись MB (от M до B) — перпендикулярно MB, слева снаружи малого треугольника */
+  var mbDir={x:B.x-M.x,y:B.y-M.y},mbLen=Math.sqrt(mbDir.x*mbDir.x+mbDir.y*mbDir.y)||1;
+  var mbNx=-mbDir.y/mbLen,mbNy=mbDir.x/mbLen;
+  /* знак: влево от MB (наружу малого треугольника) */
+  var mbSign=(mbNx*(minX-(M.x+B.x)/2)+mbNy*(maxY-(M.y+B.y)/2))>0?1:-1;
+  var mbLab={x:(M.x+B.x)/2+mbNx*mbSign*4.0,y:(M.y+B.y)/2+mbNy*mbSign*4.0};
+  h+="<text x='"+sx(mbLab.x).toFixed(0)+"' y='"+sy(mbLab.y).toFixed(0)+"' font-size='12' fill='var(--green)' font-weight='700' text-anchor='middle'>MB = "+fmt(d1)+"</text>";
   h+="</svg>";
   return h;
 }
@@ -463,7 +497,7 @@ function svgTriParSeg(ab,ac,am,mn){
   h+="<text x='"+(sx(M.x)-8).toFixed(0)+"' y='"+(sy(M.y)-7).toFixed(0)+"' font-size='13' fill='var(--red)' font-weight='700' text-anchor='middle'>M</text>";
   h+="<circle cx='"+sx(N.x).toFixed(1)+"' cy='"+sy(N.y).toFixed(1)+"' r='3' fill='var(--red)'/>";
   h+="<text x='"+(sx(N.x)+8).toFixed(0)+"' y='"+(sy(N.y)+14).toFixed(0)+"' font-size='13' fill='var(--red)' font-weight='700' text-anchor='middle'>N</text>";
-  /* Подписи сторон: AB слева снаружи (вдали от M); AM справа внутри; AC справа снаружи; MN ВЫШЕ MN (в quadrilateral AMNC) */
+  /* Подписи сторон: AB слева снаружи (вдали от M); AM справа внутри (с большим смещением); AC справа снаружи; MN ВЫШЕ MN (в quadrilateral AMNC, с большим смещением) */
   function ptOnSide(p1,p2,t,off){
     var dx=p2.x-p1.x,dy=p2.y-p1.y;
     var len=Math.sqrt(dx*dx+dy*dy)||1;
@@ -474,11 +508,11 @@ function svgTriParSeg(ab,ac,am,mn){
   h+="<text x='"+sx(abPos.x).toFixed(0)+"' y='"+sy(abPos.y).toFixed(0)+"' font-size='12' fill='var(--blue)' font-weight='600' text-anchor='middle'>AB = "+ab+"</text>";
   var acPos=ptOnSide(v[0],v[2],0.65,1.5);
   h+="<text x='"+sx(acPos.x).toFixed(0)+"' y='"+sy(acPos.y).toFixed(0)+"' font-size='12' fill='var(--blue)' font-weight='600' text-anchor='middle'>AC = "+ac+"</text>";
-  /* AM — справа от AB (внутри), у середины AM */
-  var amPos=ptOnSide(v[0],M,0.5,0.9);
+  /* AM — справа от AB (внутри), у середины AM, с увеличенным смещением */
+  var amPos=ptOnSide(v[0],M,0.5,1.8);
   h+="<text x='"+sx(amPos.x).toFixed(0)+"' y='"+sy(amPos.y).toFixed(0)+"' font-size='12' fill='var(--green)' font-weight='700' text-anchor='middle'>AM = "+fmt(am)+"</text>";
-  /* MN — ВЫШЕ MN (в quadrilateral AMNC), вдали от AB */
-  var mnPos=ptOnSide(M,N,0.5,1.6);
+  /* MN — ВЫШЕ MN (в quadrilateral AMNC), с большим перпендикулярным смещением */
+  var mnPos=ptOnSide(M,N,0.5,3.0);
   h+="<text x='"+sx(mnPos.x).toFixed(0)+"' y='"+sy(mnPos.y).toFixed(0)+"' font-size='12' fill='var(--red)' font-weight='700' text-anchor='middle'>MN = "+fmt(mn)+"</text>";
   h+="</svg>";
   return h;
@@ -509,9 +543,9 @@ function svgInscribedSquare(a,h,x){
   /* △ABC */
   var poly=[A,B,C].map(function(p){return sx(p.x).toFixed(1)+","+sy(p.y).toFixed(1);}).join(" ");
   h_+="<polygon points='"+poly+"' fill='rgba(47,111,208,.06)' stroke='var(--ink)' stroke-width='2'/>";
-  /* Подпись CH (пунктиром) — слева от высоты, выше квадрата */
+  /* Подпись CH (пунктиром) — слева от высоты, выше квадрата, с увеличенным отступом */
   h_+="<line x1='"+sx(C.x).toFixed(1)+"' y1='"+sy(C.y).toFixed(1)+"' x2='"+sx(H.x).toFixed(1)+"' y2='"+sy(H.y).toFixed(1)+"' stroke='var(--mute)' stroke-width='1.2' stroke-dasharray='4,3'/>";
-  h_+="<text x='"+(sx(0)-18).toFixed(0)+"' y='"+sy(h-x-0.5).toFixed(0)+"' font-size='12' fill='var(--mute)' font-weight='600' text-anchor='end'>CH = "+h+"</text>";
+  h_+="<text x='"+(sx(0)-25).toFixed(0)+"' y='"+sy(h-x-0.5).toFixed(0)+"' font-size='12' fill='var(--mute)' font-weight='600' text-anchor='end'>CH = "+h+"</text>";
   /* Квадрат */
   var sq=[P,Q,R,S].map(function(p){return sx(p.x).toFixed(1)+","+sy(p.y).toFixed(1);}).join(" ");
   h_+="<polygon points='"+sq+"' fill='rgba(220,80,60,.15)' stroke='var(--red)' stroke-width='2'/>";
@@ -663,8 +697,22 @@ function genType5(rng){
 
 /* Тип 6: Трапеция — боковые стороны продолжены до пересечения (обратная) */
 function genType6(rng){
-  var small=ri(rng,3,7),large=small+ri(rng,2,5);
-  var side1=ri(rng,3,6),side2=ri(rng,3,6);
+  /* Подбираем параметры так, чтобы трапеция существовала:
+     нужно |side1 − side2| < large − small (иначе нарушается неравенство треугольника).
+     Также side1 + side2 > large − small (всегда выполняется при наших значениях). */
+  var small=ri(rng,3,7);
+  var largeAdd=ri(rng,3,6); /* увеличил диапазон, чтобы large−small было больше */
+  var large=small+largeAdd;
+  var side1=ri(rng,4,7);
+  /* Максимальное отклонение side2 от side1, чтобы трапеция существовала */
+  var maxDelta=Math.max(1, largeAdd-1);
+  var side2=side1+ri(rng,-Math.min(maxDelta,side1-3),Math.min(maxDelta,7-side1));
+  if(side2<3)side2=3;
+  if(side2>7)side2=7;
+  /* Если всё-таки не существует — приравниваем side2 к side1 */
+  if(Math.abs(side1-side2)>=largeAdd){
+    side2=side1;
+  }
   /* расстояние от M до меньшего основания = side * small/(large-small) */
   var d1=side1*small/(large-small);
   var d2=side2*small/(large-small);
