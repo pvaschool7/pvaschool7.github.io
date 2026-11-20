@@ -187,6 +187,14 @@
 /* Смешанное число: целая часть + дробь */
 .mixed{display:inline-flex;align-items:center;vertical-align:middle}
 .mixed .whole{margin-right:4px;font-weight:600}
+/* ===== Таблица для ЕГЭ 9 задания ===== */
+.ege9-table-wrap{overflow-x:auto;max-height:340px;overflow-y:auto;margin:10px 0;border:1px solid var(--line);border-radius:8px}
+.ege9-table{border-collapse:collapse;font-size:13px;font-family:ui-monospace,Consolas,"Courier New",monospace;background:var(--card)}
+.ege9-table th{background:var(--paper);border:1px solid var(--line);padding:3px 8px;text-align:center;font-weight:700;color:var(--ink);position:sticky;top:0}
+.ege9-table td{border:1px solid var(--line);padding:2px 8px;text-align:center;color:var(--ink)}
+.ege9-table td.row-num{background:var(--paper);font-weight:600;color:var(--mute)}
+.ege9-table tbody tr:hover{background:rgba(47,111,208,.06)}
+.calc-formula{background:#eef5ff;border:1px solid #b3d1f7;border-radius:6px;padding:8px 12px;font-family:ui-monospace,Consolas,"Courier New",monospace;font-size:14px;color:#1a4d8f;margin:6px 0;white-space:pre-wrap;word-break:break-all}
 .tz-graph-wrap{margin:12px auto;max-width:440px;text-align:center}
 .tz-graph-wrap svg{max-width:100%;height:auto;border:1px solid var(--line);border-radius:10px;background:var(--paper)}
 .tz-graph-table input:focus{outline:none;border-color:var(--green)}
@@ -262,6 +270,7 @@
 <script src="podobnye.js"></script>
 <script src="drobi.js"></script>
 <script src="smeshnye-delenie.js"></script>
+<script src="ege9.js"></script>
 <script>
 (function(){
 "use strict";
