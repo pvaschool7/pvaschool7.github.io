@@ -177,6 +177,16 @@
 .rev .dz-det b{font-weight:700}
 .svg-center{text-align:center;margin:10px 0}
 .svg-center svg{max-width:100%;height:auto}
+/* ===== Отрисовка дробей для темы «Сумма и разность дробей» ===== */
+.frac{display:inline-flex;flex-direction:column;vertical-align:middle;text-align:center;margin:0 3px;line-height:1.15;font-family:inherit}
+.frac .num{padding:0 6px 1px}
+.frac .den{padding:1px 6px 0;border-top:1.5px solid currentColor}
+.frac sup{font-size:.65em;vertical-align:super}
+.tz-q .frac,.rev .dz-det .frac{font-size:1em}
+.tz-q .frac .num,.tz-q .frac .den,.rev .dz-det .frac .num,.rev .dz-det .frac .den{font-size:1em}
+/* Смешанное число: целая часть + дробь */
+.mixed{display:inline-flex;align-items:center;vertical-align:middle}
+.mixed .whole{margin-right:4px;font-weight:600}
 .tz-graph-wrap{margin:12px auto;max-width:440px;text-align:center}
 .tz-graph-wrap svg{max-width:100%;height:auto;border:1px solid var(--line);border-radius:10px;background:var(--paper)}
 .tz-graph-table input:focus{outline:none;border-color:var(--green)}
@@ -250,6 +260,8 @@
 <script src="proporcii.js"></script>
 <script src="ekstremumy.js"></script>
 <script src="podobnye.js"></script>
+<script src="drobi.js"></script>
+<script src="smeshnye-delenie.js"></script>
 <script>
 (function(){
 "use strict";
