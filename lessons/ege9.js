@@ -250,7 +250,7 @@ function step(title, html){
 }
 
 /* ---------- Генератор задания ---------- */
-function genTask(rng, typeIdx, params){
+function genTask(rng, typeIdx, params, variantNum){
   var type = TYPES[typeIdx];
   var cols = params.cols;
   var rows = params.rows;
@@ -261,7 +261,7 @@ function genTask(rng, typeIdx, params){
     type.target = params.target;
   }
   
-  /* Генерируем таблицу */
+  /* Генерируем таблицу (10000 строк — для вычисления ответа) */
   var table = genTable(rng, rows, cols, minV, maxV);
   
   /* Вычисляем ответ */
@@ -274,16 +274,24 @@ function genTask(rng, typeIdx, params){
     }
   });
   
-  /* Формируем условие */
+  /* Формируем условие — БЕЗ таблицы, с номером варианта и ссылкой на ODT */
   var condDesc = type.desc(params);
-  var qText = "Откройте файл электронной таблицы, содержащей в каждой строке "+cols+
-    " натуральных чисел. Определите количество строк таблицы, для которых выполнено условие:<br/>"+
-    "<b>"+condDesc+"</b>.<br/><br/>В ответе запишите только число.";
-  qText += renderTable(table);
+  var fileLink = "";
+  if(typeof global!=="undefined" && global.EGE9_LINKS && global.EGE9_LINKS[variantNum]){
+    fileLink = "<a href='"+global.EGE9_LINKS[variantNum]+"' target='_blank' class='btn sm' style='margin:6px 0'>Открыть файл задания (ODT) →</a>";
+  }
+  var qText = "<div style='background:#eef5ff;border:1px solid #b3d1f7;border-radius:8px;padding:10px 14px;margin-bottom:12px'>"+
+    "<b>Вариант "+variantNum+"</b> · Файл электронной таблицы содержит в каждой строке "+cols+
+    " натуральных чисел (всего "+rows+" строк).</div>"+
+    fileLink+
+    "<p>Определите количество строк таблицы, для которых выполнено условие:<br/>"+
+    "<b>"+condDesc+"</b>.</p>"+
+    "<p>В ответе запишите только число.</p>";
+  /* Таблицу в задании НЕ показываем — ученик работает с ODT файлом */
   
   /* Формируем подробное решение */
   var det = "";
-  det += step("Анализ условия", "Нужно проверить каждую строку таблицы на условие: <b>"+condDesc+"</b>. "+"Подсчитаем количество строк, где условие выполняется.");
+  det += step("Анализ условия", "Нужно проверить каждую строку таблицы (всего "+rows+" строк) на условие: <b>"+condDesc+"</b>. "+"Подсчитаем количество строк, где условие выполняется.");
   
   /* Решение 1: в OpenOffice Calc */
   var lastCol = String.fromCharCode(64+params.cols);
@@ -337,18 +345,17 @@ function genTask(rng, typeIdx, params){
 }
 
 /* ---------- Генератор варианта: 1 задание ---------- */
-function genVariant(rng){
+function genVariant(rng, variantNum){
   /* Случайно выбираем тип задачи */
   var typeIdx = ri(rng, 0, TYPES.length-1);
   /* Случайные параметры */
   var cols = pick(rng, [5, 6, 7]);
-  var rows = ri(rng, 40, 60); /* для тренажёра — небольшие таблицы */
+  var rows = 10000; /* фиксированное количество строк — как в ODT файлах */
   var minV = 1;
   var maxV = ri(rng, 30, 100);
   /* Для типов с target — выбираем значение, которое даст ~30-70% совпадений */
   var target;
   if(typeIdx === 4){ /* пара с суммой > target — средняя пара ~ (minV+maxV) */
-    /* Среднее значение суммы двух случайных чисел = 2*(minV+maxV)/2 = minV+maxV */
     target = Math.round((minV + maxV) * 0.8 + ri(rng, -10, 10));
   }else if(typeIdx === 6){ /* сумма max+min > target — средняя ~ minV+maxV */
     target = Math.round((minV + maxV) * 0.8 + ri(rng, -10, 10));
@@ -357,7 +364,9 @@ function genVariant(rng){
   }else if(typeIdx === 9){ /* сумма делится на target */
     target = pick(rng, [3, 5, 7, 9, 11]);
   }
-  return [genTask(rng, typeIdx, {cols:cols, rows:rows, minV:minV, maxV:maxV, target:target})];
+  /* variantNum передаётся из buildVariant — это номер варианта (1..100) */
+  if(!variantNum)variantNum = ri(rng, 1, 100);
+  return [genTask(rng, typeIdx, {cols:cols, rows:rows, minV:minV, maxV:maxV, target:target}, variantNum)];
 }
 
 /* ---------- регистрация темы ---------- */

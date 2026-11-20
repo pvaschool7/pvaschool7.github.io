@@ -1355,7 +1355,7 @@ function buildVariant(topicId,variant){
  var rng=mulberry32((TOPICS.indexOf(topic)+1)*7919+variant*104729+11);
  var blocks=[];
  topic.blocks.forEach(function(b){
-  blocks.push({name:b.name,tasks:b.gen(rng)});
+  blocks.push({name:b.name,tasks:b.gen(rng, variant)});
  });
  return {topicId:topic.id,subject:topic.subject,grade:topic.grade,title:topic.title,
          dz:!!topic.dz,level:topic.level||"",sample:topic.sample||"",
