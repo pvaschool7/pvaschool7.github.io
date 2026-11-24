@@ -198,6 +198,16 @@ function fracHtml(numPol, denPol){
   return frac(numPol.toHtml(), denPol.toHtml());
 }
 
+/* Текстовая версия для sol (без HTML) */
+function fracText(numPol, denPol){
+  if(denPol.isConst() && denPol.constValue()===1){
+    if(numPol.isZero())return "0";
+    return numPol.toHtml().replace(/<[^>]+>/g,"");
+  }
+  if(numPol.isZero())return "0";
+  return numPol.toHtml().replace(/<[^>]+>/g,"") + "/" + denPol.toHtml().replace(/<[^>]+>/g,"");
+}
+
 /* =====================================================================
    ГЕНЕРАТОРЫ 10 ТИПОВ ЗАДАЧ
    ===================================================================== */
@@ -300,7 +310,7 @@ function genType1(rng){
   }
   det+="<p><b>Ответ:</b> "+fracHtml(resNum,resDen)+"</p>";
 
-  return mkF({q:qText+note, fn:fn, sol:fracHtml(resNum,resDen), hint:"Приведите дроби к общему знаменателю", detailed:det});
+  return mkF({q:qText+note, fn:fn, sol:fracText(resNum,resDen), hint:"Приведите дроби к общему знаменателю", detailed:det});
 }
 
 /* Тип 2: (k1 + k2·b²)/(d1·a·b) + (k3·b³ + k4)/(d2·a·b²)
@@ -383,7 +393,7 @@ function genType2(rng){
   }
   det+="<p><b>Ответ:</b> "+fracHtml(resNum,resDen)+"</p>";
 
-  return mkF({q:qText+note, fn:fn, sol:fracHtml(resNum,resDen), hint:"Приведите к общему знаменателю", detailed:det});
+  return mkF({q:qText+note, fn:fn, sol:fracText(resNum,resDen), hint:"Приведите к общему знаменателю", detailed:det});
 }
 
 /* Тип 3: k1/(d1·a³) − k2/(d2·a⁵)
@@ -457,7 +467,7 @@ function genType3(rng){
   }
   det+="<p><b>Ответ:</b> "+fracHtml(resNum,resDen)+"</p>";
 
-  return mkF({q:qText+note, fn:fn, sol:fracHtml(resNum,resDen), hint:"Общий знаменатель — НОК числовых и a^5", detailed:det});
+  return mkF({q:qText+note, fn:fn, sol:fracText(resNum,resDen), hint:"Общий знаменатель — НОК числовых и a^5", detailed:det});
 }
 
 /* Тип 4: b²/(d1·x⁵) − b/(d2·x⁶) — здесь b→b, x→a
@@ -531,7 +541,7 @@ function genType4(rng){
   }
   det+="<p><b>Ответ:</b> "+fracHtml(resNum,resDen)+"</p>";
 
-  return mkF({q:qText+note, fn:fn, sol:fracHtml(resNum,resDen), hint:"Общий знаменатель — НОК·a^6", detailed:det});
+  return mkF({q:qText+note, fn:fn, sol:fracText(resNum,resDen), hint:"Общий знаменатель — НОК·a^6", detailed:det});
 }
 
 /* Тип 5: 1/(a·b) + 1/(a·c) + 1/(b·c)
@@ -593,7 +603,7 @@ function genType5(rng){
   }
   det+="<p><b>Ответ:</b> "+fracHtml(resNum,resDen)+"</p>";
 
-  return mkF({q:qText+note, fn:fn, sol:fracHtml(resNum,resDen), hint:"Общий знаменатель — abc", detailed:det});
+  return mkF({q:qText+note, fn:fn, sol:fracText(resNum,resDen), hint:"Общий знаменатель — abc", detailed:det});
 }
 
 /* Тип 6: (a·b − b)/a − (a·b − a)/b − (a² − b²)/(a·b)
@@ -653,7 +663,7 @@ function genType6(rng){
   }
   det+="<p><b>Ответ:</b> "+fracHtml(resNum,resDen)+"</p>";
 
-  return mkF({q:qText+note, fn:fn, sol:fracHtml(resNum,resDen), hint:"Общий знаменатель — ab", detailed:det});
+  return mkF({q:qText+note, fn:fn, sol:fracText(resNum,resDen), hint:"Общий знаменатель — ab", detailed:det});
 }
 
 /* Тип 7: (b−a)/(ab) + (c−b)/(bc) − (c−a)/(ac)
@@ -713,7 +723,7 @@ function genType7(rng){
   }
   det+="<p><b>Ответ:</b> "+fracHtml(resNum,resDen)+"</p>";
 
-  return mkF({q:qText+note, fn:fn, sol:fracHtml(resNum,resDen), hint:"Общий знаменатель — abc", detailed:det});
+  return mkF({q:qText+note, fn:fn, sol:fracText(resNum,resDen), hint:"Общий знаменатель — abc", detailed:det});
 }
 
 /* Тип 8: (3ab+2b²)/(ab) − (a+2b)/a + (a−2b)/b
@@ -779,7 +789,7 @@ function genType8(rng){
   }
   det+="<p><b>Ответ:</b> "+fracHtml(resNum,resDen)+"</p>";
 
-  return mkF({q:qText+note, fn:fn, sol:fracHtml(resNum,resDen), hint:"Общий знаменатель — ab", detailed:det});
+  return mkF({q:qText+note, fn:fn, sol:fracText(resNum,resDen), hint:"Общий знаменатель — ab", detailed:det});
 }
 
 /* Тип 9: (a−b)/(ab) − (a−c)/(ac)
@@ -833,7 +843,7 @@ function genType9(rng){
   }
   det+="<p><b>Ответ:</b> "+fracHtml(resNum,resDen)+"</p>";
 
-  return mkF({q:qText+note, fn:fn, sol:fracHtml(resNum,resDen), hint:"Общий знаменатель — abc", detailed:det});
+  return mkF({q:qText+note, fn:fn, sol:fracText(resNum,resDen), hint:"Общий знаменатель — abc", detailed:det});
 }
 
 /* Тип 10: (a−2b)/(d·b) − (b−2a)/(d·a)
@@ -912,7 +922,7 @@ function genType10(rng){
   }
   det+="<p><b>Ответ:</b> "+fracHtml(resNum,resDen)+"</p>";
 
-  return mkF({q:qText+note, fn:fn, sol:fracHtml(resNum,resDen), hint:"Общий знаменатель — d·a·b", detailed:det});
+  return mkF({q:qText+note, fn:fn, sol:fracText(resNum,resDen), hint:"Общий знаменатель — d·a·b", detailed:det});
 }
 
 /* ---------- генератор варианта: 10 заданий в случайном порядке ---------- */

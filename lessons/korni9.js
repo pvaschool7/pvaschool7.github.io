@@ -59,7 +59,7 @@ function genType1(rng){
   var wrong1="√"+prod;
   var wrong2="√"+(a+b);
   var wrong3="√"+a+"·√"+b;
-  return mkMC({q:qText,c:ansText,opts:[ansText,wrong1,wrong2,wrong3],sol:ansHtml,hint:"√a·√b=√(ab)",detailed:det});
+  return mkMC({q:qText,c:ansText,opts:[ansText,wrong1,wrong2,wrong3],sol:ansText,hint:"√a·√b=√(ab)",detailed:det});
 }
 
 /* ===== ТИП 2: Умножение корней разных степеней ===== */
@@ -78,7 +78,7 @@ function genType2(rng){
   var w1=rt(L,"a"+(k1*k2>1?SUP_MAP[String(k1*k2)]||k1*k2:""));
   var w2=rt(n1*n2,"a");
   var w3=rt(L,"a"+(expNum>1?SUP_MAP[String(expNum)]||expNum:""));
-  return mkMC({q:qText,c:ansText,opts:[ansText,w1,w2,w3],sol:ansHtml,hint:"Привести к общему показателю через НОК",detailed:det});
+  return mkMC({q:qText,c:ansText,opts:[ansText,w1,w2,w3],sol:ansText,hint:"Привести к общему показателю через НОК",detailed:det});
 }
 
 /* ===== ТИП 3: Деление корней одинаковой степени ===== */
@@ -96,7 +96,7 @@ function genType3(rng){
   det+=step("Решение",nthroot(n,a)+" : "+nthroot(n,b)+" = "+nthroot(n,frac(a,b))+".");
   if(g>1)det+=step("Сократим",frac(a,b)+" = "+frac(na,nb)+". Получим: "+ansHtml+".");
   det+="<p><b>Ответ:</b> <span class='dz-code'>"+ansHtml+"</span></p>";
-  return mkMC({q:qText,c:ansText,opts:[ansText,rt(n,a+"/"+b),rt(n,a)+":"+rt(n,b),na+"/"+nb],sol:ansHtml,hint:"Деление корней = корень из дроби",detailed:det});
+  return mkMC({q:qText,c:ansText,opts:[ansText,rt(n,a+"/"+b),rt(n,a)+":"+rt(n,b),na+"/"+nb],sol:ansText,hint:"Деление корней = корень из дроби",detailed:det});
 }
 
 /* ===== ТИП 4: Деление корней разных степеней ===== */
@@ -117,7 +117,7 @@ function genType4(rng){
   det+=step("Разделим",nthroot(6,"10"+sup(2*k1))+":"+nthroot(6,"10"+sup(k2))+" = "+nthroot(6,"10"+sup(exp))+".");
   det+=step("Упростим",ansHtml+".");
   det+="<p><b>Ответ:</b> <span class='dz-code'>"+ansHtml+"</span></p>";
-  return mkMC({q:qText,c:ansText,opts:[ansText,"√10","10",rt(6,"10")],sol:ansHtml,hint:"Привести к общему показателю",detailed:det});
+  return mkMC({q:qText,c:ansText,opts:[ansText,"√10","10",rt(6,"10")],sol:ansText,hint:"Привести к общему показателю",detailed:det});
 }
 
 /* ===== ТИП 5: Вложенные корни ===== */
@@ -131,7 +131,7 @@ function genType5(rng){
   det+=step("Через степени",nthroot(n2,"a")+" = a^("+ft(1,n2)+"). Тогда "+nthroot(n1,"a^("+ft(1,n2)+")")+" = a^("+ft(1,L)+").");
   det+=step("Вернём к корню","a^("+ft(1,L)+") = "+ansHtml+".");
   det+="<p><b>Ответ:</b> <span class='dz-code'>"+ansHtml+"</span></p>";
-  return mkMC({q:qText,c:ansText,opts:[ansText,rt(L,"a"+n1),rt(n1+n2,"a"),rt(n1,"a")+"·"+rt(n2,"a")],sol:ansHtml,hint:"Корень из корня = корень произведения степеней",detailed:det});
+  return mkMC({q:qText,c:ansText,opts:[ansText,rt(L,"a"+n1),rt(n1+n2,"a"),rt(n1,"a")+"·"+rt(n2,"a")],sol:ansText,hint:"Корень из корня = корень произведения степеней",detailed:det});
 }
 
 /* ===== ТИП 6: Вложенные корни со степенью ===== */
@@ -150,7 +150,7 @@ function genType6(rng){
   if(g>1)det+=step("Сократим",ft(10,12)+" = "+ft(newExp,newDeg)+".");
   det+=step("Вернём к корню",ansHtml+".");
   det+="<p><b>Ответ:</b> <span class='dz-code'>"+ansHtml+"</span></p>";
-  return mkMC({q:qText,c:ansText,opts:[ansText,rt(L,"y¹⁰"),rt(n1+n2,"y¹⁰"),"y¹⁰"],sol:ansHtml,hint:"Внутренний → степень, потом внешний",detailed:det});
+  return mkMC({q:qText,c:ansText,opts:[ansText,rt(L,"y¹⁰"),rt(n1+n2,"y¹⁰"),"y¹⁰"],sol:ansText,hint:"Внутренний → степень, потом внешний",detailed:det});
 }
 
 /* ===== ТИП 7: Составной корень — √(a·⁴√a) ===== */
@@ -164,7 +164,7 @@ function genType7(rng){
   det+=step("Преобразуем",nthroot(n2,"a")+" = a^("+ft(1,n2)+"). a · a^("+ft(1,n2)+") = a^("+ft(5,4)+").");
   det+=step("Извлечём корень",sqrt("a^("+ft(5,4)+")")+" = a^("+ft(5,8)+") = "+ansHtml+".");
   det+="<p><b>Ответ:</b> <span class='dz-code'>"+ansHtml+"</span></p>";
-  return mkMC({q:qText,c:ansText,opts:[ansText,rt(L,"a"),"√a·"+rt(n2,"a"),rt(2*n2,"a")],sol:ansHtml,hint:"Внутренний корень → степень, потом внешний",detailed:det});
+  return mkMC({q:qText,c:ansText,opts:[ansText,rt(L,"a"),"√a·"+rt(n2,"a"),rt(2*n2,"a")],sol:ansText,hint:"Внутренний корень → степень, потом внешний",detailed:det});
 }
 
 /* ===== ТИП 8: Многоэтажный корень — √(x·√(x·√x)) ===== */
@@ -178,7 +178,7 @@ function genType8(rng){
   det+=step("Следующий",sqrt("x · x^(1/2)")+" = sqrt(x^(3/2)) = x^(3/4).");
   det+=step("Внешний",sqrt("x · x^(3/4)")+" = sqrt(x^(7/4)) = x^(7/8) = "+ansHtml+".");
   det+="<p><b>Ответ:</b> <span class='dz-code'>"+ansHtml+"</span></p>";
-  return mkMC({q:qText,c:ansText,opts:[ansText,rt(8,"x"),"√x",rt(4,"x³")],sol:ansHtml,hint:"Раскручивай изнутри наружу",detailed:det});
+  return mkMC({q:qText,c:ansText,opts:[ansText,rt(8,"x"),"√x",rt(4,"x³")],sol:ansText,hint:"Раскручивай изнутри наружу",detailed:det});
 }
 
 /* ===== ТИП 9: Вынесение из-под корня — ³√(8x³y⁶/(27a¹²b⁹)) ===== */
@@ -191,7 +191,7 @@ function genType9(rng){
   det+=step("Извлечём","³√8=2, ³√27=3, ³√x³=x, ³√a¹²=a⁴, ³√y⁶=y², ³√b⁹=b³.");
   det+=step("Соберём",frac("2xy²","3a⁴b³")+".");
   det+="<p><b>Ответ:</b> <span class='dz-code'>"+ansHtml+"</span></p>";
-  return mkMC({q:qText,c:ansText,opts:[ansText,"2xy/(3ab)","8x³y⁶/(27a¹²b⁹)","2x³y⁶/(3a¹²b⁹)"],sol:ansHtml,hint:"Корень из дроби = дробь корней",detailed:det});
+  return mkMC({q:qText,c:ansText,opts:[ansText,"2xy/(3ab)","8x³y⁶/(27a¹²b⁹)","2x³y⁶/(3a¹²b⁹)"],sol:ansText,hint:"Корень из дроби = дробь корней",detailed:det});
 }
 
 /* ===== ТИП 10: ⁴√(16a¹⁶b¹²/(81x²⁴b⁴)) ===== */
@@ -204,7 +204,7 @@ function genType10(rng){
   det+=step("Извлечём","⁴√16=2, ⁴√81=3, ⁴√a¹⁶=a⁴, ⁴√x²⁴=x⁶, ⁴√b¹²=b³, ⁴√b⁴=b.");
   det+=step("Соберём",frac("2a⁴b³","3x⁶b")+" = "+frac("2a⁴b²","3x⁶")+" (сократили b).");
   det+="<p><b>Ответ:</b> <span class='dz-code'>"+ansHtml+"</span></p>";
-  return mkMC({q:qText,c:ansText,opts:[ansText,"2a⁴b³/(3x⁶b)","4a⁴b³/(9x⁶b)","2ab/(3x)"],sol:ansHtml,hint:"Извлекай 4-е степени из каждого множителя",detailed:det});
+  return mkMC({q:qText,c:ansText,opts:[ansText,"2a⁴b³/(3x⁶b)","4a⁴b³/(9x⁶b)","2ab/(3x)"],sol:ansText,hint:"Извлекай 4-е степени из каждого множителя",detailed:det});
 }
 
 /* ---------- генератор варианта ---------- */

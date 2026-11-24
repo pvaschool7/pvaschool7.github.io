@@ -391,7 +391,7 @@ function genType8(rng){
     correct="AM";
   }
   det+="<p><b>Ответ:</b> <span class='dz-code'>"+vec(correct)+"</span></p>";
-  return mkMC({q:qText,c:correct,opts:[correct,correct==="AK"?"AM":"AK","0","AD"],sol:vec(correct),hint:"AB+BC=AC, группируй по правилу треугольника",detailed:det});
+  return mkMC({q:qText,c:correct,opts:[correct,correct==="AK"?"AM":"AK","0","AD"],sol:correct,hint:"AB+BC=AC, группируй по правилу треугольника",detailed:det});
 }
 
 /* Тип 9: Выразить через a и b */
@@ -422,7 +422,7 @@ function genType10(rng){
     {x1:120,y1:60,x2:80,y2:180,label:"DA",color:"#dc503c"}
   ],"Замкнутый контур ABCD")+"</div>";
   det+="<p><b>Ответ:</b> <span class='dz-code'>"+vec("0")+"</span> — доказано.</p>";
-  return mkMC({q:qText,c:"Доказано",opts:["Доказано","Не доказано"],sol:vec("0"),hint:"Сумма по замкнутому контуру = 0",detailed:det});
+  return mkMC({q:qText,c:"Доказано",opts:["Доказано","Не доказано"],sol:"0",hint:"Сумма по замкнутому контуру = 0",detailed:det});
 }
 
 /* ---------- генератор варианта ---------- */
