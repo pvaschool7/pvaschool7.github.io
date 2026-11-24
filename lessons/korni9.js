@@ -287,8 +287,8 @@ function getTZ(){
 }
 function register(){
   var TZ=getTZ();if(!TZ||!TZ.TOPICS)return;
-  /* Регистрируем checkRootAnswer */
-  if(!TZ.checkFormula)TZ.checkFormula=checkRootAnswer;
+  /* Регистрируем checkRootAnswer — всегда перезаписываем, т.к. наша версия поддерживает √ */
+  TZ.checkFormula=checkRootAnswer;
   for(var i=0;i<TZ.TOPICS.length;i++)if(TZ.TOPICS[i].id==="korni9")return;
   TZ.TOPICS.push({id:"korni9",subject:"Математика",grade:"9 класс",title:"Корни (радикалы)",variants:40,
     desc:"Тренажёр по алгебре (9 класс): корни n-й степени. 10 заданий от простого к сложному. "+
