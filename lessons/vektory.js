@@ -88,10 +88,13 @@ global.__vecRedraw=function(svgId){
     html+="<line x1='"+x1+"' y1='"+y1+"' x2='"+x2+"' y2='"+y2+"' stroke='"+col+"' stroke-width='1.5'/>";
     /* Маленькая стрелка */
     html+="<polygon points='"+x2+","+y2+" "+(x2-ux*10+px*aw).toFixed(0)+","+(y2-uy*10+py*aw).toFixed(0)+" "+(x2-ux*10-px*aw).toFixed(0)+","+(y2-uy*10-py*aw).toFixed(0)+"' fill='"+col+"'/>";
-    /* Точка начала */
-    html+="<circle cx='"+x1+"' cy='"+y1+"' r='5' fill='"+col+"' fill-opacity='0.3' stroke='"+col+"' stroke-width='1.2' style='cursor:grab' data-vid='"+i+"' data-end='start' data-field='"+svgId+"'/>";
-    /* Точка конца */
-    html+="<circle cx='"+x2+"' cy='"+y2+"' r='7' fill='"+col+"' fill-opacity='0.4' stroke='#fff' stroke-width='1.5' style='cursor:grab' data-vid='"+i+"' data-end='end' data-field='"+svgId+"'/>";
+    /* Середина вектора — большая точка для перемещения (drag всего вектора) */
+    var mx=(x1+x2)/2, my=(y1+y2)/2;
+    html+="<circle cx='"+mx.toFixed(0)+"' cy='"+my.toFixed(0)+"' r='9' fill='"+col+"' fill-opacity='0.25' stroke='"+col+"' stroke-width='2' style='cursor:grab' data-vid='"+i+"' data-mode='move' data-field='"+svgId+"' title='Перемещение'/>";
+    /* Точка конца — для поворота на 180° (клик) */
+    html+="<circle cx='"+x2+"' cy='"+y2+"' r='6' fill='"+col+"' fill-opacity='0.5' stroke='#fff' stroke-width='1.5' style='cursor:pointer' data-vid='"+i+"' data-mode='flip' data-field='"+svgId+"' title='Поворот на 180°'/>";
+    /* Точка начала (маленькая, декоративная) */
+    html+="<circle cx='"+x1+"' cy='"+y1+"' r='3' fill='"+col+"' fill-opacity='0.8'/>";
     /* Подпись */
     if(v.label)html+="<text x='"+(x1+dx*0.5+px*16).toFixed(0)+"' y='"+(y1+dy*0.5+py*16+5).toFixed(0)+"' font-size='14' fill='"+col+"' font-weight='700' text-anchor='middle'>"+v.label+"</text>";
   }
@@ -99,12 +102,30 @@ global.__vecRedraw=function(svgId){
   /* Привязка обработчиков */
   var circles=g.querySelectorAll("circle");
   for(var ci=0;ci<circles.length;ci++){
-    circles[ci].addEventListener("mousedown",global.__vecDragStart);
-    circles[ci].addEventListener("touchstart",global.__vecDragStart,{passive:false});
+    var mode=circles[ci].getAttribute("data-mode");
+    if(mode==="move"){
+      circles[ci].addEventListener("mousedown",global.__vecDragStart);
+      circles[ci].addEventListener("touchstart",global.__vecDragStart,{passive:false});
+    }else if(mode==="flip"){
+      circles[ci].addEventListener("click",global.__vecFlip);
+    }
   }
 };
 
-global.__vecDrag={active:false,vid:-1,end:"end",field:"",startX:0,startY:0,origX1:0,origY1:0,origX2:0,origY2:0};
+/* Поворот вектора на 180° — меняем местами начало и конец */
+global.__vecFlip=function(e){
+  e.preventDefault();
+  var circle=e.currentTarget||e.target;
+  var vid=parseInt(circle.getAttribute("data-vid"));
+  var fieldId=circle.getAttribute("data-field");
+  var v=global.__vecFields[fieldId][vid];
+  var tx=v.x1, ty=v.y1;
+  v.x1=v.x2; v.y1=v.y2;
+  v.x2=tx; v.y2=ty;
+  global.__vecRedraw(fieldId);
+};
+
+global.__vecDrag={active:false,vid:-1,field:"",startX:0,startY:0,origX1:0,origY1:0,origX2:0,origY2:0};
 
 global.__vecDragStart=function(e){
   e.preventDefault();
@@ -112,7 +133,6 @@ global.__vecDragStart=function(e){
   var circle=e.currentTarget || e.target;
   global.__vecDrag.active=true;
   global.__vecDrag.vid=parseInt(circle.getAttribute("data-vid"));
-  global.__vecDrag.end=circle.getAttribute("data-end");
   global.__vecDrag.field=circle.getAttribute("data-field");
   var svg=document.getElementById(global.__vecDrag.field);
   if(!svg)return;
@@ -144,13 +164,12 @@ global.__vecDragMove=function(e){
   var dx=loc.x-global.__vecDrag.startX;
   var dy=loc.y-global.__vecDrag.startY;
   var v=global.__vecFields[global.__vecDrag.field][global.__vecDrag.vid];
-  if(global.__vecDrag.end==="start"){
-    v.x1=Math.round(global.__vecDrag.origX1+dx);
-    v.y1=Math.round(global.__vecDrag.origY1+dy);
-  }else{
-    v.x2=Math.round(global.__vecDrag.origX2+dx);
-    v.y2=Math.round(global.__vecDrag.origY2+dy);
-  }
+  /* Перемещаем весь вектор — и начало, и конец сдвигаются одинаково */
+  /* Угол и длина не меняются */
+  v.x1=Math.round(global.__vecDrag.origX1+dx);
+  v.y1=Math.round(global.__vecDrag.origY1+dy);
+  v.x2=Math.round(global.__vecDrag.origX2+dx);
+  v.y2=Math.round(global.__vecDrag.origY2+dy);
   global.__vecRedraw(global.__vecDrag.field);
 };
 
@@ -176,7 +195,7 @@ function interactiveField(vecs, fieldId, instruction){
   var h="<div class='tz-graph-wrap' style='max-width:520px'>";
   h+="<svg id='"+fieldId+"' width='"+W+"' height='"+H+"' viewBox='0 0 "+W+" "+H+"' style='background:#fafafa;border:1px solid #ddd;border-radius:10px;touch-action:none'>";
   h+="<rect width='"+W+"' height='"+H+"' fill='#fafafa' rx='8'/>";
-  h+="<text x='12' y='20' font-size='11' fill='#aaa'>Перетаскивайте векторы за точки</text>";
+  h+="<text x='12' y='20' font-size='11' fill='#aaa'>Перетащите за середину вектора. Клик по концу — поворот на 180°</text>";
   h+="<g id='vec-dynamic'></g>";
   h+="</svg>";
   h+="<p style='color:#666;font-size:13px;text-align:center;margin:4px 0'>"+instruction+"</p>";
@@ -219,7 +238,7 @@ function genType1(rng){
   ];
   var qText="<p>Даны два вектора: "+vec("a")+" длиной "+len1+" и "+vec("b")+" длиной "+len2+". Угол между ними — "+angleBetween+"°.</p>";
   qText+="<p>Перетащите векторы так, чтобы начало "+vec("b")+" совпало с концом "+vec("a")+". Найдите |"+vec("a")+" + "+vec("b")+"|.</p>";
-  qText+=interactiveField(vecs,"vf1","Тяните за цветные точки: синяя — начало, большая — конец");
+  qText+=interactiveField(vecs,"vf1","Тяните за большую точку в середине — перемещение. Клик по концу — поворот на 180°");
   qText+="<p><b>Введите ответ:</b></p>"+NOTE;
   /* Чертёж построения в решении */
   var endX1=100+v1.dx, endY1=220+v1.dy;
@@ -246,7 +265,7 @@ function genType2(rng){
   ];
   var qText="<p>Даны два перпендикулярных вектора: "+vec("a")+" длиной "+len1+" и "+vec("b")+" длиной "+len2+".</p>";
   qText+="<p>Перетащите векторы, совместив начало "+vec("b")+" с концом "+vec("a")+". Найдите |"+vec("a")+" + "+vec("b")+"|.</p>";
-  qText+=interactiveField(vecs,"vf2","Тяните за точки, чтобы совместить векторы");
+  qText+=interactiveField(vecs,"vf2","Тяните за середину вектора. Клик по концу — поворот на 180°");
   qText+="<p><b>Введите ответ:</b></p>"+NOTE;
   var det="";
   det+=step("Построение","Совместили начало "+vec("b")+" с концом "+vec("a")+".");
@@ -270,7 +289,7 @@ function genType3(rng){
   ];
   var qText="<p>Даны два перпендикулярных вектора: "+vec("a")+" длиной "+len1+" и "+vec("b")+" длиной "+len2+".</p>";
   qText+="<p>Совместите <b>начала</b> векторов. Найдите |"+vec("a")+" − "+vec("b")+"|.</p>";
-  qText+=interactiveField(vecs,"vf3","Тяните за синие точки — совместите начала");
+  qText+=interactiveField(vecs,"vf3","Тяните за середину. Клик по концу — поворот на 180°");
   qText+="<p><b>Введите ответ:</b></p>"+NOTE;
   var det="";
   det+=step("Построение",vec("a")+" − "+vec("b")+" = "+vec("a")+" + (−"+vec("b")+"). Совместили начала.");
@@ -295,7 +314,7 @@ function genType4(rng){
   ];
   var qText="<p>Даны три вектора: "+vec("a")+" = "+a+", "+vec("b")+" = "+b+", "+vec("c")+" = "+c+". "+vec("a")+" → вправо, "+vec("b")+" → вверх, "+vec("c")+" → влево.</p>";
   qText+="<p>Выстройте векторы друг за другом. Найдите |"+vec("a")+" + "+vec("b")+" + "+vec("c")+"|.</p>";
-  qText+=interactiveField(vecs,"vf4","Тяните за точки — выстройте цепочку a→b→c");
+  qText+=interactiveField(vecs,"vf4","Тяните за середину. Клик по концу — поворот на 180°");
   qText+="<p><b>Введите ответ:</b></p>"+NOTE;
   var det="";
   det+=step("Построение","Выстроили a→b→c по правилу многоугольника.");
@@ -330,7 +349,7 @@ function genType5(rng){
   var qText="<p>Дано "+n+" векторов: ";
   for(var i=0;i<n;i++)qText+=vec(String.fromCharCode(97+i))+"="+lens[i]+(i<n-1?", ":"");
   qText+=".</p><p>Выстройте векторы в <b>замкнутый контур</b> (конец последнего → начало первого). Чему равна сумма?</p>";
-  qText+=interactiveField(vecs,"vf5","Тяните за точки — замкните контур");
+  qText+=interactiveField(vecs,"vf5","Тяните за середину. Клик по концу — поворот на 180°");
   qText+="<p><b>Введите ответ:</b></p>"+NOTE;
   var det="";
   det+=step("Замкнутый контур","Конец последнего вектора совпадает с началом первого → сумма = "+vec("0")+".");
