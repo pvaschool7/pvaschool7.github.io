@@ -712,6 +712,13 @@ function renderRun(){
    }
   }
  }
+ /* для интерактивных векторов: инициализация после рендеринга */
+ if(sl.kind==="task"){
+  var vsvg=app.querySelector("svg[id^='vf']");
+  if(vsvg&&window.__vecRedraw&&window.__vecFields){
+   window.__vecRedraw(vsvg.id);
+  }
+ }
  if(tinputs2.length>0&&!inp)tinputs2[0].focus();
  if(sl.kind==="div"&&np)np.focus();
  window.scrollTo(0,0);
