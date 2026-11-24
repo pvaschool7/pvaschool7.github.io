@@ -187,6 +187,11 @@
 /* Смешанное число: целая часть + дробь */
 .mixed{display:inline-flex;align-items:center;vertical-align:middle}
 .mixed .whole{margin-right:4px;font-weight:600}
+/* ===== Корни n-й степени для темы «Корни (радикалы)» ===== */
+.nthroot,.sqrt{display:inline-flex;align-items:flex-start;vertical-align:middle}
+.nthroot .degree{font-size:.7em;margin-right:-3px;margin-top:1px;font-weight:600}
+.nthroot .rad,.sqrt .rad{font-size:1.4em;line-height:1;font-weight:400}
+.nthroot .radicand,.sqrt .radicand{border-top:1.5px solid currentColor;padding:0 3px;margin-left:-2px}
 /* ===== Таблица для ЕГЭ 9 задания ===== */
 .ege9-table-wrap{overflow-x:auto;max-height:340px;overflow-y:auto;margin:10px 0;border:1px solid var(--line);border-radius:8px}
 .ege9-table{border-collapse:collapse;font-size:13px;font-family:ui-monospace,Consolas,"Courier New",monospace;background:var(--card)}
@@ -272,6 +277,7 @@
 <script src="smeshnye-delenie.js"></script>
 <script src="protsenty6.js"></script>
 <script src="vektory.js"></script>
+<script src="korni9.js"></script>
 <script src="ege9-links.js"></script>
 <script src="ege9.js"></script>
 <script>
