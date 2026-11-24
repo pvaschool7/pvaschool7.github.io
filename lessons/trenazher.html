@@ -61,6 +61,7 @@
 .tz-answer{display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin:16px 0}
 .tz-num{font:600 19px "Golos Text",sans-serif;padding:11px 14px;border:2.5px solid var(--blue);border-radius:12px;background:var(--paper);color:var(--ink);width:190px}
 .tz-num:focus{outline:none;border-color:var(--green)}
+.tz-root-btn{margin-left:8px;font-size:20px;font-weight:700;padding:10px 16px;border-radius:10px;border:2px solid var(--blue);background:var(--paper);color:var(--blue);min-width:48px;min-height:48px}
 .tz-unit{font-weight:600;color:var(--mute);font-size:17px}
 .tz-unit sup{font-size:.62em}
 /* Таблица для заполнения (тип table) */
@@ -646,6 +647,9 @@ function renderRun(){
   h+="<div class='slide'>"+slideBadge(sl.bi)+"<div class='tz-n'>"+(sl.g+1)+"</div><div class='tz-q'>"+task.q+"</div>";
   if(task.type==="num"||task.type==="dec"||task.type==="formula"||task.type==="maxmin"){
    h+="<div class='tz-answer'><input class='tz-num' id='tzin' type='text' inputmode='text' autocomplete='off' value='"+(saved||"")+"' aria-label='Ответ'>"+(task.unit?"<span class='tz-unit'>"+task.unit+"</span>":"")+"</div>";
+   if(task.type==="formula"&&task.rootButton){
+    h+="<button class='btn sm tz-root-btn' type='button' onclick='var i=document.getElementById(\"tzin\");var p=i.selectionStart||i.value.length;i.value=i.value.substring(0,p)+\"√(\"+i.value.substring(p)+\")\";i.focus();var np=p+2;i.setSelectionRange(np,np);'>√</button>";
+   }
   }else if(task.type==="graph"){
    /* интерактивный график — SVG уже внутри task.q, обработчики повесим ниже */
   }else if(task.type==="roots"){
