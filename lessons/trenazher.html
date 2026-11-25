@@ -614,6 +614,11 @@ function saveCurrent(){
      S.ans[sl.g] уже обновлён — не переопределяем */
   return;
  }
+ if(taskType==="veccheck"){
+  /* состояние векторного поля хранится в window.__vecFields[fieldId],
+     ученик либо нажал "Проверить построение", либо нет — S.ans уже обновлён */
+  return;
+ }
  if(taskType==="mc"){
   var sel=app.querySelector(".tz-opt.sel");
   val=sel?sel.getAttribute("data-v"):null;
@@ -656,6 +661,10 @@ function renderRun(){
    }
   }else if(task.type==="graph"){
    /* интерактивный график — SVG уже внутри task.q, обработчики повесим ниже */
+  }else if(task.type==="veccheck"){
+   /* векторное поле уже внутри task.q; добавляем кнопку "Проверить построение" */
+   h+="<div class='tz-answer'><button class='btn' type='button' id='tz-veccheck-btn' data-field='"+task.fieldId+"' data-check='"+task.checkType+"'>Проверить построение</button></div>";
+   h+="<p id='tz-veccheck-msg' style='text-align:center;margin:8px 0;font-weight:600'></p>";
   }else if(task.type==="roots"){
    h+="<div class='tz-answer'>"+(task.unit?"<span class='tz-unit'>"+task.unit+"</span>":"")+"<input class='tz-num' id='tzin' type='text' inputmode='text' autocomplete='off' placeholder='"+(task.placeholder||"напр.: 3, −2  или  нет корней").replace(/'/g,"&#39;")+"' value='"+(saved||"")+"' aria-label='Ответ'></div>";
   }else if(task.type==="table"){
@@ -725,6 +734,38 @@ function renderRun(){
   var vsvg=app.querySelector("svg[id^='vf']");
   if(vsvg&&window.__vecRedraw&&window.__vecFields){
    window.__vecRedraw(vsvg.id);
+  }
+  /* обработчик кнопки "Проверить построение" для типа veccheck */
+  var vbtn=document.getElementById("tz-veccheck-btn");
+  if(vbtn){
+   vbtn.addEventListener("click",function(){
+    var fid=this.getAttribute("data-field");
+    var chk=this.getAttribute("data-check");
+    var msg=document.getElementById("tz-veccheck-msg");
+    var ok=false;
+    try{ok=D.checkVecBuilding&&D.checkVecBuilding(fid,chk)}catch(e){ok=false}
+    var was=S.ans[sl.g]!==null&&S.ans[sl.g]!==""&&S.ans[sl.g]!==undefined;
+    if(msg){
+     if(ok){
+      msg.innerHTML="<span style='color:var(--green)'>✓ Верно! Построение правильное. Жмите «Далее».</span>";
+      S.ans[sl.g]="__VECCHECK_OK__";
+     }else{
+      msg.innerHTML="<span style='color:var(--red)'>✗ Ещё не совсем правильно. Попробуйте ещё раз.</span>";
+      S.ans[sl.g]="__VECCHECK_FAIL__";
+     }
+    }
+    var now=S.ans[sl.g]!==null&&S.ans[sl.g]!==""&&S.ans[sl.g]!==undefined;
+    if(!was&&now)S.answered++;
+    if(was&&!now)S.answered--;
+    var tp=app.querySelector(".tz-top");
+    if(tp){
+     var pct=Math.round(100*(S.answered/S.total));
+     var fill=tp.querySelector(".tz-fill");
+     if(fill)fill.style.width=pct+"%";
+     var cnt=tp.querySelector(".cnt");
+     if(cnt)cnt.textContent=(sl.kind==="task"?("Задание "+(sl.g+1)+" из "+S.total):("Блок "+(sl.bi+1)+" из "+S.data.blocks.length))+" · Отвечено: "+S.answered+" из "+S.total;
+    }
+   });
   }
  }
  if(tinputs2.length>0&&!inp)tinputs2[0].focus();
@@ -944,6 +985,7 @@ function finish(){
    else if(task.type==="maxmin")right=a!==null&&a!==""&&D.checkMaxmin&&D.checkMaxmin(a,task);
    else if(task.type==="formula")right=a!==null&&a!==""&&D.checkFormula&&D.checkFormula(a,task);
    else if(task.type==="graph")right=a!==null&&a.p1&&a.p2&&D.checkGraph&&D.checkGraph(a,task);
+   else if(task.type==="veccheck")right=a==="__VECCHECK_OK__";
    else if(task.type==="roots")right=a!==null&&a!==""&&D.checkRoots(a,task);
    else if(task.type==="table"){
     if(a&&Array.isArray(a)&&task.answers){
@@ -974,6 +1016,8 @@ function finish(){
     } else {
      myText="нет ответа";
     }
+   } else if(task.type==="veccheck"){
+    myText=a==="__VECCHECK_OK__"?"построение верное":(a==="__VECCHECK_FAIL__"?"построение неверное":"нет ответа");
    } else {
     myText=a===null||a===""?"нет ответа":(Array.isArray(a)?a.join(", "):a);
    }
@@ -1002,6 +1046,10 @@ function finish(){
     /* для графика: показываем текст вопроса без интерактивного SVG */
     var qGraphClean=task.q.replace(/<div class='tz-graph-wrap'[\s\S]*?<\/div>/gi,"").trim();
     review+="<div class='rev'><p>"+st+"<b>Задание "+(g+1)+"</b></p><p>"+qGraphClean+"</p><p class='ans'>Твой ответ: <b>"+esc(myText)+"</b>"+(right?"":" · Верно: <b>"+esc(corrText)+"</b>")+"</p>"+(task.detailed?"<div class='dz-det'>"+task.detailed+"</div>":"")+"</div>";
+   } else if(task.type==="veccheck"){
+    /* для векторов: показываем текст задания без интерактивного поля */
+    var qVecClean=task.q.replace(/<div class='tz-graph-wrap'[\s\S]*?<\/div>/gi,"").trim();
+    review+="<div class='rev'><p>"+st+"<b>Задание "+(g+1)+"</b></p><p>"+qVecClean+"</p><p class='ans'>Твой ответ: <b>"+esc(myText)+"</b>"+(right?"":" · Верно: <b>правильное построение (см. чертёж ниже)</b>")+"</p>"+(task.detailed?"<div class='dz-det'>"+task.detailed+"</div>":"")+"</div>";
    } else {
     review+="<div class='rev'><p>"+st+"<b>Задание "+(g+1)+"</b></p><p>"+task.q+"</p><p class='ans'>Твой ответ: <b>"+esc(myText)+"</b>"+(right?"":" · Верно: <b>"+esc(corrText)+"</b>")+(task.type==="num"&&task.hint?" · <span style='color:var(--mute)'>"+task.hint.replace(/<[^>]+>/g,"")+"</span>":"")+"</p>"+(task.detailed?"<div class='dz-det'>"+task.detailed+"</div>":"")+"</div>";
    }

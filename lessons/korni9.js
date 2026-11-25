@@ -24,9 +24,13 @@ function frac(num,den){return "<span class='frac'><span class='num'>"+num+"</spa
 function vec(name){return "<span style='text-decoration:overline'>"+name+"</span>";}
 function step(title,html){return "<p><b>"+title+"</b></p><p style='margin-left:14px'>"+html+"</p>";}
 
-/* Текстовая версия ответа (Unicode) */
-var SUP_MAP={"2":"²","3":"³","4":"⁴","5":"⁵","6":"⁶","7":"⁷","8":"⁸","9":"⁹","10":"¹⁰","12":"¹²","15":"¹⁵","20":"²⁰"};
-function rt(n, expr){return n===2?"√"+expr:(SUP_MAP[String(n)]||n)+"√"+expr;}
+/* Текстовая версия ответа (Unicode). Если expr содержит операторы — оборачиваем в скобки */
+var SUP_MAP={"2":"²","3":"³","4":"⁴","5":"⁵","6":"⁶","7":"⁷","8":"⁸","9":"⁹","10":"¹⁰","12":"¹²","15":"¹⁵","16":"¹⁶","20":"²⁰"};
+function rt(n, expr){
+  var needsParens=/[\/\+\-\^\*\s]/.test(String(expr)) && !/^[\(\[]/.test(String(expr));
+  var e=needsParens?"("+expr+")":expr;
+  return n===2?"√"+e:(SUP_MAP[String(n)]||n)+"√"+e;
+}
 
 var NOTE=" <span style='color:var(--mute);font-size:14px'>(введите ответ: используйте кнопку √ для корня, например 2√(7) или ⁸√(a^5))</span>";
 
@@ -41,34 +45,139 @@ function compileRootExpr(src){
   var s=String(src==null?"":src).trim();
   if(!s)return null;
   s=s.replace(/,/g,".").replace(/\u2212/g,"-").replace(/\s+/g,"");
-  /* √(expr) → Math.sqrt(expr) */
-  s=s.replace(/√\(/g,"Math.sqrt(");
-  /* √N → Math.sqrt(N) где N — число или переменная */
-  s=s.replace(/√(\d+)/g,"Math.sqrt($1)");
-  s=s.replace(/√([a-zA-Z])/g,"Math.sqrt($1)");
-  /* ⁿ√(expr) → Math.pow(expr, 1/n) — поддерживаем Unicode надстрочные */
+  /* Superscript → степени. Поддержка и односимвольных (²³⁴...) и двухсимвольных (¹⁰,¹²,¹⁵,¹⁶,²⁰) */
   var supChars={"²":2,"³":3,"⁴":4,"⁵":5,"⁶":6,"⁷":7,"⁸":8,"⁹":9};
-  for(var ch in supChars){
-    var re=new RegExp(ch+"√\\(","g");
-    s=s.replace(re,"Math.pow(");
-    /* Нужно закрыть скобку и добавить ,1/n) — сложно, отложим */
+  var supMulti={"¹⁰":10,"¹²":12,"¹⁵":15,"¹⁶":16,"²⁰":20};
+
+  /* 1. Обработка ⁿ√(expr) → Math.pow(expr, 1/n) — с парсингом скобок */
+  var changed=true;
+  while(changed){
+    changed=false;
+    /* Сначала ищем двухсимвольные ⁿ√(expr) */
+    for(var mk in supMulti){
+      var mn=supMulti[mk];
+      var mprefix=mk+"√(";
+      var mpos=s.indexOf(mprefix);
+      if(mpos<0)continue;
+      var mdepth=1, mend=-1;
+      for(var mj=mpos+mprefix.length;mj<s.length;mj++){
+        if(s.charAt(mj)==='(')mdepth++;
+        else if(s.charAt(mj)===')'){mdepth--;if(mdepth===0){mend=mj;break;}}
+      }
+      if(mend<0)return null;
+      var minner=s.substring(mpos+mprefix.length, mend);
+      s=s.substring(0,mpos)+"Math.pow("+minner+",1/"+mn+")"+s.substring(mend+1);
+      changed=true;
+      break;
+    }
+    if(changed)continue;
+    /* Затем односимвольные ⁿ√(expr) */
+    for(var ch in supChars){
+      var n=supChars[ch];
+      var prefix=ch+"√(";
+      var pos=s.indexOf(prefix);
+      if(pos<0)continue;
+      var depth=1, end=-1;
+      for(var j=pos+prefix.length;j<s.length;j++){
+        if(s.charAt(j)==='(')depth++;
+        else if(s.charAt(j)===')'){depth--;if(depth===0){end=j;break;}}
+      }
+      if(end<0)return null;
+      var inner=s.substring(pos+prefix.length, end);
+      s=s.substring(0,pos)+"Math.pow("+inner+",1/"+n+")"+s.substring(end+1);
+      changed=true;
+      break;
+    }
   }
-  /* ^ → ** */
+
+  /* 2. ⁿ√N и ⁿ√a — сначала двухсимвольные, потом односимвольные */
+  for(mk in supMulti){
+    mn=supMulti[mk];
+    var mreN=new RegExp(mk+"√(\\d+(?:\\.\\d+)?)","g");
+    s=s.replace(mreN, "Math.pow($1,1/"+mn+")");
+    var mreV=new RegExp(mk+"√([a-zA-Z])","g");
+    s=s.replace(mreV, "Math.pow($1,1/"+mn+")");
+  }
+  for(ch in supChars){
+    n=supChars[ch];
+    var reN=new RegExp(ch+"√(\\d+(?:\\.\\d+)?)","g");
+    s=s.replace(reN, "Math.pow($1,1/"+n+")");
+    var reV=new RegExp(ch+"√([a-zA-Z])","g");
+    s=s.replace(reV, "Math.pow($1,1/"+n+")");
+  }
+
+  /* 4. √(expr) → Math.sqrt(expr) — с парсингом скобок */
+  changed=true;
+  while(changed){
+    changed=false;
+    var p2=s.indexOf("√(");
+    if(p2<0)break;
+    var d2=1, e2=-1;
+    for(var k=p2+2;k<s.length;k++){
+      if(s.charAt(k)==='(')d2++;
+      else if(s.charAt(k)===')'){
+        d2--;
+        if(d2===0){e2=k;break;}
+      }
+    }
+    if(e2<0)return null;
+    var inner2=s.substring(p2+2, e2);
+    s=s.substring(0,p2)+"Math.sqrt("+inner2+")"+s.substring(e2+1);
+    changed=true;
+  }
+
+  /* 5. √N → Math.sqrt(N), √a → Math.sqrt(a) */
+  s=s.replace(/√(\d+(?:\.\d+)?)/g,"Math.sqrt($1)");
+  s=s.replace(/√([a-zA-Z])/g,"Math.sqrt($1)");
+
+  /* 6. ^ → ** */
   s=s.replace(/\^/g,"**");
-  /* a² → a**2, a³ → a**3 */
+
+  /* 7. Unicode superscripts → **N */
   s=s.replace(/([a-zA-Z0-9\)])²/g,"$1**2");
   s=s.replace(/([a-zA-Z0-9\)])³/g,"$1**3");
   s=s.replace(/([a-zA-Z0-9\)])⁴/g,"$1**4");
   s=s.replace(/([a-zA-Z0-9\)])⁵/g,"$1**5");
   s=s.replace(/([a-zA-Z0-9\)])⁶/g,"$1**6");
-  /* Неявное умножение: 2a → 2*a, 2√ → 2*Math.sqrt */
+  s=s.replace(/([a-zA-Z0-9\)])⁷/g,"$1**7");
+  s=s.replace(/([a-zA-Z0-9\)])⁸/g,"$1**8");
+
+  /* 8. Неявное умножение: 2a → 2*a, 2Math → 2*Math, xy → x*y, ab → a*b */
   s=s.replace(/(\d)([a-zA-Z])/g,"$1*$2");
-  s=s.replace(/(\d)√/g,"$1*Math.sqrt");
+  /* буква-буква (но не Math/sqrt/pow): обрабатываем парами */
+  /* Идём по строке и вставляем * между буквами, не входящими в имена функций */
+  var result="", buffer="";
+  for(var ci=0; ci<s.length; ci++){
+    var c=s.charAt(ci);
+    if(/[a-zA-Z]/.test(c)){
+      buffer+=c;
+    } else {
+      if(buffer){
+        /* Если buffer — имя функции (Math, sqrt, pow), оставляем как есть */
+        if(/^(Math|sqrt|pow|abs|sin|cos|tan|log|exp|floor|ceil|round|max|min|PI|E)$/.test(buffer)){
+          result+=buffer;
+        } else {
+          /* Иначе разбиваем на отдельные буквы через * */
+          result+=buffer.split("").join("*");
+        }
+        buffer="";
+      }
+      result+=c;
+    }
+  }
+  if(buffer){
+    if(/^(Math|sqrt|pow|abs|sin|cos|tan|log|exp|floor|ceil|round|max|min|PI|E)$/.test(buffer)){
+      result+=buffer;
+    } else {
+      result+=buffer.split("").join("*");
+    }
+  }
+  s=result;
   s=s.replace(/\)([a-zA-Z(])/g,")*$1");
-  s=s.replace(/√([a-zA-Z])/g,"Math.sqrt($1)");
+
   /* Безопасность */
   if(/\b(window|document|eval|Function|constructor|prototype|__proto__|global|process|require|import|this|new|while|for|if|var|let|const)\b/i.test(s))return null;
-  if(!/^[0-9+\-*/().a-zA-Z*Math]+$/.test(s))return null;
+  if(!/^[0-9+\-*/().,a-zA-Z*Math]+$/.test(s))return null;
   try{
     var fn=new Function("a","b","x","y","return "+s+";");
     var test=fn(1.5,2.3,1.5,2.3);
