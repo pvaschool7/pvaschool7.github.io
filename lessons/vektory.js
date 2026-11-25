@@ -219,15 +219,33 @@ function interactiveField(vecs, fieldId, instruction){
   return h;
 }
 
-/* Генерация вектора — координаты в пикселях SVG. scale по умолчанию 75 (крупный). */
+/* Генерация вектора — координаты в пикселях SVG. scale по умолчанию 33 (компактный). */
 function makeVec(len, angleDeg, label, color, scale){
-  scale=scale||50;
+  scale=scale||33;
   var rad=angleDeg*Math.PI/180;
   return {len:len, angle:angleDeg, label:label, color:color, scale:scale,
     dx:Math.round(len*scale*Math.cos(rad)), dy:-Math.round(len*scale*Math.sin(rad))};
 }
-/* Вектор для чертежей решения (масштаб 38 px/ед) */
-function solVec(len, angleDeg, label, color){return makeVec(len,angleDeg,label,color,38);}
+/* Вектор для чертежей решения (масштаб 25 px/ед) */
+function solVec(len, angleDeg, label, color){return makeVec(len,angleDeg,label,color,25);}
+
+/* Результирующий вектор = v1 + v2 (сумма), с указанным label и color */
+function sumVec(v1, v2, label, color){
+  var dx=v1.dx+v2.dx, dy=v1.dy+v2.dy;
+  var scale=v1.scale;
+  var lenUnits=Math.sqrt(dx*dx+dy*dy)/scale;
+  var angleDeg=Math.atan2(-dy, dx)*180/Math.PI;
+  return makeVec(lenUnits, angleDeg, label, color, scale);
+}
+/* Результирующий вектор = v1 − v2 (разность) */
+function diffVec(v1, v2, label, color){
+  /* v1 - v2 = v1 + (-v2) */
+  var dx=v1.dx-v2.dx, dy=v1.dy-v2.dy;
+  var scale=v1.scale;
+  var lenUnits=Math.sqrt(dx*dx+dy*dy)/scale;
+  var angleDeg=Math.atan2(-dy, dx)*180/Math.PI;
+  return makeVec(lenUnits, angleDeg, label, color, scale);
+}
 
 /* =====================================================================
    ПРОВЕРКА ПОСТРОЕНИЯ ВЕКТОРОВ
@@ -236,6 +254,9 @@ function solVec(len, angleDeg, label, color){return makeVec(len,angleDeg,label,c
      "sameStart2" — a.x1≈b.x1 и a.y1≈b.y1 (начала a и b совпадают)
      "chain3" — b.x1≈a.x2, b.y1≈a.y2 и c.x1≈b.x2, c.y1≈b.y2
      "closed" — замкнутый контур: конец i = начало i+1, конец посл. = начало первого
+     "chain2_sum" — b пристыкован к a + s идёт от начала a к концу b (сумма)
+     "sameStart2_diff" — начала совпадают + r идёт от конца b к концу a (разность)
+     "chain3_sum" — a→b→c цепочкой + s от начала a к концу c
    ===================================================================== */
 global.__vecCheck=function(fieldId, checkType){
   var vecs=global.__vecFields[fieldId];
@@ -263,6 +284,36 @@ global.__vecCheck=function(fieldId, checkType){
     }
     return true;
   }
+  /* Новые: с результирующим вектором */
+  if(checkType==="chain2_sum"&&vecs.length>=3){
+    /* vecs[0]=a, vecs[1]=b, vecs[2]=s (сумма) */
+    var a4=vecs[0], b4=vecs[1], s4=vecs[2];
+    /* b пристыкован к концу a */
+    if(!close({x:a4.x2,y:a4.y2}, {x:b4.x1,y:b4.y1}))return false;
+    /* s: начало в начале a, конец в конце b */
+    if(!close({x:s4.x1,y:s4.y1}, {x:a4.x1,y:a4.y1}))return false;
+    if(!close({x:s4.x2,y:s4.y2}, {x:b4.x2,y:b4.y2}))return false;
+    return true;
+  }
+  if(checkType==="sameStart2_diff"&&vecs.length>=3){
+    /* vecs[0]=a, vecs[1]=b, vecs[2]=r (разность a-b) */
+    var a5=vecs[0], b5=vecs[1], r5=vecs[2];
+    /* начала a и b совпадают */
+    if(!close({x:a5.x1,y:a5.y1}, {x:b5.x1,y:b5.y1}))return false;
+    /* r: начало в конце b, конец в конце a (a-b = от конца b к концу a) */
+    if(!close({x:r5.x1,y:r5.y1}, {x:b5.x2,y:b5.y2}))return false;
+    if(!close({x:r5.x2,y:r5.y2}, {x:a5.x2,y:a5.y2}))return false;
+    return true;
+  }
+  if(checkType==="chain3_sum"&&vecs.length>=4){
+    /* vecs[0]=a, vecs[1]=b, vecs[2]=c, vecs[3]=s (сумма a+b+c) */
+    var a6=vecs[0], b6=vecs[1], c6=vecs[2], s6=vecs[3];
+    if(!close({x:a6.x2,y:a6.y2},{x:b6.x1,y:b6.y1}))return false;
+    if(!close({x:b6.x2,y:b6.y2},{x:c6.x1,y:c6.y1}))return false;
+    if(!close({x:s6.x1,y:s6.y1}, {x:a6.x1,y:a6.y1}))return false;
+    if(!close({x:s6.x2,y:s6.y2}, {x:c6.x2,y:c6.y2}))return false;
+    return true;
+  }
   return false;
 };
 
@@ -277,15 +328,19 @@ function genType1(rng){
   var angleBetween=ang2-ang1;
   var v1=makeVec(len1,ang1,"a","#2f6fd0");
   var v2=makeVec(len2,ang2,"b","#3aa758");
+  var vs=sumVec(v1,v2,"a+b","#dc503c"); /* результирующий */
   var vecs=[
-    {x1:107,y1:340,x2:107+v1.dx,y2:340+v1.dy,label:"a",color:"#2f6fd0"},
-    {x1:413,y1:340,x2:413+v2.dx,y2:340+v2.dy,label:"b",color:"#3aa758"}
+    {x1:80,y1:340,x2:80+v1.dx,y2:340+v1.dy,label:"a",color:"#2f6fd0"},
+    {x1:520,y1:340,x2:520+v2.dx,y2:340+v2.dy,label:"b",color:"#3aa758"},
+    {x1:300,y1:100,x2:300+vs.dx,y2:100+vs.dy,label:"a+b",color:"#dc503c"}
   ];
   var fieldId="vf1_"+ri(rng,1,99999);
   var qText="<p>Даны два вектора: "+vec("a")+" длиной "+len1+" и "+vec("b")+" длиной "+len2+". Угол между ними — "+angleBetween+"°.</p>";
-  qText+="<p><b>Постройте сумму</b> "+vec("a")+" + "+vec("b")+" по правилу треугольника: переместите векторы так, чтобы <b>начало "+vec("b")+" совпало с концом "+vec("a")+"</b>.</p>";
-  qText+=interactiveField(vecs,fieldId,"Перетащите векторы: начало b должно совпасть с концом a");
-  /* Чертёж-решение: правильное построение */
+  qText+="<p><b>Постройте сумму</b> "+vec("a")+" + "+vec("b")+":</p>";
+  qText+="<p>1) Переместите "+vec("b")+" так, чтобы его <b>начало совпало с концом</b> "+vec("a")+".</p>";
+  qText+="<p>2) Переместите красный вектор <b>"+vec("a+b")+"</b> так, чтобы его <b>начало совпало с началом</b> "+vec("a")+", а <b>конец — с концом</b> "+vec("b")+".</p>";
+  qText+=interactiveField(vecs,fieldId,"1) Приставьте b к концу a. 2) Красный a+b: начало → к началу a, конец → к концу b");
+  /* Чертёж-решение */
   var s1=solVec(len1,ang1,"a"), s2=solVec(len2,ang2,"b");
   var startX=120, startY=320;
   var endX1=startX+s1.dx, endY1=startY+s1.dy;
@@ -310,8 +365,8 @@ function genType1(rng){
       {x1:startX,y1:startY,x2:sumEndX,y2:sumEndY,label:"a+b",color:"#dc503c"}
     ],"Результат сложения", {W:480,H:420})}
   ]);
-  return mkVecCheck({q:qText,checkType:"chain2",fieldId:fieldId,
-    hint:"Перетащите b так, чтобы его начало совпало с концом a",
+  return mkVecCheck({q:qText,checkType:"chain2_sum",fieldId:fieldId,
+    hint:"1) b к концу a. 2) Красный a+b: начало к началу a, конец к концу b",
     detailed:det});
 }
 
@@ -320,14 +375,18 @@ function genType2(rng){
   var len1=ri(rng,3,6), len2=ri(rng,3,6);
   var v1=makeVec(len1,0,"a","#2f6fd0");
   var v2=makeVec(len2,90,"b","#3aa758");
+  var vs=sumVec(v1,v2,"a+b","#dc503c");
   var vecs=[
-    {x1:107,y1:340,x2:107+v1.dx,y2:340,label:"a",color:"#2f6fd0"},
-    {x1:440,y1:340,x2:440,y2:340+v2.dy,label:"b",color:"#3aa758"}
+    {x1:80,y1:340,x2:80+v1.dx,y2:340,label:"a",color:"#2f6fd0"},
+    {x1:520,y1:340,x2:520,y2:340+v2.dy,label:"b",color:"#3aa758"},
+    {x1:300,y1:100,x2:300+vs.dx,y2:100+vs.dy,label:"a+b",color:"#dc503c"}
   ];
   var fieldId="vf2_"+ri(rng,1,99999);
   var qText="<p>Даны два перпендикулярных вектора: "+vec("a")+" длиной "+len1+" (вправо) и "+vec("b")+" длиной "+len2+" (вверх).</p>";
-  qText+="<p><b>Постройте сумму</b> "+vec("a")+" + "+vec("b")+": переместите векторы так, чтобы <b>начало "+vec("b")+" совпало с концом "+vec("a")+"</b>.</p>";
-  qText+=interactiveField(vecs,fieldId,"Перетащите векторы: начало b должно совпасть с концом a");
+  qText+="<p><b>Постройте сумму</b> "+vec("a")+" + "+vec("b")+":</p>";
+  qText+="<p>1) Переместите "+vec("b")+" так, чтобы его <b>начало совпало с концом</b> "+vec("a")+".</p>";
+  qText+="<p>2) Переместите красный вектор <b>"+vec("a+b")+"</b> так, чтобы его <b>начало совпало с началом</b> "+vec("a")+", а <b>конец — с концом</b> "+vec("b")+".</p>";
+  qText+=interactiveField(vecs,fieldId,"1) Приставьте b к концу a. 2) Красный a+b: начало → к началу a, конец → к концу b");
   var s1=solVec(len1,0,"a"), s2=solVec(len2,90,"b");
   var startX=120, startY=300;
   var endX1=startX+s1.dx, endY1=startY;
@@ -352,24 +411,28 @@ function genType2(rng){
       {x1:startX,y1:startY,x2:sumEndX,y2:sumEndY,label:"a+b",color:"#dc503c"}
     ],"Результат сложения", {W:480,H:420})}
   ]);
-  return mkVecCheck({q:qText,checkType:"chain2",fieldId:fieldId,
-    hint:"Перетащите b так, чтобы его начало совпало с концом a",
+  return mkVecCheck({q:qText,checkType:"chain2_sum",fieldId:fieldId,
+    hint:"1) b к концу a. 2) Красный a+b: начало к началу a, конец к концу b",
     detailed:det});
 }
 
-/* Тип 3: Разность векторов — совместить начала */
+/* Тип 3: Разность векторов — совместить начала + построить a-b */
 function genType3(rng){
   var len1=ri(rng,4,7), len2=ri(rng,3,5);
   var v1=makeVec(len1,0,"a","#2f6fd0");
   var v2=makeVec(len2,90,"b","#3aa758");
+  var vr=diffVec(v1,v2,"a-b","#dc503c"); /* результирующий a-b */
   var vecs=[
-    {x1:120,y1:340,x2:120+v1.dx,y2:340,label:"a",color:"#2f6fd0"},
-    {x1:440,y1:340,x2:440,y2:340+v2.dy,label:"b",color:"#3aa758"}
+    {x1:100,y1:340,x2:100+v1.dx,y2:340,label:"a",color:"#2f6fd0"},
+    {x1:520,y1:340,x2:520,y2:340+v2.dy,label:"b",color:"#3aa758"},
+    {x1:300,y1:100,x2:300+vr.dx,y2:100+vr.dy,label:"a-b",color:"#dc503c"}
   ];
   var fieldId="vf3_"+ri(rng,1,99999);
   var qText="<p>Даны два перпендикулярных вектора: "+vec("a")+" длиной "+len1+" (вправо) и "+vec("b")+" длиной "+len2+" (вверх).</p>";
-  qText+="<p><b>Постройте разность</b> "+vec("a")+" − "+vec("b")+": переместите векторы так, чтобы <b>их начала совпадали</b>. Разность — это вектор от конца "+vec("b")+" к концу "+vec("a")+".</p>";
-  qText+=interactiveField(vecs,fieldId,"Перетащите векторы: начала a и b должны совпасть");
+  qText+="<p><b>Постройте разность</b> "+vec("a")+" − "+vec("b")+":</p>";
+  qText+="<p>1) Переместите "+vec("b")+" так, чтобы <b>начало b совпало с началом a</b> (общее начало).</p>";
+  qText+="<p>2) Переместите красный вектор <b>"+vec("a-b")+"</b> так, чтобы его <b>начало совпало с концом</b> "+vec("b")+", а <b>конец — с концом</b> "+vec("a")+".</p>";
+  qText+=interactiveField(vecs,fieldId,"1) Совместите начала a и b. 2) Красный a-b: начало → к концу b, конец → к концу a");
   var s1=solVec(len1,0,"a"), s2=solVec(len2,90,"b");
   var startX=160, startY=240;
   var endX1=startX+s1.dx, endY1=startY;
@@ -394,24 +457,35 @@ function genType3(rng){
       {x1:endX2,y1:endY2,x2:endX1,y2:endY1,label:"a-b",color:"#dc503c"}
     ],"Результат вычитания", {W:480,H:420})}
   ]);
-  return mkVecCheck({q:qText,checkType:"sameStart2",fieldId:fieldId,
-    hint:"Перетащите векторы так, чтобы их начальные точки совпали",
+  return mkVecCheck({q:qText,checkType:"sameStart2_diff",fieldId:fieldId,
+    hint:"1) Начала a и b совпадают. 2) Красный a-b: начало к концу b, конец к концу a",
     detailed:det});
 }
 
-/* Тип 4: Сумма трёх векторов (правило многоугольника) */
+/* Тип 4: Сумма трёх векторов (правило многоугольника) + результирующий */
 function genType4(rng){
   var a=ri(rng,3,5), b=ri(rng,3,5), c=ri(rng,2,4);
+  var va=makeVec(a,0,"a","#2f6fd0");
+  var vb=makeVec(b,90,"b","#3aa758");
+  var vc=makeVec(c,180,"c","#e8a820");
+  /* Сумма a+b+c */
+  var vabc={dx:va.dx+vb.dx+vc.dx, dy:va.dy+vb.dy+vc.dy, scale:va.scale};
+  var sumLen=Math.sqrt(vabc.dx*vabc.dx+vabc.dy*vabc.dy)/va.scale;
+  var sumAng=Math.atan2(-vabc.dy, vabc.dx)*180/Math.PI;
+  var vs=makeVec(sumLen,sumAng,"s","#dc503c");
   var vecs=[
-    {x1:107,y1:330,x2:107+a*50,y2:330,label:"a",color:"#2f6fd0"},
-    {x1:373,y1:330,x2:373,y2:330-b*50,label:"b",color:"#3aa758"},
-    {x1:480,y1:360,x2:480-c*50,y2:360,label:"c",color:"#e8a820"}
+    {x1:80,y1:340,x2:80+va.dx,y2:340,label:"a",color:"#2f6fd0"},
+    {x1:340,y1:340,x2:340,y2:340+vb.dy,label:"b",color:"#3aa758"},
+    {x1:540,y1:340,x2:540+vc.dx,y2:340,label:"c",color:"#e8a820"},
+    {x1:300,y1:100,x2:300+vs.dx,y2:100+vs.dy,label:"s",color:"#dc503c"}
   ];
   var fieldId="vf4_"+ri(rng,1,99999);
   var qText="<p>Даны три вектора: "+vec("a")+" = "+a+" (вправо), "+vec("b")+" = "+b+" (вверх), "+vec("c")+" = "+c+" (влево).</p>";
-  qText+="<p><b>Постройте сумму</b> "+vec("a")+" + "+vec("b")+" + "+vec("c")+" по правилу многоугольника: выстройте векторы <b>друг за другом</b> (конец "+vec("a")+" → начало "+vec("b")+", конец "+vec("b")+" → начало "+vec("c")+").</p>";
-  qText+=interactiveField(vecs,fieldId,"Выстройте a → b → c друг за другом");
-  var sa=a*38, sb=b*38, sc=c*38;
+  qText+="<p><b>Постройте сумму</b> "+vec("a")+" + "+vec("b")+" + "+vec("c")+":</p>";
+  qText+="<p>1) Выстройте векторы <b>друг за другом</b>: конец "+vec("a")+" → начало "+vec("b")+", конец "+vec("b")+" → начало "+vec("c")+".</p>";
+  qText+="<p>2) Переместите красный вектор <b>"+vec("s")+"</b> так, чтобы его <b>начало совпало с началом</b> "+vec("a")+", а <b>конец — с концом</b> "+vec("c")+".</p>";
+  qText+=interactiveField(vecs,fieldId,"1) Выстройте a→b→c. 2) Красный s: начало → к началу a, конец → к концу c");
+  var sa=a*25, sb=b*25, sc=c*25; /* solVec scale = 25 */
   var startX=100, startY=360;
   var p1x=startX+sa, p1y=startY;
   var p2x=p1x, p2y=p1y-sb;
@@ -439,8 +513,8 @@ function genType4(rng){
       {x1:startX,y1:startY,x2:p3x,y2:p3y,label:"s",color:"#dc503c"}
     ],"Итоговая сумма", {W:480,H:420})}
   ]);
-  return mkVecCheck({q:qText,checkType:"chain3",fieldId:fieldId,
-    hint:"Конец a → начало b, конец b → начало c",
+  return mkVecCheck({q:qText,checkType:"chain3_sum",fieldId:fieldId,
+    hint:"1) a→b→c цепочкой. 2) Красный s: начало к началу a, конец к концу c",
     detailed:det});
 }
 
@@ -454,7 +528,7 @@ function genType5(rng){
     lens.push(l);
     var ang=ri(rng,0,360);
     var rad=ang*Math.PI/180;
-    var scale=50;
+    var scale=33;
     var dx=Math.round(l*scale*Math.cos(rad));
     var dy=-Math.round(l*scale*Math.sin(rad));
     vecs.push({x1:80+ri(rng,0,400),y1:60+ri(rng,0,250),x2:0,y2:0,label:String.fromCharCode(97+i)});
