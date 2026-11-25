@@ -106,19 +106,33 @@ global.__vecRedraw=function(svgId){
     var x1=v.x1,y1=v.y1,x2=v.x2,y2=v.y2;
     var dx=x2-x1,dy=y2-y1,len=Math.sqrt(dx*dx+dy*dy)||1;
     var ux=dx/len,uy=dy/len,px=-uy,py=ux,aw=6;
-    html+="<line x1='"+x1+"' y1='"+y1+"' x2='"+x2+"' y2='"+y2+"' stroke='"+col+"' stroke-width='2.5'/>";
-    html+="<polygon points='"+x2+","+y2+" "+(x2-ux*12+px*aw).toFixed(0)+","+(y2-uy*12+py*aw).toFixed(0)+" "+(x2-ux*12-px*aw).toFixed(0)+","+(y2-uy*12-py*aw).toFixed(0)+"' fill='"+col+"'/>";
-    var mx=(x1+x2)/2, my=(y1+y2)/2;
-    html+="<circle cx='"+mx.toFixed(0)+"' cy='"+my.toFixed(0)+"' r='10' fill='"+col+"' fill-opacity='0.25' stroke='"+col+"' stroke-width='2.5' style='cursor:grab' data-vid='"+i+"' data-mode='move' data-field='"+svgId+"' title='Перетаскивание'/>";
-    html+="<circle cx='"+x2+"' cy='"+y2+"' r='6' fill='"+col+"' fill-opacity='0.55' stroke='#fff' stroke-width='2' style='cursor:pointer' data-vid='"+i+"' data-mode='flip' data-field='"+svgId+"' title='Поворот на 180°'/>";
-    html+="<circle cx='"+x1+"' cy='"+y1+"' r='4' fill='"+col+"' fill-opacity='0.85'/>";
-    if(v.label)html+="<text x='"+(x1+dx*0.5+px*18).toFixed(0)+"' y='"+(y1+dy*0.5+py*18+5).toFixed(0)+"' font-size='17' fill='"+col+"' font-weight='700' text-anchor='middle'>"+v.label+"</text>";
+    /* Линия и стрелка (если длина > 0) */
+    if(len>2){
+      html+="<line x1='"+x1+"' y1='"+y1+"' x2='"+x2+"' y2='"+y2+"' stroke='"+col+"' stroke-width='2.5'/>";
+      html+="<polygon points='"+x2+","+y2+" "+(x2-ux*12+px*aw).toFixed(0)+","+(y2-uy*12+py*aw).toFixed(0)+" "+(x2-ux*12-px*aw).toFixed(0)+","+(y2-uy*12-py*aw).toFixed(0)+"' fill='"+col+"'/>";
+    }
+    if(v.editable==="ends"){
+      /* Результирующий вектор: две независимые точки (начало и конец) */
+      html+="<circle cx='"+x1+"' cy='"+y1+"' r='8' fill='"+col+"' fill-opacity='0.5' stroke='#fff' stroke-width='2.5' style='cursor:grab' data-vid='"+i+"' data-mode='moveStart' data-field='"+svgId+"' title='Начало вектора'/>";
+      html+="<circle cx='"+x2+"' cy='"+y2+"' r='8' fill='"+col+"' fill-opacity='0.5' stroke='#fff' stroke-width='2.5' style='cursor:grab' data-vid='"+i+"' data-mode='moveEnd' data-field='"+svgId+"' title='Конец вектора'/>";
+    }else{
+      /* Обычный вектор: середина (перемещение), конец (поворот на 180°), начало (декоративная) */
+      var mx=(x1+x2)/2, my=(y1+y2)/2;
+      html+="<circle cx='"+mx.toFixed(0)+"' cy='"+my.toFixed(0)+"' r='10' fill='"+col+"' fill-opacity='0.25' stroke='"+col+"' stroke-width='2.5' style='cursor:grab' data-vid='"+i+"' data-mode='move' data-field='"+svgId+"' title='Перетаскивание'/>";
+      html+="<circle cx='"+x2+"' cy='"+y2+"' r='6' fill='"+col+"' fill-opacity='0.55' stroke='#fff' stroke-width='2' style='cursor:pointer' data-vid='"+i+"' data-mode='flip' data-field='"+svgId+"' title='Поворот на 180°'/>";
+      html+="<circle cx='"+x1+"' cy='"+y1+"' r='4' fill='"+col+"' fill-opacity='0.85'/>";
+    }
+    if(v.label){
+      /* Подпись — рядом с серединой вектора */
+      var lx=(x1+x2)/2+px*18, ly=(y1+y2)/2+py*18+5;
+      html+="<text x='"+lx.toFixed(0)+"' y='"+ly.toFixed(0)+"' font-size='17' fill='"+col+"' font-weight='700' text-anchor='middle'>"+v.label+"</text>";
+    }
   }
   g.innerHTML=html;
   var circles=g.querySelectorAll("circle");
   for(var ci=0;ci<circles.length;ci++){
     var mode=circles[ci].getAttribute("data-mode");
-    if(mode==="move"){
+    if(mode==="move"||mode==="moveStart"||mode==="moveEnd"){
       circles[ci].addEventListener("mousedown",global.__vecDragStart);
       circles[ci].addEventListener("touchstart",global.__vecDragStart,{passive:false});
     }else if(mode==="flip"){
@@ -139,7 +153,7 @@ global.__vecFlip=function(e){
   global.__vecRedraw(fieldId);
 };
 
-global.__vecDrag={active:false,vid:-1,field:"",startX:0,startY:0,origX1:0,origY1:0,origX2:0,origY2:0};
+global.__vecDrag={active:false,vid:-1,field:"",mode:"",startX:0,startY:0,origX1:0,origY1:0,origX2:0,origY2:0};
 
 global.__vecDragStart=function(e){
   e.preventDefault();
@@ -148,6 +162,7 @@ global.__vecDragStart=function(e){
   global.__vecDrag.active=true;
   global.__vecDrag.vid=parseInt(circle.getAttribute("data-vid"));
   global.__vecDrag.field=circle.getAttribute("data-field");
+  global.__vecDrag.mode=circle.getAttribute("data-mode")||"move";
   var svg=document.getElementById(global.__vecDrag.field);
   if(!svg)return;
   var pt=svg.createSVGPoint();
@@ -178,10 +193,22 @@ global.__vecDragMove=function(e){
   var dx=loc.x-global.__vecDrag.startX;
   var dy=loc.y-global.__vecDrag.startY;
   var v=global.__vecFields[global.__vecDrag.field][global.__vecDrag.vid];
-  v.x1=Math.round(global.__vecDrag.origX1+dx);
-  v.y1=Math.round(global.__vecDrag.origY1+dy);
-  v.x2=Math.round(global.__vecDrag.origX2+dx);
-  v.y2=Math.round(global.__vecDrag.origY2+dy);
+  var mode=global.__vecDrag.mode;
+  if(mode==="moveStart"){
+    /* Двигаем только начало вектора (для результирующего) */
+    v.x1=Math.round(global.__vecDrag.origX1+dx);
+    v.y1=Math.round(global.__vecDrag.origY1+dy);
+  }else if(mode==="moveEnd"){
+    /* Двигаем только конец вектора (для результирующего) */
+    v.x2=Math.round(global.__vecDrag.origX2+dx);
+    v.y2=Math.round(global.__vecDrag.origY2+dy);
+  }else{
+    /* Обычный режим: двигаем весь вектор */
+    v.x1=Math.round(global.__vecDrag.origX1+dx);
+    v.y1=Math.round(global.__vecDrag.origY1+dy);
+    v.x2=Math.round(global.__vecDrag.origX2+dx);
+    v.y2=Math.round(global.__vecDrag.origY2+dy);
+  }
   global.__vecRedraw(global.__vecDrag.field);
 };
 
@@ -328,18 +355,18 @@ function genType1(rng){
   var angleBetween=ang2-ang1;
   var v1=makeVec(len1,ang1,"a","#2f6fd0");
   var v2=makeVec(len2,ang2,"b","#3aa758");
-  var vs=sumVec(v1,v2,"a+b","#dc503c"); /* результирующий */
   var vecs=[
     {x1:80,y1:340,x2:80+v1.dx,y2:340+v1.dy,label:"a",color:"#2f6fd0"},
     {x1:520,y1:340,x2:520+v2.dx,y2:340+v2.dy,label:"b",color:"#3aa758"},
-    {x1:300,y1:100,x2:300+vs.dx,y2:100+vs.dy,label:"a+b",color:"#dc503c"}
+    /* Результирующий — ученик сам рисует: короткий вектор, который нужно растянуть */
+    {x1:560,y1:380,x2:626,y2:380,label:"a+b",color:"#dc503c",editable:"ends"}
   ];
   var fieldId="vf1_"+ri(rng,1,99999);
   var qText="<p>Даны два вектора: "+vec("a")+" длиной "+len1+" и "+vec("b")+" длиной "+len2+". Угол между ними — "+angleBetween+"°.</p>";
   qText+="<p><b>Постройте сумму</b> "+vec("a")+" + "+vec("b")+":</p>";
   qText+="<p>1) Переместите "+vec("b")+" так, чтобы его <b>начало совпало с концом</b> "+vec("a")+".</p>";
-  qText+="<p>2) Переместите красный вектор <b>"+vec("a+b")+"</b> так, чтобы его <b>начало совпало с началом</b> "+vec("a")+", а <b>конец — с концом</b> "+vec("b")+".</p>";
-  qText+=interactiveField(vecs,fieldId,"1) Приставьте b к концу a. 2) Красный a+b: начало → к началу a, конец → к концу b");
+  qText+="<p>2) <b>Нарисуйте результирующий вектор</b> "+vec("a+b")+": потяните за его точки (начало и конец) так, чтобы <b>начало было в начале</b> "+vec("a")+", а <b>конец — в конце</b> "+vec("b")+".</p>";
+  qText+=interactiveField(vecs,fieldId,"1) Приставьте b к концу a. 2) Красный a+b: потяните за точки — начало к началу a, конец к концу b");
   /* Чертёж-решение */
   var s1=solVec(len1,ang1,"a"), s2=solVec(len2,ang2,"b");
   var startX=120, startY=320;
@@ -375,18 +402,17 @@ function genType2(rng){
   var len1=ri(rng,3,6), len2=ri(rng,3,6);
   var v1=makeVec(len1,0,"a","#2f6fd0");
   var v2=makeVec(len2,90,"b","#3aa758");
-  var vs=sumVec(v1,v2,"a+b","#dc503c");
   var vecs=[
     {x1:80,y1:340,x2:80+v1.dx,y2:340,label:"a",color:"#2f6fd0"},
     {x1:520,y1:340,x2:520,y2:340+v2.dy,label:"b",color:"#3aa758"},
-    {x1:300,y1:100,x2:300+vs.dx,y2:100+vs.dy,label:"a+b",color:"#dc503c"}
+    {x1:560,y1:380,x2:626,y2:380,label:"a+b",color:"#dc503c",editable:"ends"}
   ];
   var fieldId="vf2_"+ri(rng,1,99999);
   var qText="<p>Даны два перпендикулярных вектора: "+vec("a")+" длиной "+len1+" (вправо) и "+vec("b")+" длиной "+len2+" (вверх).</p>";
   qText+="<p><b>Постройте сумму</b> "+vec("a")+" + "+vec("b")+":</p>";
   qText+="<p>1) Переместите "+vec("b")+" так, чтобы его <b>начало совпало с концом</b> "+vec("a")+".</p>";
-  qText+="<p>2) Переместите красный вектор <b>"+vec("a+b")+"</b> так, чтобы его <b>начало совпало с началом</b> "+vec("a")+", а <b>конец — с концом</b> "+vec("b")+".</p>";
-  qText+=interactiveField(vecs,fieldId,"1) Приставьте b к концу a. 2) Красный a+b: начало → к началу a, конец → к концу b");
+  qText+="<p>2) <b>Нарисуйте результирующий вектор</b> "+vec("a+b")+": потяните за его точки так, чтобы <b>начало было в начале</b> "+vec("a")+", а <b>конец — в конце</b> "+vec("b")+".</p>";
+  qText+=interactiveField(vecs,fieldId,"1) Приставьте b к концу a. 2) Красный a+b: потяните за точки — начало к началу a, конец к концу b");
   var s1=solVec(len1,0,"a"), s2=solVec(len2,90,"b");
   var startX=120, startY=300;
   var endX1=startX+s1.dx, endY1=startY;
@@ -421,18 +447,17 @@ function genType3(rng){
   var len1=ri(rng,4,7), len2=ri(rng,3,5);
   var v1=makeVec(len1,0,"a","#2f6fd0");
   var v2=makeVec(len2,90,"b","#3aa758");
-  var vr=diffVec(v1,v2,"a-b","#dc503c"); /* результирующий a-b */
   var vecs=[
     {x1:100,y1:340,x2:100+v1.dx,y2:340,label:"a",color:"#2f6fd0"},
     {x1:520,y1:340,x2:520,y2:340+v2.dy,label:"b",color:"#3aa758"},
-    {x1:300,y1:100,x2:300+vr.dx,y2:100+vr.dy,label:"a-b",color:"#dc503c"}
+    {x1:560,y1:380,x2:626,y2:380,label:"a-b",color:"#dc503c",editable:"ends"}
   ];
   var fieldId="vf3_"+ri(rng,1,99999);
   var qText="<p>Даны два перпендикулярных вектора: "+vec("a")+" длиной "+len1+" (вправо) и "+vec("b")+" длиной "+len2+" (вверх).</p>";
   qText+="<p><b>Постройте разность</b> "+vec("a")+" − "+vec("b")+":</p>";
   qText+="<p>1) Переместите "+vec("b")+" так, чтобы <b>начало b совпало с началом a</b> (общее начало).</p>";
-  qText+="<p>2) Переместите красный вектор <b>"+vec("a-b")+"</b> так, чтобы его <b>начало совпало с концом</b> "+vec("b")+", а <b>конец — с концом</b> "+vec("a")+".</p>";
-  qText+=interactiveField(vecs,fieldId,"1) Совместите начала a и b. 2) Красный a-b: начало → к концу b, конец → к концу a");
+  qText+="<p>2) <b>Нарисуйте результирующий вектор</b> "+vec("a-b")+": потяните за его точки так, чтобы <b>начало было в конце</b> "+vec("b")+", а <b>конец — в конце</b> "+vec("a")+".</p>";
+  qText+=interactiveField(vecs,fieldId,"1) Совместите начала a и b. 2) Красный a-b: потяните за точки — начало к концу b, конец к концу a");
   var s1=solVec(len1,0,"a"), s2=solVec(len2,90,"b");
   var startX=160, startY=240;
   var endX1=startX+s1.dx, endY1=startY;
@@ -468,23 +493,18 @@ function genType4(rng){
   var va=makeVec(a,0,"a","#2f6fd0");
   var vb=makeVec(b,90,"b","#3aa758");
   var vc=makeVec(c,180,"c","#e8a820");
-  /* Сумма a+b+c */
-  var vabc={dx:va.dx+vb.dx+vc.dx, dy:va.dy+vb.dy+vc.dy, scale:va.scale};
-  var sumLen=Math.sqrt(vabc.dx*vabc.dx+vabc.dy*vabc.dy)/va.scale;
-  var sumAng=Math.atan2(-vabc.dy, vabc.dx)*180/Math.PI;
-  var vs=makeVec(sumLen,sumAng,"s","#dc503c");
   var vecs=[
     {x1:80,y1:340,x2:80+va.dx,y2:340,label:"a",color:"#2f6fd0"},
     {x1:340,y1:340,x2:340,y2:340+vb.dy,label:"b",color:"#3aa758"},
     {x1:540,y1:340,x2:540+vc.dx,y2:340,label:"c",color:"#e8a820"},
-    {x1:300,y1:100,x2:300+vs.dx,y2:100+vs.dy,label:"s",color:"#dc503c"}
+    {x1:560,y1:380,x2:626,y2:380,label:"s",color:"#dc503c",editable:"ends"}
   ];
   var fieldId="vf4_"+ri(rng,1,99999);
   var qText="<p>Даны три вектора: "+vec("a")+" = "+a+" (вправо), "+vec("b")+" = "+b+" (вверх), "+vec("c")+" = "+c+" (влево).</p>";
   qText+="<p><b>Постройте сумму</b> "+vec("a")+" + "+vec("b")+" + "+vec("c")+":</p>";
   qText+="<p>1) Выстройте векторы <b>друг за другом</b>: конец "+vec("a")+" → начало "+vec("b")+", конец "+vec("b")+" → начало "+vec("c")+".</p>";
-  qText+="<p>2) Переместите красный вектор <b>"+vec("s")+"</b> так, чтобы его <b>начало совпало с началом</b> "+vec("a")+", а <b>конец — с концом</b> "+vec("c")+".</p>";
-  qText+=interactiveField(vecs,fieldId,"1) Выстройте a→b→c. 2) Красный s: начало → к началу a, конец → к концу c");
+  qText+="<p>2) <b>Нарисуйте результирующий вектор</b> "+vec("s")+": потяните за его точки так, чтобы <b>начало было в начале</b> "+vec("a")+", а <b>конец — в конце</b> "+vec("c")+".</p>";
+  qText+=interactiveField(vecs,fieldId,"1) Выстройте a→b→c. 2) Красный s: потяните за точки — начало к началу a, конец к концу c");
   var sa=a*25, sb=b*25, sc=c*25; /* solVec scale = 25 */
   var startX=100, startY=360;
   var p1x=startX+sa, p1y=startY;
