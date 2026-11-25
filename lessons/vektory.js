@@ -227,7 +227,11 @@ if(typeof document!=="undefined"&&!global.__vecGlobalHandlers){
 /* Создаёт интерактивное SVG-поле (крупное: 960×620) */
 function interactiveField(vecs, fieldId, instruction){
   var W=640, H=415;
-  var vecsCopy=vecs.map(function(v){return {x1:v.x1,y1:v.y1,x2:v.x2,y2:v.y2,label:v.label,color:v.color};});
+  var vecsCopy=vecs.map(function(v){
+    var c={x1:v.x1,y1:v.y1,x2:v.x2,y2:v.y2,label:v.label,color:v.color};
+    if(v.editable)c.editable=v.editable;
+    return c;
+  });
   global.__vecFields[fieldId]=vecsCopy;
   var h="<div class='tz-graph-wrap' style='max-width:680px'>";
   h+="<svg id='"+fieldId+"' width='"+W+"' height='"+H+"' viewBox='0 0 "+W+" "+H+"' style='background:#fafafa;border:1px solid #ddd;border-radius:10px;touch-action:none'>";
