@@ -105,14 +105,14 @@ global.__vecRedraw=function(svgId){
     var col=v.color||colors[i%colors.length];
     var x1=v.x1,y1=v.y1,x2=v.x2,y2=v.y2;
     var dx=x2-x1,dy=y2-y1,len=Math.sqrt(dx*dx+dy*dy)||1;
-    var ux=dx/len,uy=dy/len,px=-uy,py=ux,aw=9;
-    html+="<line x1='"+x1+"' y1='"+y1+"' x2='"+x2+"' y2='"+y2+"' stroke='"+col+"' stroke-width='3'/>";
-    html+="<polygon points='"+x2+","+y2+" "+(x2-ux*16+px*aw).toFixed(0)+","+(y2-uy*16+py*aw).toFixed(0)+" "+(x2-ux*16-px*aw).toFixed(0)+","+(y2-uy*16-py*aw).toFixed(0)+"' fill='"+col+"'/>";
+    var ux=dx/len,uy=dy/len,px=-uy,py=ux,aw=6;
+    html+="<line x1='"+x1+"' y1='"+y1+"' x2='"+x2+"' y2='"+y2+"' stroke='"+col+"' stroke-width='2.5'/>";
+    html+="<polygon points='"+x2+","+y2+" "+(x2-ux*12+px*aw).toFixed(0)+","+(y2-uy*12+py*aw).toFixed(0)+" "+(x2-ux*12-px*aw).toFixed(0)+","+(y2-uy*12-py*aw).toFixed(0)+"' fill='"+col+"'/>";
     var mx=(x1+x2)/2, my=(y1+y2)/2;
-    html+="<circle cx='"+mx.toFixed(0)+"' cy='"+my.toFixed(0)+"' r='14' fill='"+col+"' fill-opacity='0.25' stroke='"+col+"' stroke-width='3' style='cursor:grab' data-vid='"+i+"' data-mode='move' data-field='"+svgId+"' title='Перетаскивание'/>";
-    html+="<circle cx='"+x2+"' cy='"+y2+"' r='9' fill='"+col+"' fill-opacity='0.55' stroke='#fff' stroke-width='2.5' style='cursor:pointer' data-vid='"+i+"' data-mode='flip' data-field='"+svgId+"' title='Поворот на 180°'/>";
-    html+="<circle cx='"+x1+"' cy='"+y1+"' r='5' fill='"+col+"' fill-opacity='0.85'/>";
-    if(v.label)html+="<text x='"+(x1+dx*0.5+px*22).toFixed(0)+"' y='"+(y1+dy*0.5+py*22+7).toFixed(0)+"' font-size='22' fill='"+col+"' font-weight='700' text-anchor='middle'>"+v.label+"</text>";
+    html+="<circle cx='"+mx.toFixed(0)+"' cy='"+my.toFixed(0)+"' r='10' fill='"+col+"' fill-opacity='0.25' stroke='"+col+"' stroke-width='2.5' style='cursor:grab' data-vid='"+i+"' data-mode='move' data-field='"+svgId+"' title='Перетаскивание'/>";
+    html+="<circle cx='"+x2+"' cy='"+y2+"' r='6' fill='"+col+"' fill-opacity='0.55' stroke='#fff' stroke-width='2' style='cursor:pointer' data-vid='"+i+"' data-mode='flip' data-field='"+svgId+"' title='Поворот на 180°'/>";
+    html+="<circle cx='"+x1+"' cy='"+y1+"' r='4' fill='"+col+"' fill-opacity='0.85'/>";
+    if(v.label)html+="<text x='"+(x1+dx*0.5+px*18).toFixed(0)+"' y='"+(y1+dy*0.5+py*18+5).toFixed(0)+"' font-size='17' fill='"+col+"' font-weight='700' text-anchor='middle'>"+v.label+"</text>";
   }
   g.innerHTML=html;
   var circles=g.querySelectorAll("circle");
@@ -199,16 +199,16 @@ if(typeof document!=="undefined"&&!global.__vecGlobalHandlers){
 
 /* Создаёт интерактивное SVG-поле (крупное: 960×620) */
 function interactiveField(vecs, fieldId, instruction){
-  var W=960, H=620;
+  var W=640, H=415;
   var vecsCopy=vecs.map(function(v){return {x1:v.x1,y1:v.y1,x2:v.x2,y2:v.y2,label:v.label,color:v.color};});
   global.__vecFields[fieldId]=vecsCopy;
-  var h="<div class='tz-graph-wrap' style='max-width:980px'>";
+  var h="<div class='tz-graph-wrap' style='max-width:680px'>";
   h+="<svg id='"+fieldId+"' width='"+W+"' height='"+H+"' viewBox='0 0 "+W+" "+H+"' style='background:#fafafa;border:1px solid #ddd;border-radius:10px;touch-action:none'>";
   h+="<rect width='"+W+"' height='"+H+"' fill='#fafafa' rx='8'/>";
-  h+="<text x='16' y='28' font-size='15' fill='#888'>Тяните за большую точку в середине вектора — перемещение. Клик по концу — поворот на 180°.</text>";
+  h+="<text x='12' y='20' font-size='12' fill='#888'>Тяните за точку в середине вектора — перемещение. Клик по концу — поворот на 180°.</text>";
   h+="<g id='vec-dynamic'></g>";
   h+="</svg>";
-  h+="<p style='color:#666;font-size:15px;text-align:center;margin:8px 0'>"+instruction+"</p>";
+  h+="<p style='color:#666;font-size:13px;text-align:center;margin:6px 0'>"+instruction+"</p>";
   h+="</div>";
   if(typeof document!=="undefined"&&typeof setTimeout!=="undefined"){
     setTimeout(function(){
@@ -221,7 +221,7 @@ function interactiveField(vecs, fieldId, instruction){
 
 /* Генерация вектора — координаты в пикселях SVG. scale по умолчанию 75 (крупный). */
 function makeVec(len, angleDeg, label, color, scale){
-  scale=scale||75;
+  scale=scale||50;
   var rad=angleDeg*Math.PI/180;
   return {len:len, angle:angleDeg, label:label, color:color, scale:scale,
     dx:Math.round(len*scale*Math.cos(rad)), dy:-Math.round(len*scale*Math.sin(rad))};
@@ -272,14 +272,14 @@ global.__vecCheck=function(fieldId, checkType){
 
 /* Тип 1: Сумма двух векторов (правило треугольника) */
 function genType1(rng){
-  var len1=ri(rng,3,7), len2=ri(rng,3,7);
+  var len1=ri(rng,3,6), len2=ri(rng,3,6);
   var ang1=ri(rng,0,30), ang2=ri(rng,60,120);
   var angleBetween=ang2-ang1;
   var v1=makeVec(len1,ang1,"a","#2f6fd0");
   var v2=makeVec(len2,ang2,"b","#3aa758");
   var vecs=[
-    {x1:160,y1:480,x2:160+v1.dx,y2:480+v1.dy,label:"a",color:"#2f6fd0"},
-    {x1:620,y1:280,x2:620+v2.dx,y2:280+v2.dy,label:"b",color:"#3aa758"}
+    {x1:107,y1:340,x2:107+v1.dx,y2:340+v1.dy,label:"a",color:"#2f6fd0"},
+    {x1:413,y1:340,x2:413+v2.dx,y2:340+v2.dy,label:"b",color:"#3aa758"}
   ];
   var fieldId="vf1_"+ri(rng,1,99999);
   var qText="<p>Даны два вектора: "+vec("a")+" длиной "+len1+" и "+vec("b")+" длиной "+len2+". Угол между ними — "+angleBetween+"°.</p>";
@@ -317,12 +317,12 @@ function genType1(rng){
 
 /* Тип 2: Сумма перпендикулярных векторов */
 function genType2(rng){
-  var len1=ri(rng,3,8), len2=ri(rng,3,8);
+  var len1=ri(rng,3,6), len2=ri(rng,3,6);
   var v1=makeVec(len1,0,"a","#2f6fd0");
   var v2=makeVec(len2,90,"b","#3aa758");
   var vecs=[
-    {x1:160,y1:440,x2:160+v1.dx,y2:440,label:"a",color:"#2f6fd0"},
-    {x1:660,y1:340,x2:660,y2:340+v2.dy,label:"b",color:"#3aa758"}
+    {x1:107,y1:340,x2:107+v1.dx,y2:340,label:"a",color:"#2f6fd0"},
+    {x1:440,y1:340,x2:440,y2:340+v2.dy,label:"b",color:"#3aa758"}
   ];
   var fieldId="vf2_"+ri(rng,1,99999);
   var qText="<p>Даны два перпендикулярных вектора: "+vec("a")+" длиной "+len1+" (вправо) и "+vec("b")+" длиной "+len2+" (вверх).</p>";
@@ -359,12 +359,12 @@ function genType2(rng){
 
 /* Тип 3: Разность векторов — совместить начала */
 function genType3(rng){
-  var len1=ri(rng,5,9), len2=ri(rng,3,7);
+  var len1=ri(rng,4,7), len2=ri(rng,3,5);
   var v1=makeVec(len1,0,"a","#2f6fd0");
   var v2=makeVec(len2,90,"b","#3aa758");
   var vecs=[
-    {x1:180,y1:440,x2:180+v1.dx,y2:440,label:"a",color:"#2f6fd0"},
-    {x1:660,y1:340,x2:660,y2:340+v2.dy,label:"b",color:"#3aa758"}
+    {x1:120,y1:340,x2:120+v1.dx,y2:340,label:"a",color:"#2f6fd0"},
+    {x1:440,y1:340,x2:440,y2:340+v2.dy,label:"b",color:"#3aa758"}
   ];
   var fieldId="vf3_"+ri(rng,1,99999);
   var qText="<p>Даны два перпендикулярных вектора: "+vec("a")+" длиной "+len1+" (вправо) и "+vec("b")+" длиной "+len2+" (вверх).</p>";
@@ -401,11 +401,11 @@ function genType3(rng){
 
 /* Тип 4: Сумма трёх векторов (правило многоугольника) */
 function genType4(rng){
-  var a=ri(rng,3,6), b=ri(rng,3,6), c=ri(rng,2,5);
+  var a=ri(rng,3,5), b=ri(rng,3,5), c=ri(rng,2,4);
   var vecs=[
-    {x1:160,y1:480,x2:160+a*75,y2:480,label:"a",color:"#2f6fd0"},
-    {x1:560,y1:200,x2:560,y2:200-b*75,label:"b",color:"#3aa758"},
-    {x1:720,y1:520,x2:720-c*75,y2:520,label:"c",color:"#e8a820"}
+    {x1:107,y1:330,x2:107+a*50,y2:330,label:"a",color:"#2f6fd0"},
+    {x1:373,y1:330,x2:373,y2:330-b*50,label:"b",color:"#3aa758"},
+    {x1:480,y1:360,x2:480-c*50,y2:360,label:"c",color:"#e8a820"}
   ];
   var fieldId="vf4_"+ri(rng,1,99999);
   var qText="<p>Даны три вектора: "+vec("a")+" = "+a+" (вправо), "+vec("b")+" = "+b+" (вверх), "+vec("c")+" = "+c+" (влево).</p>";
@@ -450,14 +450,14 @@ function genType5(rng){
   var vecs=[];
   var lens=[];
   for(var i=0;i<n;i++){
-    var l=ri(rng,3,7);
+    var l=ri(rng,2,5);
     lens.push(l);
     var ang=ri(rng,0,360);
     var rad=ang*Math.PI/180;
-    var scale=75;
+    var scale=50;
     var dx=Math.round(l*scale*Math.cos(rad));
     var dy=-Math.round(l*scale*Math.sin(rad));
-    vecs.push({x1:120+ri(rng,0,600),y1:80+ri(rng,0,440),x2:0,y2:0,label:String.fromCharCode(97+i)});
+    vecs.push({x1:80+ri(rng,0,400),y1:60+ri(rng,0,250),x2:0,y2:0,label:String.fromCharCode(97+i)});
     vecs[i].x2=vecs[i].x1+dx;
     vecs[i].y2=vecs[i].y1+dy;
   }
