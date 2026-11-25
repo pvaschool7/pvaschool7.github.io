@@ -189,13 +189,18 @@
 .mixed{display:inline-flex;align-items:center;vertical-align:middle}
 .mixed .whole{margin-right:4px;font-weight:600}
 /* ===== Корни n-й степени для темы «Корни (радикалы)» ===== */
-.nthroot,.sqrt{display:inline-flex;align-items:flex-start;vertical-align:middle}
-.nthroot .degree{font-size:.65em;margin-right:-4px;margin-top:2px;font-weight:600;z-index:1;position:relative}
-.nthroot .rad,.sqrt .rad{font-size:1.5em;line-height:.9;font-weight:400}
-.nthroot .radicand,.sqrt .radicand{border-top:1.5px solid currentColor;padding:1px 4px 0;margin-left:-3px;display:inline-flex;flex-direction:column;align-items:center}
+.nthroot,.sqrt{display:inline-flex;align-items:flex-start;vertical-align:middle;position:relative}
+.nthroot .degree{font-size:.65em;font-weight:600;position:absolute;top:-.45em;left:0;line-height:1;z-index:2;white-space:nowrap}
+.nthroot .rad,.sqrt .rad{font-size:1.5em;line-height:.9;font-weight:400;padding-left:.55em}
+.nthroot .radicand,.sqrt .radicand{border-top:1.5px solid currentColor;padding:1px 4px 0;margin-left:-3px;display:inline-block;vertical-align:top}
 .nthroot .radicand .frac,.sqrt .radicand .frac{margin:0}
 .nthroot .radicand .frac .num,.nthroot .radicand .frac .den,.sqrt .radicand .frac .num,.sqrt .radicand .frac .den{border:none;padding:0 4px}
 .nthroot .radicand .frac .den{border-top:1.2px solid currentColor}
+/* Вложенные корни (ⁿ√(ᵐ√a)) — без position:absolute для degree, чтобы избежать лесенки */
+.nthroot .radicand .nthroot,.nthroot .radicand .sqrt{font-size:.82em;vertical-align:middle}
+.nthroot .radicand .nthroot .degree{position:relative;top:auto;left:auto;margin-right:-2px;margin-top:.05em;align-self:flex-start}
+.nthroot .radicand .nthroot .rad,.nthroot .radicand .sqrt .rad{padding-left:0}
+.nthroot .radicand .nthroot .radicand,.nthroot .radicand .sqrt .radicand{margin-left:-2px;padding:1px 3px 0}
 /* ===== Таблица для ЕГЭ 9 задания ===== */
 .ege9-table-wrap{overflow-x:auto;max-height:340px;overflow-y:auto;margin:10px 0;border:1px solid var(--line);border-radius:8px}
 .ege9-table{border-collapse:collapse;font-size:13px;font-family:ui-monospace,Consolas,"Courier New",monospace;background:var(--card)}
