@@ -650,6 +650,7 @@ function register(){
   if(!TZ||!TZ.TOPICS)return;
   if(!TZ.checkGraph)TZ.checkGraph=checkGraph;
   if(!TZ.setupGraphInteraction)TZ.setupGraphInteraction=setupGraphInteraction;
+  if(!TZ.graphSvgFn)TZ.graphSvgFn=graphSVG;
 
   for(var i=0;i<TZ.TOPICS.length;i++){
     if(TZ.TOPICS[i].id==="proporcii")return;
